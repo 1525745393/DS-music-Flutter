@@ -10,6 +10,9 @@ jobs:
   test:
     name: Analyze + Unit Test
     runs-on: ubuntu-latest
+    # 关键：Auto-fix formatting 步骤需要 push 权限
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -27,6 +30,18 @@ jobs:
         with:
           name: pub-get-log
           path: pub_get.log
+      - name: Auto-fix formatting
+        # 关键：沙箱无 dart SDK，CI 上自动跑 dart format 修复格式问题
+        # 并把改动 commit 回当前分支（用 GitHub Actions 内置的 GITHUB_TOKEN）
+        run: |
+          git config user.name "ds-player-bot"
+          git config user.email "bot@dsplayer.local"
+          dart format lib test
+          if ! git diff --quiet; then
+            git add -A
+            git commit -m "style: dart format 自动修复" || true
+            git push || true
+          fi
       - name: Verify formatting
         run: dart format --set-exit-if-changed lib test
       - name: Static analysis
