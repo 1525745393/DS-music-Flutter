@@ -16,6 +16,8 @@ class DioClient {
   String? _sid;
   // 401 触发重登的回调，由 AuthRepository 设置
   Future<bool> Function()? onUnauthorized;
+  // 401 时是否已经触发过重登，避免无限递归
+  bool _silentRetried = false;
 
   DioClient({required this.baseUrl})
       : dio = Dio(BaseOptions(
@@ -33,7 +35,11 @@ class DioClient {
   }
 
   String? get sid => _sid;
-  set sid(String? value) => _sid = value;
+  set sid(String? value) {
+    _sid = value;
+    // 换 SID 后允许再次尝试静默重登
+    if (value != null) _silentRetried = false;
+  }
 
   void _initInterceptor() {
     // 1. 自签名证书兼容
@@ -66,6 +72,22 @@ class DioClient {
             return;
           } catch (_) {}
         }
+        // 401/未授权：触发静默重登
+        final code = err.response?.statusCode;
+        if ((code == 401 || _isBusinessUnauthorized(err)) &&
+            onUnauthorized != null &&
+            !_silentRetried) {
+          _silentRetried = true;
+          try {
+            final ok = await onUnauthorized!.call();
+            if (ok) {
+              // 重登成功后用新 SID 重放一次原请求
+              final retry = await dio.fetch(err.requestOptions);
+              handler.resolve(retry);
+              return;
+            }
+          } catch (_) {}
+        }
         handler.next(err);
       },
     ));
@@ -93,6 +115,16 @@ class DioClient {
         err.type == DioExceptionType.receiveTimeout ||
         err.type == DioExceptionType.sendTimeout) {
       return true;
+    }
+    return false;
+  }
+
+  /// 业务层未授权：群晖 WebAPI 在 HTTP 200 内返回 error.code=105/106/119
+  bool _isBusinessUnauthorized(DioException err) {
+    final data = err.response?.data;
+    if (data is Map) {
+      final code = data['error']?['code'];
+      return code == 105 || code == 106 || code == 119;
     }
     return false;
   }

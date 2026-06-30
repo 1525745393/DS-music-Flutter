@@ -1,0 +1,106 @@
+// App 模块 build.gradle
+// 关键：minSdk 21（覆盖 99% Android 设备），
+// compileSdk 34（Android 14），targetSdk 34
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader("UTF-8") { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty("flutter.versionCode")
+if (flutterVersionCode == null) {
+    flutterVersionCode = "1"
+}
+
+def flutterVersionName = localProperties.getProperty("flutter.versionName")
+if (flutterVersionName == null) {
+    flutterVersionName = "1.0"
+}
+
+android {
+    namespace "com.dsplayer.music"
+    compileSdk 34
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
+    }
+
+    defaultConfig {
+        applicationId "com.dsplayer.music"
+        // 最低支持 Android 5.0（API 21）
+        minSdk 21
+        targetSdk 34
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+
+        // 兼容多 ABI：armeabi-v7a / arm64-v8a / x86_64
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86_64"
+        }
+    }
+
+    signingConfigs {
+        debug {
+            // 默认 debug.keystore
+        }
+    }
+
+    buildTypes {
+        release {
+            // 待接入签名后再加 signingConfig
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
+        debug {
+            applicationIdSuffix ".debug"
+        }
+    }
+
+    // 关闭 buildConfig 生成（节省构建时间）
+    buildFeatures {
+        buildConfig false
+    }
+
+    packagingOptions {
+        resources {
+            excludes += [
+                "META-INF/AL2.0",
+                "META-INF/LGPL2.1",
+                "META-INF/DEPENDENCIES",
+                "META-INF/LICENSE*",
+                "META-INF/NOTICE*"
+            ]
+        }
+    }
+}
+
+flutter {
+    source "../.."
+}
+
+dependencies {
+    // just_audio_background 依赖 androidx.media
+    implementation "androidx.media:media:1.7.0"
+    // 通知兼容性
+    implementation "androidx.core:core-ktx:1.13.1"
+    implementation "androidx.appcompat:appcompat:1.6.1"
+}

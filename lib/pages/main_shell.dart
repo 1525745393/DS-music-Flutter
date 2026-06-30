@@ -1,11 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../components/mini_player/mini_player_bar.dart';
+import '../components/player_bar/mini_player_bar.dart';
 import '../l10n/app_strings.dart';
 import '../theme/app_colors.dart';
 import 'home/home_page.dart';
+import 'search/search_page.dart';
+import 'settings/settings_page.dart';
+import '../provider/library_provider.dart';
 
 /// 主框架：底部 4 个 Tab + MiniPlayer
+/// Tab 含义：
+///   0 = 音乐（HomePage）
+///   1 = 搜索（SearchPage）
+///   2 = 歌单（HomePage 切到 playlists Tab）
+///   3 = 设置（SettingsPage）
 class MainShell extends ConsumerStatefulWidget {
   const MainShell({super.key});
 
@@ -28,6 +36,27 @@ class _MainShellState extends ConsumerState<MainShell> {
     ];
   }
 
+  /// 根据当前 tab 渲染对应页面。
+  /// 关键：歌单 tab 复用 HomePage 但把内部 tab 切到 playlists，避免重复路由栈。
+  Widget _buildPage(int index) {
+    switch (index) {
+      case 0:
+        return const HomePage(key: ValueKey('home_music'));
+      case 1:
+        return const SearchPage();
+      case 2:
+        // 切到 HomePage 的 playlists Tab
+        return HomePage(
+          key: const ValueKey('home_playlists'),
+          initialTab: LibraryTab.playlists,
+        );
+      case 3:
+        return const SettingsPage();
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final tabs = _buildTabs(context);
@@ -40,7 +69,7 @@ class _MainShellState extends ConsumerState<MainShell> {
               duration: const Duration(milliseconds: 200),
               child: KeyedSubtree(
                 key: ValueKey('tab-$_tab'),
-                child: _pages[_tab],
+                child: _buildPage(_tab),
               ),
             ),
           ),
@@ -50,13 +79,6 @@ class _MainShellState extends ConsumerState<MainShell> {
       ),
     );
   }
-
-  final List<Widget> _pages = [
-    const HomePage(),
-    const SizedBox.shrink(), // 占位：搜索由 main_shell 直接跳转
-    const HomePage(), // 占位：歌单使用 HomePage 的 tab=4
-    const SizedBox.shrink(), // 占位：设置由 main_shell 直接跳转
-  ];
 
   Widget _bottomBar(List<BottomTabItem> tabs) {
     return Container(
@@ -76,9 +98,11 @@ class _MainShellState extends ConsumerState<MainShell> {
               behavior: HitTestBehavior.opaque,
               onTap: () {
                 setState(() => _tab = i);
-                if (i == 1) {
-                  // 搜索跳到 SearchPage
-                  // 实际项目可以更精细，此处简化
+                // 切到歌单 tab 时同步通知 HomePage 内部 libraryTabProvider
+                if (i == 2) {
+                  ref.read(libraryTabProvider.notifier).state = LibraryTab.playlists;
+                } else if (i == 0) {
+                  ref.read(libraryTabProvider.notifier).state = LibraryTab.albums;
                 }
               },
               child: Column(

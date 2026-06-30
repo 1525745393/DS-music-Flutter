@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:audio_service/audio_service.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -49,6 +50,12 @@ Future<void> main() async {
     androidNotificationChannelName: 'DS Player 播放',
     androidNotificationOngoing: true,
   );
+
+  // 1.1 配置音频会话：处理来电/导航播报等音频焦点
+  // 设计原因：iOS/Android 在来电、CarPlay、导航播报时会中断当前 App 音频，
+  // 必须显式配置 AVAudioSession/Android AudioFocus 才能拿到 interruption 事件
+  final audioSession = await AudioSession.instance;
+  await audioSession.configure(const AudioSessionConfiguration.music());
 
   // 2. 加载持久化
   final sp = await SharedPreferences.getInstance();
@@ -100,6 +107,24 @@ Future<void> main() async {
   } catch (e) {
     AppLogger.w('权限请求失败：$e');
   }
+
+  // 5.1 订阅音频焦点事件：来电/导航/CarPlay 触发时自动暂停
+  // 设计原因：手机/车机场景下其他 App 抢占音频焦点是常态，
+  // 应在硬件层面降级处理而不是依赖 UI 层监听
+  audioSession.becomingNoisyEventStream.listen((_) {
+    AppLogger.i('音频焦点丢失（耳机拔出 / 其他 App 抢占），自动暂停');
+    handler.pause();
+  });
+  audioSession.interruptionEventStream.listen((event) {
+    if (event.begin) {
+      AppLogger.i('音频被打断：${event.type}');
+      handler.pause();
+    } else {
+      // 中断结束：iOS/Android 由系统决定是否自动恢复，
+      // 出于用户体验考虑不主动 resume，让用户手动点击
+      AppLogger.i('音频中断结束');
+    }
+  });
 
   runApp(ProviderScope(
     parent: container,

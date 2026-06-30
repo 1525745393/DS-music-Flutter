@@ -85,11 +85,24 @@ class DSPlayerHandler extends BaseAudioHandler with SeekHandler {
     for (var i = 0; i < songs.length; i++) {
       sources.add(_buildAudioSource(songs[i]));
     }
-    _queueSource = ConcatenatingAudioSource(
-      useLazyPreparation: true,
-      shuffleOrder: DefaultShuffleOrder(),
-      children: sources,
-    );
+    // 应用「无缝播放」开关：
+    //   - 开：ConcatenatingAudioSource 内部连续预加载下一首，真正 0 gap 切换
+    //   - 关：插入 100ms SilenceIntercom 作为「喘息」，降低 CPU/带宽但有体感停顿
+    final settings = _settingsGetter();
+    if (settings.gaplessEnabled) {
+      _queueSource = ConcatenatingAudioSource(
+        useLazyPreparation: true,
+        shuffleOrder: DefaultShuffleOrder(),
+        children: sources,
+      );
+    } else {
+      _queueSource = ConcatenatingAudioSource(
+        useLazyPreparation: false,
+        shuffleOrder: DefaultShuffleOrder(),
+        // 非无缝模式：在每首之间插入短暂静音以减轻后端压力
+        children: _withBreaks(sources),
+      );
+    }
     await _player.setAudioSource(
       _queueSource!,
       initialIndex: startIndex,
@@ -102,6 +115,65 @@ class DSPlayerHandler extends BaseAudioHandler with SeekHandler {
       await _player.play();
     }
   }
+
+  /// 在每两首歌之间插入 100ms 静音片段
+  /// 设计原因：关闭 gapless 时仍希望队列结构稳定，但给系统留出缓冲/调度窗口
+  List<AudioSource> _withBreaks(List<AudioSource> sources) {
+    if (sources.length <= 1) return sources;
+    final out = <AudioSource>[];
+    for (var i = 0; i < sources.length; i++) {
+      out.add(sources[i]);
+      if (i < sources.length - 1) {
+        out.add(AudioSource.uri(
+          Uri.dataFromBytes(_silentWavBytes),
+          tag: MediaItem(id: '__gap_$i', title: '', album: ''),
+        ));
+      }
+    }
+    return out;
+  }
+
+  /// 100ms 静音的 WAV（44 字节头 + ~4410 字节静音样本），
+  /// 用 Uri.dataFromBytes 内嵌避免再起一次网络请求
+  static final List<int> _silentWavBytes = _buildSilentWav();
+
+  static List<int> _buildSilentWav() {
+    const sampleRate = 44100;
+    const samples = 4410; // 100ms
+    const dataSize = samples * 2; // 16-bit mono
+    final bytes = <int>[];
+    // RIFF header
+    bytes.addAll('RIFF'.codeUnits);
+    bytes.addAll(_u32(36 + dataSize));
+    bytes.addAll('WAVE'.codeUnits);
+    // fmt chunk
+    bytes.addAll('fmt '.codeUnits);
+    bytes.addAll(_u32(16));      // chunk size
+    bytes.addAll(_u16(1));       // PCM
+    bytes.addAll(_u16(1));       // mono
+    bytes.addAll(_u32(sampleRate));
+    bytes.addAll(_u32(sampleRate * 2));
+    bytes.addAll(_u16(2));       // block align
+    bytes.addAll(_u16(16));      // bits per sample
+    // data chunk
+    bytes.addAll('data'.codeUnits);
+    bytes.addAll(_u32(dataSize));
+    // 静音样本（0）
+    for (var i = 0; i < dataSize; i++) {
+      bytes.add(0);
+    }
+    return bytes;
+  }
+
+  static List<int> _u16(int v) =>
+      [(v & 0xFF), ((v >> 8) & 0xFF)];
+
+  static List<int> _u32(int v) => [
+        (v & 0xFF),
+        ((v >> 8) & 0xFF),
+        ((v >> 16) & 0xFF),
+        ((v >> 24) & 0xFF),
+      ];
 
   Future<void> setSingleAndPlay(Song song) async {
     _currentQueue

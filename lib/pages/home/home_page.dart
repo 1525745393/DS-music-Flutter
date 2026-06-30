@@ -24,14 +24,30 @@ import '../player/player_page.dart';
 import '../../utils/logger.dart';
 
 /// 首页：专辑墙 + Tab 切换
+/// [initialTab] 可选：传入后立即跳到指定 tab（默认 albums）。
+/// 主要给 main_shell 的「歌单」底部 tab 使用。
 class HomePage extends ConsumerStatefulWidget {
-  const HomePage({super.key});
+  final LibraryTab? initialTab;
+  const HomePage({super.key, this.initialTab});
 
   @override
   ConsumerState<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    // 首次构建时若指定了 initialTab，强制覆盖 libraryTabProvider，
+    // 这样从 main_shell 切到「歌单」tab 时直接进入歌单视图
+    if (widget.initialTab != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        ref.read(libraryTabProvider.notifier).state = widget.initialTab!;
+      });
+    }
+  }
+
   /// 标签列表：i18n 需从 context.s 动态构造
   /// 关键：去掉 static const，改 build 时构造
   List<String> _buildTabs(BuildContext context) {
@@ -117,6 +133,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Widget _albumsView({required Key key}) {
+    final t = context.s;
     final async = ref.watch(albumsProvider);
     return async.when(
       loading: () => DSStatePage(type: StateType.loading, message: t.loading),
