@@ -79,9 +79,12 @@ class DSText extends StatelessWidget {
 
   TextStyle _baseStyle(TextStyleType t, Brightness b) {
     final isDark = b == Brightness.dark;
-    final primary = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final secondary = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
-    final assistant = isDark ? AppColors.textAssistantDark : AppColors.textAssistantLight;
+    final primary =
+        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final secondary =
+        isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+    final assistant =
+        isDark ? AppColors.textAssistantDark : AppColors.textAssistantLight;
     switch (t) {
       case TextStyleType.largeTitle:
         return AppTextStyles.largeTitle.copyWith(color: primary);

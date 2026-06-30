@@ -127,7 +127,8 @@ class AndroidAutoBrowseTree {
         id: 'album:${a.id}',
         title: a.name,
         subtitle: a.artist,
-        albumArtUrl: a.coverUrl != null ? _repo.coverUrl(a.id, size: 'big') : null,
+        albumArtUrl:
+            a.coverUrl != null ? _repo.coverUrl(a.id, size: 'big') : null,
         isBrowsable: true,
       );
 
@@ -143,7 +144,9 @@ class AndroidAutoBrowseTree {
         id: 'song:${s.id}',
         title: s.title,
         subtitle: s.artist ?? '',
-        albumArtUrl: s.albumId != null ? _repo.coverUrl(s.albumId!, size: 'small') : null,
+        albumArtUrl: s.albumId != null
+            ? _repo.coverUrl(s.albumId!, size: 'small')
+            : null,
         isBrowsable: false,
         durationMs: s.duration * 1000,
       );
@@ -167,7 +170,8 @@ class AndroidAutoBrowseTree {
 /// ```
 /// 反注册：调用 [AABrowseBridge.dispose]
 class AABrowseBridge {
-  static const MethodChannel _channel = MethodChannel('com.dsplayer.music/auto_browse');
+  static const MethodChannel _channel =
+      MethodChannel('com.dsplayer.music/auto_browse');
 
   final AndroidAutoBrowseTree tree;
   AABrowseBridge(this.tree);
@@ -185,7 +189,8 @@ class AABrowseBridge {
   Future<dynamic> _handle(MethodCall call) async {
     switch (call.method) {
       case 'getChildren':
-        final parentId = (call.arguments as Map?)?['parentId']?.toString() ?? 'root';
+        final parentId =
+            (call.arguments as Map?)?['parentId']?.toString() ?? 'root';
         final items = await tree.getChildren(parentId);
         return items.map(_serialize).toList();
       case 'getItem':

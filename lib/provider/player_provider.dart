@@ -140,7 +140,8 @@ class PlayerStateNotifier extends StateNotifier<PlayerStateData> {
 
   void prev() {
     if (state.queue.isEmpty) return;
-    final idx = (state.currentIndex - 1 + state.queue.length) % state.queue.length;
+    final idx =
+        (state.currentIndex - 1 + state.queue.length) % state.queue.length;
     setCurrentIndex(idx);
   }
 }

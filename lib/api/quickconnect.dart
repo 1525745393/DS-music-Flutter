@@ -14,7 +14,8 @@ class QuickConnect {
     baseUrl: 'https://$_apiHost',
     connectTimeout: const Duration(seconds: 8),
     receiveTimeout: const Duration(seconds: 8),
-  ))..httpClientAdapter = _insecureAdapter();
+  ))
+    ..httpClientAdapter = _insecureAdapter();
   // 关键：使用 IOHttpClientAdapter 配置自签证书接受，
   // 旧 API 直接赋 HttpClient 在 Dio 5.x 会类型不匹配（HttpClient vs HttpClientAdapter）
 

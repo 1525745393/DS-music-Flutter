@@ -27,7 +27,8 @@ class GlassContainer extends StatelessWidget {
     final color = brightness == Brightness.dark
         ? AppColors.glassDark
         : AppColors.glassLight;
-    final radius = borderRadius ?? BorderRadius.circular(AppDimens.radiusMedium);
+    final radius =
+        borderRadius ?? BorderRadius.circular(AppDimens.radiusMedium);
     return ClipRRect(
       borderRadius: radius,
       child: BackdropFilter(

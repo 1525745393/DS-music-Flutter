@@ -91,7 +91,8 @@ class _DlnaDevicesPageState extends ConsumerState<DlnaDevicesPage> {
                       icon: _discovering ? null : CupertinoIcons.speaker_3,
                     )
                   : ListView.separated(
-                      itemCount: devices.length + (_controller.servers.isNotEmpty ? 1 : 0),
+                      itemCount: devices.length +
+                          (_controller.servers.isNotEmpty ? 1 : 0),
                       separatorBuilder: (_, __) => Container(
                         margin: const EdgeInsets.only(left: 72),
                         height: 0.5,
@@ -162,7 +163,8 @@ class _DlnaDevicesPageState extends ConsumerState<DlnaDevicesPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.darkDivider, width: 0.5)),
+        border: Border(
+            bottom: BorderSide(color: AppColors.darkDivider, width: 0.5)),
       ),
       child: Row(
         children: [
@@ -173,7 +175,8 @@ class _DlnaDevicesPageState extends ConsumerState<DlnaDevicesPage> {
           ] else
             DSText.assistant('已找到 $count 个设备'),
           const Spacer(),
-          if (!hasCurrent) const DSText.assistant('请先开始播放', color: AppColors.warning),
+          if (!hasCurrent)
+            const DSText.assistant('请先开始播放', color: AppColors.warning),
         ],
       ),
     );
@@ -197,7 +200,8 @@ class _DlnaDevicesPageState extends ConsumerState<DlnaDevicesPage> {
               context: context,
               builder: (_) => CupertinoAlertDialog(
                 title: DSText(ok ? '已投屏' : '投屏失败'),
-                content: DSText(ok ? '正在 $name 播放\n${current.title}' : '请检查设备连接'),
+                content:
+                    DSText(ok ? '正在 $name 播放\n${current.title}' : '请检查设备连接'),
                 actions: [
                   CupertinoDialogAction(
                     onPressed: () => Navigator.pop(context),
@@ -223,8 +227,12 @@ class _DlnaDevicesPageState extends ConsumerState<DlnaDevicesPage> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
-                selected ? CupertinoIcons.speaker_3_fill : CupertinoIcons.speaker_3,
-                color: selected ? CupertinoColors.white : AppColors.textAssistantDark,
+                selected
+                    ? CupertinoIcons.speaker_3_fill
+                    : CupertinoIcons.speaker_3,
+                color: selected
+                    ? CupertinoColors.white
+                    : AppColors.textAssistantDark,
                 size: 22,
               ),
             ),
@@ -241,7 +249,8 @@ class _DlnaDevicesPageState extends ConsumerState<DlnaDevicesPage> {
               ),
             ),
             if (selected)
-              const Icon(CupertinoIcons.checkmark_circle_fill, color: AppColors.accent, size: 20),
+              const Icon(CupertinoIcons.checkmark_circle_fill,
+                  color: AppColors.accent, size: 20),
           ],
         ),
       ),
@@ -277,7 +286,8 @@ class _ControlPanelState extends State<_ControlPanel> {
       decoration: BoxDecoration(
         color: AppColors.accent.withOpacity(0.12),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.accent.withOpacity(0.4), width: 0.5),
+        border:
+            Border.all(color: AppColors.accent.withOpacity(0.4), width: 0.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,7 +309,9 @@ class _ControlPanelState extends State<_ControlPanel> {
                 widget.controller.seekTo(0);
               }),
               _ctrlBtn(
-                widget.isPlaying ? CupertinoIcons.pause_fill : CupertinoIcons.play_fill,
+                widget.isPlaying
+                    ? CupertinoIcons.pause_fill
+                    : CupertinoIcons.play_fill,
                 widget.isPlaying ? '暂停' : '播放',
                 () async {
                   if (widget.isPlaying) {

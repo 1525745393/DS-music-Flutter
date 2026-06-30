@@ -70,8 +70,7 @@ class _LyricsViewState extends State<LyricsView> {
   Widget build(BuildContext context) {
     if (widget.lyrics.lines.isEmpty) {
       return Center(
-        child: Text('暂无歌词',
-            style: AppTextStyles.lyricsInactive),
+        child: Text('暂无歌词', style: AppTextStyles.lyricsInactive),
       );
     }
     return ListView.builder(
@@ -94,7 +93,8 @@ class _LyricsViewState extends State<LyricsView> {
                 textAlign: TextAlign.center,
                 style: (isActive
                         ? (widget.activeStyle ?? AppTextStyles.lyricsActive)
-                        : (widget.inactiveStyle ?? AppTextStyles.lyricsInactive))
+                        : (widget.inactiveStyle ??
+                            AppTextStyles.lyricsInactive))
                     .copyWith(
                   color: isActive
                       ? AppColors.textPrimaryDark

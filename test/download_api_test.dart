@@ -14,11 +14,12 @@ class _StubAudio extends AudioStationApi {
   @override
   String buildDownloadUrl(Song song) => 'https://stub/${song.id}';
   @override
-  String coverUrl(String albumId, {int size = 300}) => 'https://stub/cover/$albumId';
+  String coverUrl(String albumId, {int size = 300}) =>
+      'https://stub/cover/$albumId';
 }
 
-Song _song(String id) =>
-    Song.fromJson({'id': id, 'title': 'S$id', 'duration': 60, 'container': 'mp3'});
+Song _song(String id) => Song.fromJson(
+    {'id': id, 'title': 'S$id', 'duration': 60, 'container': 'mp3'});
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -43,7 +44,8 @@ void main() {
       final t = api.register(_song('x'), '/tmp/x.mp3');
       // 反射写入 status（测试用）
       // 简化：直接调 _resolveSid 验证 SP 读不到 sid 是 null
-      expect(t.status, anyOf(DownloadStatus.pending, DownloadStatus.downloading));
+      expect(
+          t.status, anyOf(DownloadStatus.pending, DownloadStatus.downloading));
       final removed = await api.clearCompleted();
       // pending 状态不应被清
       expect(api.tasks.any((x) => x.song.id == 'x'), true);
@@ -73,8 +75,11 @@ void main() {
   group('DownloadTask 序列化', () {
     test('toJson/fromJson 往返一致', () {
       final s = _song('z');
-      final t = DownloadTask(song: s, localPath: '/tmp/z.mp3',
-          receivedBytes: 1024, totalBytes: 4096);
+      final t = DownloadTask(
+          song: s,
+          localPath: '/tmp/z.mp3',
+          receivedBytes: 1024,
+          totalBytes: 4096);
       final j = t.toJson();
       final t2 = DownloadTask.fromJson(j);
       expect(t2, isNotNull);
@@ -85,7 +90,11 @@ void main() {
 
     test('status 字符串 round-trip', () {
       for (final s in DownloadStatus.values) {
-        final j = {'song': {'id': 'a', 'title': 'A', 'duration': 0}, 'localPath': '', 'status': s.name};
+        final j = {
+          'song': {'id': 'a', 'title': 'A', 'duration': 0},
+          'localPath': '',
+          'status': s.name
+        };
         final t = DownloadTask.fromJson(j);
         expect(t, isNotNull);
       }

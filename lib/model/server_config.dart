@@ -5,10 +5,10 @@ class ServerConfig {
   final String id;
   final String name;
   final ServerMode mode;
-  final String host;            // 内网 IP / 域名 / QuickConnect ID
-  final int port;               // 内网/域名模式下必填
-  final bool useHttps;          // 启用 HTTPS（自签证书）
-  final String? account;        // 已保存的账号（可为空）
+  final String host; // 内网 IP / 域名 / QuickConnect ID
+  final int port; // 内网/域名模式下必填
+  final bool useHttps; // 启用 HTTPS（自签证书）
+  final String? account; // 已保存的账号（可为空）
   final bool isDefault;
 
   const ServerConfig({
@@ -54,24 +54,24 @@ class ServerConfig {
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'mode': mode.index,
-    'host': host,
-    'port': port,
-    'useHttps': useHttps,
-    'account': account,
-    'isDefault': isDefault,
-  };
+        'id': id,
+        'name': name,
+        'mode': mode.index,
+        'host': host,
+        'port': port,
+        'useHttps': useHttps,
+        'account': account,
+        'isDefault': isDefault,
+      };
 
   factory ServerConfig.fromJson(Map<String, dynamic> json) => ServerConfig(
-    id: json['id'] as String,
-    name: json['name'] as String,
-    mode: ServerMode.values[json['mode'] as int],
-    host: json['host'] as String,
-    port: json['port'] as int,
-    useHttps: json['useHttps'] as bool,
-    account: json['account'] as String?,
-    isDefault: (json['isDefault'] as bool?) ?? false,
-  );
+        id: json['id'] as String,
+        name: json['name'] as String,
+        mode: ServerMode.values[json['mode'] as int],
+        host: json['host'] as String,
+        port: json['port'] as int,
+        useHttps: json['useHttps'] as bool,
+        account: json['account'] as String?,
+        isDefault: (json['isDefault'] as bool?) ?? false,
+      );
 }

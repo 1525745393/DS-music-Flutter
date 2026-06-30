@@ -26,8 +26,7 @@ extension NetTypeX on NetType {
   }
 
   /// 是否为高带宽（应使用原始码流）
-  bool get isHighBandwidth =>
-      this == NetType.wifi || this == NetType.ethernet;
+  bool get isHighBandwidth => this == NetType.wifi || this == NetType.ethernet;
 }
 
 /// 网络状态监听器

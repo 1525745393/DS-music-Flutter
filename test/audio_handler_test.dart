@@ -17,12 +17,14 @@ class _StubSettings implements SettingsPort {
 /// LibraryAccess 测试桩
 class _StubRepo implements LibraryAccess {
   @override
-  String streamUrl(Song song, {bool forceTranscode = false, bool preferLossless = false}) {
+  String streamUrl(Song song,
+      {bool forceTranscode = false, bool preferLossless = false}) {
     return 'https://stub.stream/${song.id}?trans=$forceTranscode';
   }
 
   @override
-  String coverUrl(String albumId, {String size = '300'}) => 'https://stub.cover/$albumId';
+  String coverUrl(String albumId, {String size = '300'}) =>
+      'https://stub.cover/$albumId';
 }
 
 Song _song(String id) =>
@@ -38,8 +40,7 @@ void main() {
         settingsGetter: () => _StubSettings(),
       );
       expect(handler.playbackState.value.playing, isFalse);
-      expect(handler.playbackState.value.processingState,
-          isNotNull);
+      expect(handler.playbackState.value.processingState, isNotNull);
       handler.stop();
     });
 

@@ -68,8 +68,8 @@ class LocalePickerPage extends ConsumerWidget {
 }
 
 class _LocaleOption {
-  final String code;     // 持久化 key
-  final String label;    // UI 显示
-  final String? bcp47;   // 真实 locale tag，给后续 flutter_localizations 用
+  final String code; // 持久化 key
+  final String label; // UI 显示
+  final String? bcp47; // 真实 locale tag，给后续 flutter_localizations 用
   const _LocaleOption(this.code, this.label, this.bcp47);
 }

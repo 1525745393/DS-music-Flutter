@@ -20,7 +20,8 @@ class ApiConstants {
   static const String audioStationCover = 'SYNO.AudioStation.Cover';
   static const String audioStationSearch = 'SYNO.AudioStation.Search';
   static const String audioStationRating = 'SYNO.AudioStation.Rating';
-  static const String audioStationExternalPlayer = 'SYNO.AudioStation.ExternalPlayer';
+  static const String audioStationExternalPlayer =
+      'SYNO.AudioStation.ExternalPlayer';
 
   // —— QuickConnect ——
   static const String quickConnectId = 'SYNO.QuickConnect.ID';

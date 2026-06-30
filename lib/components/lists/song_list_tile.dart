@@ -38,7 +38,10 @@ class SongListTile extends StatelessWidget {
         child: Row(
           children: [
             if (showCover) ...[
-              CoverImage(url: coverUrl, size: AppDimens.listCoverSize, withShadow: false),
+              CoverImage(
+                  url: coverUrl,
+                  size: AppDimens.listCoverSize,
+                  withShadow: false),
               const SizedBox(width: AppDimens.itemSpacing),
             ],
             Expanded(
@@ -72,7 +75,8 @@ class SongListTile extends StatelessWidget {
                 onTap: onMore,
                 child: const Padding(
                   padding: EdgeInsets.all(4),
-                  child: Icon(CupertinoIcons.ellipsis, size: 18, color: AppColors.textAssistantDark),
+                  child: Icon(CupertinoIcons.ellipsis,
+                      size: 18, color: AppColors.textAssistantDark),
                 ),
               ),
             ],

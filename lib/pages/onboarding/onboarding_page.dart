@@ -80,7 +80,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   const Spacer(),
                   CupertinoButton(
                     onPressed: _complete,
-                    child: DSText.assistant(t.onboardSkip, color: AppColors.textAssistantDark),
+                    child: DSText.assistant(t.onboardSkip,
+                        color: AppColors.textAssistantDark),
                   ),
                 ],
               ),
@@ -110,7 +111,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                         height: 6,
                         margin: const EdgeInsets.symmetric(horizontal: 3),
                         decoration: BoxDecoration(
-                          color: active ? AppColors.accent : AppColors.darkDivider,
+                          color:
+                              active ? AppColors.accent : AppColors.darkDivider,
                           borderRadius: BorderRadius.circular(3),
                         ),
                       );
@@ -118,7 +120,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   ),
                   const SizedBox(height: 24),
                   DSButton(
-                    text: _index == pages.length - 1 ? t.onboardStart : t.onboardNext,
+                    text: _index == pages.length - 1
+                        ? t.onboardStart
+                        : t.onboardNext,
                     onPressed: () {
                       if (_index == pages.length - 1) {
                         _complete();
@@ -146,7 +150,8 @@ class _OnboardSlide extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
-  const _OnboardSlide({required this.icon, required this.title, required this.subtitle});
+  const _OnboardSlide(
+      {required this.icon, required this.title, required this.subtitle});
 
   @override
   Widget build(BuildContext context) {

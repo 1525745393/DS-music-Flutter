@@ -3,9 +3,9 @@ class AppDimens {
   AppDimens._();
 
   // —— 圆角 ——
-  static const double radiusLarge = 16;  // 封面、卡片
+  static const double radiusLarge = 16; // 封面、卡片
   static const double radiusMedium = 10; // 按钮、弹窗
-  static const double radiusSmall = 4;   // 标签、小元素
+  static const double radiusSmall = 4; // 标签、小元素
   static const double radiusCircle = 999;
 
   // —— 间距 ——

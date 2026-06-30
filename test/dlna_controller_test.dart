@@ -75,8 +75,10 @@ void main() {
 
   group('DlnaMediaItem', () {
     test('isContainer 判定', () {
-      final c = const DlnaMediaItem(id: '1', title: 'A', type: 'container', childrenCount: 5);
-      final a = const DlnaMediaItem(id: '2', title: 'B', type: 'audio', childrenCount: 0);
+      final c = const DlnaMediaItem(
+          id: '1', title: 'A', type: 'container', childrenCount: 5);
+      final a = const DlnaMediaItem(
+          id: '2', title: 'B', type: 'audio', childrenCount: 0);
       expect(c.isContainer, true);
       expect(a.isContainer, false);
     });
@@ -85,7 +87,8 @@ void main() {
   group('push/pushQueue', () {
     test('未选设备时 push 返回 false', () async {
       final c = DlnaController();
-      final ok = await c.push(Song.fromJson({'id': '1', 'title': 'S'}), 'https://stub/1');
+      final ok = await c.push(
+          Song.fromJson({'id': '1', 'title': 'S'}), 'https://stub/1');
       expect(ok, false);
       c.dispose();
     });

@@ -16,11 +16,13 @@ void main() {
     tearDown(() => container.dispose());
 
     test('setQueue 设置队列', () {
-      final songs = List.generate(5, (i) => Song.fromJson({
-        'id': '$i',
-        'title': 'song $i',
-        'duration': 60,
-      }));
+      final songs = List.generate(
+          5,
+          (i) => Song.fromJson({
+                'id': '$i',
+                'title': 'song $i',
+                'duration': 60,
+              }));
       notifier.setQueue(songs, startIndex: 2);
       final state = container.read(playerStateProvider);
       expect(state.queue.length, 5);
@@ -29,18 +31,23 @@ void main() {
     });
 
     test('addToQueue 追加', () {
-      notifier.setQueue([Song.fromJson({'id': '1', 'title': 'a', 'duration': 60})]);
-      notifier.addToQueue(Song.fromJson({'id': '2', 'title': 'b', 'duration': 60}));
+      notifier.setQueue([
+        Song.fromJson({'id': '1', 'title': 'a', 'duration': 60})
+      ]);
+      notifier
+          .addToQueue(Song.fromJson({'id': '2', 'title': 'b', 'duration': 60}));
       final s = container.read(playerStateProvider);
       expect(s.queue.length, 2);
     });
 
     test('removeAt 当前索引前删除', () {
-      final songs = List.generate(3, (i) => Song.fromJson({
-        'id': '$i',
-        'title': 's$i',
-        'duration': 60,
-      }));
+      final songs = List.generate(
+          3,
+          (i) => Song.fromJson({
+                'id': '$i',
+                'title': 's$i',
+                'duration': 60,
+              }));
       notifier.setQueue(songs, startIndex: 1);
       notifier.removeAt(0);
       final s = container.read(playerStateProvider);
@@ -49,11 +56,13 @@ void main() {
     });
 
     test('next/prev 循环', () {
-      final songs = List.generate(3, (i) => Song.fromJson({
-        'id': '$i',
-        'title': 's$i',
-        'duration': 60,
-      }));
+      final songs = List.generate(
+          3,
+          (i) => Song.fromJson({
+                'id': '$i',
+                'title': 's$i',
+                'duration': 60,
+              }));
       notifier.setQueue(songs, startIndex: 0);
       notifier.next();
       notifier.next();

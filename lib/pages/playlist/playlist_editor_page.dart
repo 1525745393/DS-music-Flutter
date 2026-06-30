@@ -59,7 +59,10 @@ class _PlaylistEditorPageState extends ConsumerState<PlaylistEditorPage> {
         child: detail.when(
           loading: () => const Center(child: CupertinoActivityIndicator()),
           error: (e, _) => DSStatePage(
-              type: StateType.error, message: '加载失败: $e', onRetry: () => ref.invalidate(playlistDetailProvider(widget.playlistId))),
+              type: StateType.error,
+              message: '加载失败: $e',
+              onRetry: () =>
+                  ref.invalidate(playlistDetailProvider(widget.playlistId))),
           data: (pl) {
             if (_nameCtrl.text.isEmpty) {
               _nameCtrl.text = pl.name;
@@ -77,29 +80,39 @@ class _PlaylistEditorPageState extends ConsumerState<PlaylistEditorPage> {
                         height: 80,
                         decoration: BoxDecoration(
                           color: AppColors.darkCard,
-                          borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+                          borderRadius:
+                              BorderRadius.circular(AppDimens.radiusMedium),
                         ),
-                        child: const Icon(CupertinoIcons.music_note_list, size: 36, color: AppColors.textAssistantDark),
+                        child: const Icon(CupertinoIcons.music_note_list,
+                            size: 36, color: AppColors.textAssistantDark),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: _editing
                             ? CupertinoTextField(
                                 controller: _nameCtrl,
-                                style: const TextStyle(color: CupertinoColors.white, fontSize: 18, fontWeight: FontWeight.w600),
+                                style: const TextStyle(
+                                    color: CupertinoColors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600),
                                 decoration: BoxDecoration(
                                   color: AppColors.darkCard,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 10),
                               )
                             : Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  DSText(pl.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                                  DSText(pl.name,
+                                      style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600)),
                                   const SizedBox(height: 4),
-                                  DSText.assistant('${songs.length} 首 · ${_fmtDur(pl.duration)}'),
+                                  DSText.assistant(
+                                      '${songs.length} 首 · ${_fmtDur(pl.duration)}'),
                                 ],
                               ),
                       ),
@@ -115,9 +128,8 @@ class _PlaylistEditorPageState extends ConsumerState<PlaylistEditorPage> {
                         child: CupertinoButton(
                           color: AppColors.accent,
                           padding: const EdgeInsets.symmetric(vertical: 10),
-                          onPressed: songs.isEmpty
-                              ? null
-                              : () => _playAll(songs),
+                          onPressed:
+                              songs.isEmpty ? null : () => _playAll(songs),
                           child: DSText('播放全部', color: CupertinoColors.white),
                         ),
                       ),
@@ -154,8 +166,10 @@ class _PlaylistEditorPageState extends ConsumerState<PlaylistEditorPage> {
                               background: Container(
                                 color: CupertinoColors.systemRed,
                                 alignment: Alignment.centerRight,
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
-                                child: const Icon(CupertinoIcons.delete, color: CupertinoColors.white),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                child: const Icon(CupertinoIcons.delete,
+                                    color: CupertinoColors.white),
                               ),
                               onDismissed: (_) => _removeSong(pl, s),
                               child: SongListTile(
@@ -253,11 +267,14 @@ class _PlaylistEditorPageState extends ConsumerState<PlaylistEditorPage> {
                       onPressed: () async {
                         try {
                           if (selected.isEmpty) return;
-                          await ref.read(libraryRepositoryProvider).updatePlaylist(
+                          await ref
+                              .read(libraryRepositoryProvider)
+                              .updatePlaylist(
                                 id: pl.id,
                                 addSongIds: selected.toList(),
                               );
-                          ref.invalidate(playlistDetailProvider(widget.playlistId));
+                          ref.invalidate(
+                              playlistDetailProvider(widget.playlistId));
                           ref.invalidate(playlistsProvider);
                           if (ctx.mounted) Navigator.pop(ctx);
                         } catch (e) {

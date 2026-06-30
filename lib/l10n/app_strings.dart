@@ -60,7 +60,8 @@ class AppStrings {
   String get password => isEnglish ? 'Password' : '密码';
   String get server => isEnglish ? 'Server' : '服务器';
   String get port => isEnglish ? 'Port' : '端口';
-  String get useHttps => isEnglish ? 'Use HTTPS (self-signed)' : '使用 HTTPS（自签证书）';
+  String get useHttps =>
+      isEnglish ? 'Use HTTPS (self-signed)' : '使用 HTTPS（自签证书）';
   String get connectToNas => isEnglish
       ? 'Connect to your Synology AudioStation'
       : '连接你的群晖 AudioStation';
@@ -104,9 +105,8 @@ class AppStrings {
 
   // —— 错误信息 ——
   String get loginFailed => isEnglish ? 'Login failed' : '登录失败';
-  String get sidExpired => isEnglish
-      ? 'Session expired, please sign in again'
-      : '登录已过期，请重新登录';
+  String get sidExpired =>
+      isEnglish ? 'Session expired, please sign in again' : '登录已过期，请重新登录';
   String get permissionDenied => isEnglish ? 'Permission denied' : '权限不足';
   String get tip => isEnglish ? 'Tip' : '提示';
   String get retryLater => isEnglish ? 'Please try again later' : '请稍后重试';
@@ -117,23 +117,20 @@ class AppStrings {
   String get quickConnect => 'QuickConnect';
   String get hintAccount => isEnglish ? 'Synology account' : '群晖账号';
   String get hintPassword => isEnglish ? 'Enter password' : '请输入密码';
-  String get pleaseFillAccount => isEnglish
-      ? 'Please enter account and password'
-      : '请填写账号和密码';
-  String get pleaseFillServer => isEnglish ? 'Please enter server address' : '请填写服务器地址';
-  String get pleaseFillQcId => isEnglish ? 'Please enter QuickConnect ID' : '请填写 QuickConnect ID';
-  String get qcResolveFailed => isEnglish
-      ? 'Failed to resolve QuickConnect'
-      : 'QuickConnect 解析失败';
-  String get qcWaitAuthorize => isEnglish
-      ? 'Please approve this device on NAS'
-      : '请在 NAS 后台允许此设备的访问请求';
-  String get qcTimeout => isEnglish
-      ? 'QuickConnect authorization timeout'
-      : 'QuickConnect 授权超时';
-  String get qcRouteFailed => isEnglish
-      ? 'Cannot resolve available route'
-      : '未能解析出可用线路';
+  String get pleaseFillAccount =>
+      isEnglish ? 'Please enter account and password' : '请填写账号和密码';
+  String get pleaseFillServer =>
+      isEnglish ? 'Please enter server address' : '请填写服务器地址';
+  String get pleaseFillQcId =>
+      isEnglish ? 'Please enter QuickConnect ID' : '请填写 QuickConnect ID';
+  String get qcResolveFailed =>
+      isEnglish ? 'Failed to resolve QuickConnect' : 'QuickConnect 解析失败';
+  String get qcWaitAuthorize =>
+      isEnglish ? 'Please approve this device on NAS' : '请在 NAS 后台允许此设备的访问请求';
+  String get qcTimeout =>
+      isEnglish ? 'QuickConnect authorization timeout' : 'QuickConnect 授权超时';
+  String get qcRouteFailed =>
+      isEnglish ? 'Cannot resolve available route' : '未能解析出可用线路';
   String get agree => isEnglish
       ? 'By signing in, you agree to the User Agreement and Privacy Policy'
       : '登录即代表同意《用户协议》与《隐私政策》';
@@ -142,7 +139,8 @@ class AppStrings {
   String get onboardSkip => isEnglish ? 'Skip' : '跳过';
   String get onboardNext => isEnglish ? 'Next' : '下一步';
   String get onboardStart => isEnglish ? 'Get Started' : '开始体验';
-  String get onboard1Title => isEnglish ? 'Welcome to DS Player' : '欢迎使用 DS Player';
+  String get onboard1Title =>
+      isEnglish ? 'Welcome to DS Player' : '欢迎使用 DS Player';
   String get onboard1Subtitle => isEnglish
       ? 'A mobile music client for Synology & Plex'
       : '为 Synology / Plex 打造的移动端音乐客户端';
@@ -150,14 +148,15 @@ class AppStrings {
   String get onboard2Subtitle => isEnglish
       ? 'Lossless over WiFi\nAuto-transcode on cellular'
       : 'WiFi 下播放无损音质\n蜂窝下自动转码节省流量';
-  String get onboard3Title => isEnglish ? 'Floating Lyrics & Lock Screen' : '悬浮歌词 + 锁屏控制';
+  String get onboard3Title =>
+      isEnglish ? 'Floating Lyrics & Lock Screen' : '悬浮歌词 + 锁屏控制';
   String get onboard3Subtitle => isEnglish
       ? 'Browse and view lyrics while playing in background'
       : '后台播放时仍可浏览与查看歌词';
-  String get onboard4Title => isEnglish ? 'Android Auto Support' : '支持 Android Auto';
-  String get onboard4Subtitle => isEnglish
-      ? 'Browse your library in the car'
-      : '在车载系统中浏览你的私人曲库';
+  String get onboard4Title =>
+      isEnglish ? 'Android Auto Support' : '支持 Android Auto';
+  String get onboard4Subtitle =>
+      isEnglish ? 'Browse your library in the car' : '在车载系统中浏览你的私人曲库';
 
   // —— 主导航 ——
   String get tabMusic => isEnglish ? 'Music' : '音乐';

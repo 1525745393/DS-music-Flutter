@@ -116,10 +116,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final t = context.s;
     final host = _hostCtrl.text.trim();
     if (host.isEmpty) {
-      throw _mode == ServerMode.quickConnect ? t.pleaseFillQcId : t.pleaseFillServer;
+      throw _mode == ServerMode.quickConnect
+          ? t.pleaseFillQcId
+          : t.pleaseFillServer;
     }
     final port = int.tryParse(_portCtrl.text.trim()) ??
-        (_useHttps ? ApiConstants.defaultHttpsPort : ApiConstants.defaultHttpPort);
+        (_useHttps
+            ? ApiConstants.defaultHttpsPort
+            : ApiConstants.defaultHttpPort);
     return ServerConfig(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: host,
@@ -160,7 +164,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       backgroundColor: AppColors.darkBg,
       child: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: AppDimens.pagePaddingH),
+          padding:
+              const EdgeInsets.symmetric(horizontal: AppDimens.pagePaddingH),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -229,11 +234,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           ),
           child: DSText(
             text,
-            color: selected ? CupertinoColors.white : AppColors.textSecondaryDark,
+            color:
+                selected ? CupertinoColors.white : AppColors.textSecondaryDark,
           ),
         ),
       );
     }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -296,12 +303,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         ),
         CupertinoButton(
           padding: const EdgeInsets.only(right: 12),
-          onPressed: () =>
-              setState(() => _obscurePassword = !_obscurePassword),
+          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
           child: Icon(
-            _obscurePassword
-                ? CupertinoIcons.eye
-                : CupertinoIcons.eye_slash,
+            _obscurePassword ? CupertinoIcons.eye : CupertinoIcons.eye_slash,
             color: AppColors.textAssistantDark,
             size: 20,
           ),

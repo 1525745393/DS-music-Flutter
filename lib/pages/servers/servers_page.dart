@@ -28,7 +28,8 @@ class ServersPage extends ConsumerWidget {
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () => _addServer(context, ref),
-          child: const Icon(CupertinoIcons.add, color: AppColors.accent, size: 24),
+          child:
+              const Icon(CupertinoIcons.add, color: AppColors.accent, size: 24),
         ),
       ),
       child: SafeArea(
@@ -49,14 +50,16 @@ class ServersPage extends ConsumerWidget {
                 ),
                 itemBuilder: (_, i) {
                   final s = servers[i];
-                  return _serverItem(context, ref, s, isCurrent: s.id == current?.id);
+                  return _serverItem(context, ref, s,
+                      isCurrent: s.id == current?.id);
                 },
               ),
       ),
     );
   }
 
-  Widget _serverItem(BuildContext context, WidgetRef ref, ServerConfig s, {required bool isCurrent}) {
+  Widget _serverItem(BuildContext context, WidgetRef ref, ServerConfig s,
+      {required bool isCurrent}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       color: isCurrent ? AppColors.accent.withOpacity(0.12) : null,
@@ -71,7 +74,9 @@ class ServersPage extends ConsumerWidget {
             ),
             child: Icon(
               _iconFor(s.mode),
-              color: isCurrent ? CupertinoColors.white : AppColors.textAssistantDark,
+              color: isCurrent
+                  ? CupertinoColors.white
+                  : AppColors.textAssistantDark,
               size: 22,
             ),
           ),
@@ -83,16 +88,21 @@ class ServersPage extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    Flexible(child: DSText(s.name, maxLines: 1, overflow: TextOverflow.ellipsis)),
+                    Flexible(
+                        child: DSText(s.name,
+                            maxLines: 1, overflow: TextOverflow.ellipsis)),
                     if (isCurrent) ...[
                       const SizedBox(width: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 1),
                         decoration: BoxDecoration(
                           color: AppColors.accent,
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: const DSText('当前', color: CupertinoColors.white, type: TextStyleType.caption),
+                        child: const DSText('当前',
+                            color: CupertinoColors.white,
+                            type: TextStyleType.caption),
                       ),
                     ],
                   ],
@@ -115,7 +125,8 @@ class ServersPage extends ConsumerWidget {
           CupertinoButton(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             onPressed: () => _confirmDelete(context, ref, s),
-            child: const Icon(CupertinoIcons.trash, color: AppColors.danger, size: 20),
+            child: const Icon(CupertinoIcons.trash,
+                color: AppColors.danger, size: 20),
           ),
         ],
       ),
@@ -145,10 +156,12 @@ class ServersPage extends ConsumerWidget {
   }
 
   void _addServer(BuildContext context, WidgetRef ref) {
-    Navigator.of(context).push(CupertinoPageRoute(builder: (_) => const LoginPage()));
+    Navigator.of(context)
+        .push(CupertinoPageRoute(builder: (_) => const LoginPage()));
   }
 
-  void _switchServer(BuildContext context, WidgetRef ref, ServerConfig s) async {
+  void _switchServer(
+      BuildContext context, WidgetRef ref, ServerConfig s) async {
     // 切换服务器：先校验当前账号密码仍有效
     // 这里简化为：直接更新 currentServer，后续拉取会触发重登
     ref.read(currentServerProvider.notifier).state = s;

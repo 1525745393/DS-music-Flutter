@@ -16,7 +16,8 @@ import '../player/player_page.dart';
 class AlbumDetailPage extends ConsumerWidget {
   final String albumId;
   final String albumName;
-  const AlbumDetailPage({super.key, required this.albumId, required this.albumName});
+  const AlbumDetailPage(
+      {super.key, required this.albumId, required this.albumName});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -30,23 +31,35 @@ class AlbumDetailPage extends ConsumerWidget {
       ),
       child: SafeArea(
         child: async.when(
-          loading: () => DSStatePage(type: StateType.loading, message: context.s.loading),
-          error: (e, _) => DSStatePage(type: StateType.error, message: e.toString(), onRetry: () => ref.invalidate(albumDetailProvider(albumId))),
+          loading: () =>
+              DSStatePage(type: StateType.loading, message: context.s.loading),
+          error: (e, _) => DSStatePage(
+              type: StateType.error,
+              message: e.toString(),
+              onRetry: () => ref.invalidate(albumDetailProvider(albumId))),
           data: (data) {
             final songs = data.songs;
             return CustomScrollView(
               slivers: [
-                SliverToBoxAdapter(child: _header(data.album.coverUrl ?? '', data.album.name, data.album.artist ?? '')),
+                SliverToBoxAdapter(
+                    child: _header(data.album.coverUrl ?? '', data.album.name,
+                        data.album.artist ?? '')),
                 SliverList.separated(
                   itemCount: songs.length,
-                  separatorBuilder: (_, __) => Container(margin: const EdgeInsets.only(left: 16), height: 0.5, color: AppColors.darkDivider),
+                  separatorBuilder: (_, __) => Container(
+                      margin: const EdgeInsets.only(left: 16),
+                      height: 0.5,
+                      color: AppColors.darkDivider),
                   itemBuilder: (_, i) {
                     final Song s = songs[i];
                     return SongListTile(
                       song: s,
-                      coverUrl: ref.read(libraryRepositoryProvider).coverUrl(albumId),
+                      coverUrl:
+                          ref.read(libraryRepositoryProvider).coverUrl(albumId),
                       onTap: () {
-                        ref.read(playerStateProvider.notifier).setQueue(songs, startIndex: i);
+                        ref
+                            .read(playerStateProvider.notifier)
+                            .setQueue(songs, startIndex: i);
                         Navigator.of(context).push(CupertinoPageRoute(
                           fullscreenDialog: true,
                           builder: (_) => const PlayerPage(),
@@ -55,7 +68,8 @@ class AlbumDetailPage extends ConsumerWidget {
                     );
                   },
                 ),
-                const SliverToBoxAdapter(child: SizedBox(height: AppDimens.miniPlayerHeight + 16)),
+                const SliverToBoxAdapter(
+                    child: SizedBox(height: AppDimens.miniPlayerHeight + 16)),
               ],
             );
           },
@@ -76,7 +90,8 @@ class AlbumDetailPage extends ConsumerWidget {
               width: 120,
               height: 120,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(width: 120, height: 120, color: AppColors.darkElevated),
+              errorBuilder: (_, __, ___) => Container(
+                  width: 120, height: 120, color: AppColors.darkElevated),
             ),
           ),
           const SizedBox(width: 16),

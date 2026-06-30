@@ -35,7 +35,8 @@ class ApiAuth {
         'account': account,
         'passwd': passwd,
         if (otpCode != null) 'otp_code': otpCode,
-        'device_id': deviceId ?? _client.dio.options.headers['Device-Id'] ?? 'ds-player',
+        'device_id':
+            deviceId ?? _client.dio.options.headers['Device-Id'] ?? 'ds-player',
         'format': 'sid',
         'session': 'AudioStation',
         'enable_device_token': 'yes',

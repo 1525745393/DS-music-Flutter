@@ -9,19 +9,19 @@ class Song {
   final String? album;
   final String? albumId;
   final String? coverUrl;
-  final int duration;          // 秒
+  final int duration; // 秒
   final int? track;
   final int? year;
   final String? genre;
   final int? bitrate;
   final int? sampleRate;
-  final String? container;     // flac / dsd / mp3 ...
-  final int size;              // 字节
-  final String? path;          // NAS 上的相对路径
+  final String? container; // flac / dsd / mp3 ...
+  final int size; // 字节
+  final String? path; // NAS 上的相对路径
   final bool favorite;
-  final int rating;            // 0-5
-  final bool downloaded;       // 是否已下载到本地
-  final String? localPath;     // 本地缓存路径
+  final int rating; // 0-5
+  final bool downloaded; // 是否已下载到本地
+  final String? localPath; // 本地缓存路径
 
   const Song({
     required this.id,
@@ -70,25 +70,25 @@ class Song {
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'title': title,
-    'artist': artist,
-    'artist_id': artistId,
-    'album': album,
-    'album_id': albumId,
-    'cover': coverUrl,
-    'duration': duration,
-    'track': track,
-    'year': year,
-    'genre': genre,
-    'bitrate': bitrate,
-    'samplerate': sampleRate,
-    'container': container,
-    'size': size,
-    'path': path,
-    'favorite': favorite,
-    'rating': rating,
-  };
+        'id': id,
+        'title': title,
+        'artist': artist,
+        'artist_id': artistId,
+        'album': album,
+        'album_id': albumId,
+        'cover': coverUrl,
+        'duration': duration,
+        'track': track,
+        'year': year,
+        'genre': genre,
+        'bitrate': bitrate,
+        'samplerate': sampleRate,
+        'container': container,
+        'size': size,
+        'path': path,
+        'favorite': favorite,
+        'rating': rating,
+      };
 
   /// 格式化时长为 mm:ss
   String get durationText {

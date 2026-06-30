@@ -138,7 +138,9 @@ class _NullAccess implements LibraryAccess {
   @override
   String coverUrl(String albumId, {String size = 'mid'}) => '';
   @override
-  String streamUrl(Song song, {bool forceTranscode = false, bool preferLossless = false}) => '';
+  String streamUrl(Song song,
+          {bool forceTranscode = false, bool preferLossless = false}) =>
+      '';
 }
 
 /// 应用根

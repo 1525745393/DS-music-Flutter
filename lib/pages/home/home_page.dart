@@ -70,8 +70,8 @@ class _HomePageState extends ConsumerState<HomePage> {
           DSTabBar(
             tabs: _buildTabs(context),
             currentIndex: tab.index,
-            onTap: (i) =>
-                ref.read(libraryTabProvider.notifier).state = LibraryTab.values[i],
+            onTap: (i) => ref.read(libraryTabProvider.notifier).state =
+                LibraryTab.values[i],
           ),
           const SizedBox(height: 8),
           Expanded(
@@ -101,7 +101,8 @@ class _HomePageState extends ConsumerState<HomePage> {
             },
             child: const Padding(
               padding: EdgeInsets.symmetric(horizontal: 12),
-              child: Icon(CupertinoIcons.search, size: 22, color: AppColors.textPrimaryDark),
+              child: Icon(CupertinoIcons.search,
+                  size: 22, color: AppColors.textPrimaryDark),
             ),
           ),
           GestureDetector(
@@ -112,7 +113,8 @@ class _HomePageState extends ConsumerState<HomePage> {
             },
             child: const Padding(
               padding: EdgeInsets.symmetric(horizontal: 12),
-              child: Icon(CupertinoIcons.settings, size: 22, color: AppColors.textPrimaryDark),
+              child: Icon(CupertinoIcons.settings,
+                  size: 22, color: AppColors.textPrimaryDark),
             ),
           ),
         ],
@@ -152,7 +154,8 @@ class _HomePageState extends ConsumerState<HomePage> {
         final resp = Responsive(context);
         return GridView.builder(
           key: key,
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, AppDimens.miniPlayerHeight + 16),
+          padding: const EdgeInsets.fromLTRB(
+              16, 0, 16, AppDimens.miniPlayerHeight + 16),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: resp.albumGridColumns,
             mainAxisSpacing: 16,
@@ -168,7 +171,8 @@ class _HomePageState extends ConsumerState<HomePage> {
               coverUrl: a.id.isNotEmpty ? repo.coverUrl(a.id) : null,
               onTap: () {
                 Navigator.of(context).push(CupertinoPageRoute(
-                  builder: (_) => AlbumDetailPage(albumId: a.id, albumName: a.name),
+                  builder: (_) =>
+                      AlbumDetailPage(albumId: a.id, albumName: a.name),
                 ));
               },
             );
@@ -182,17 +186,20 @@ class _HomePageState extends ConsumerState<HomePage> {
     final t = context.s;
     final async = ref.watch(artistsProvider);
     return async.when(
-      loading: () => DSStatePage(type: StateType.loading, message: '${t.loading} (${t.tabArtists})'),
+      loading: () => DSStatePage(
+          type: StateType.loading, message: '${t.loading} (${t.tabArtists})'),
       error: (e, _) => DSStatePage(
         type: StateType.error,
         message: e.toString(),
         onRetry: () => ref.invalidate(artistsProvider),
       ),
       data: (artists) {
-        if (artists.isEmpty) return DSStatePage(type: StateType.empty, message: t.empty);
+        if (artists.isEmpty)
+          return DSStatePage(type: StateType.empty, message: t.empty);
         return ListView.separated(
           key: key,
-          padding: const EdgeInsets.only(bottom: AppDimens.miniPlayerHeight + 16),
+          padding:
+              const EdgeInsets.only(bottom: AppDimens.miniPlayerHeight + 16),
           itemCount: artists.length,
           separatorBuilder: (_, __) => Container(
             margin: const EdgeInsets.only(left: 72),
@@ -205,11 +212,13 @@ class _HomePageState extends ConsumerState<HomePage> {
               behavior: HitTestBehavior.opaque,
               onTap: () {
                 Navigator.of(context).push(CupertinoPageRoute(
-                  builder: (_) => ArtistDetailPage(artistId: a.id, artistName: a.name),
+                  builder: (_) =>
+                      ArtistDetailPage(artistId: a.id, artistName: a.name),
                 ));
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Row(
                   children: [
                     Container(
@@ -230,7 +239,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                         children: [
                           DSText(a.name),
                           const SizedBox(height: 2),
-                          DSText.assistant('${a.albumCount} 张专辑 · ${a.songCount} 首歌曲'),
+                          DSText.assistant(
+                              '${a.albumCount} 张专辑 · ${a.songCount} 首歌曲'),
                         ],
                       ),
                     ),
@@ -250,17 +260,20 @@ class _HomePageState extends ConsumerState<HomePage> {
     final t = context.s;
     final async = ref.watch(songsProvider);
     return async.when(
-      loading: () => const DSStatePage(type: StateType.loading, message: '加载歌曲中...'),
+      loading: () =>
+          const DSStatePage(type: StateType.loading, message: '加载歌曲中...'),
       error: (e, _) => DSStatePage(
         type: StateType.error,
         message: e.toString(),
         onRetry: () => ref.invalidate(songsProvider),
       ),
       data: (songs) {
-        if (songs.isEmpty) return DSStatePage(type: StateType.empty, message: t.empty);
+        if (songs.isEmpty)
+          return DSStatePage(type: StateType.empty, message: t.empty);
         return ListView.separated(
           key: key,
-          padding: const EdgeInsets.only(bottom: AppDimens.miniPlayerHeight + 16),
+          padding:
+              const EdgeInsets.only(bottom: AppDimens.miniPlayerHeight + 16),
           itemCount: songs.length,
           separatorBuilder: (_, __) => Container(
             margin: const EdgeInsets.only(left: 72),
@@ -286,17 +299,20 @@ class _HomePageState extends ConsumerState<HomePage> {
     final t = context.s;
     final async = ref.watch(foldersProvider);
     return async.when(
-      loading: () => DSStatePage(type: StateType.loading, message: '${t.loading} (${t.folders})'),
+      loading: () => DSStatePage(
+          type: StateType.loading, message: '${t.loading} (${t.folders})'),
       error: (e, _) => DSStatePage(
         type: StateType.error,
         message: e.toString(),
         onRetry: () => ref.invalidate(foldersProvider),
       ),
       data: (folders) {
-        if (folders.isEmpty) return DSStatePage(type: StateType.empty, message: t.empty);
+        if (folders.isEmpty)
+          return DSStatePage(type: StateType.empty, message: t.empty);
         return ListView.separated(
           key: key,
-          padding: const EdgeInsets.only(bottom: AppDimens.miniPlayerHeight + 16),
+          padding:
+              const EdgeInsets.only(bottom: AppDimens.miniPlayerHeight + 16),
           itemCount: folders.length,
           separatorBuilder: (_, __) => Container(
             margin: const EdgeInsets.only(left: 72),
@@ -332,7 +348,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     final t = context.s;
     final async = ref.watch(playlistsProvider);
     return async.when(
-      loading: () => DSStatePage(type: StateType.loading, message: '${t.loading} (${t.tabPlaylists})'),
+      loading: () => DSStatePage(
+          type: StateType.loading, message: '${t.loading} (${t.tabPlaylists})'),
       error: (e, _) => DSStatePage(
         type: StateType.error,
         message: e.toString(),
@@ -367,7 +384,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                     coverUrl: p.coverUrl,
                     onTap: () {
                       Navigator.of(context).push(CupertinoPageRoute(
-                        builder: (_) => PlaylistDetailPage(playlistId: p.id, name: p.name),
+                        builder: (_) =>
+                            PlaylistDetailPage(playlistId: p.id, name: p.name),
                       ));
                     },
                   );
@@ -394,7 +412,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                       ),
                     ],
                   ),
-                  child: const Icon(CupertinoIcons.add, color: CupertinoColors.white, size: 28),
+                  child: const Icon(CupertinoIcons.add,
+                      color: CupertinoColors.white, size: 28),
                 ),
               ),
             ),
@@ -429,7 +448,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                       final name = ctrl.text.trim();
                       if (name.isEmpty) return;
                       try {
-                        await ref.read(libraryRepositoryProvider).createPlaylist(name);
+                        await ref
+                            .read(libraryRepositoryProvider)
+                            .createPlaylist(name);
                         ref.invalidate(playlistsProvider);
                         if (ctx.mounted) Navigator.pop(ctx);
                       } catch (e) {
@@ -451,7 +472,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                   color: AppColors.darkBg,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               ),
             ),
           ],
@@ -461,7 +483,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   void _playAll(List<Song> songs, {int startIndex = 0}) {
-    ref.read(playerStateProvider.notifier).setQueue(songs, startIndex: startIndex);
+    ref
+        .read(playerStateProvider.notifier)
+        .setQueue(songs, startIndex: startIndex);
     Navigator.of(context).push(CupertinoPageRoute(
       fullscreenDialog: true,
       builder: (_) => const PlayerPage(),

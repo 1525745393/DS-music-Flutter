@@ -5,8 +5,8 @@ import 'core_providers.dart';
 
 class SettingsState {
   final bool followSystemTheme;
-  final bool isDark;          // 仅在 !followSystem 时有效
-  final int playMode;         // 0 顺序 1 单曲 2 列表循环
+  final bool isDark; // 仅在 !followSystem 时有效
+  final int playMode; // 0 顺序 1 单曲 2 列表循环
   final int transcodeBitrate; // bps
   final String transcodeFormat; // mp3/aac/...
   final bool forceLossless;
@@ -16,6 +16,7 @@ class SettingsState {
   final bool equalizerEnabled;
   final int equalizerPreset;
   final double volume;
+
   /// 语言：'system' / 'zh' / 'en'
   final String localeCode;
 
@@ -157,6 +158,5 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   }
 }
 
-final settingsProvider =
-    StateNotifierProvider<SettingsNotifier, SettingsState>(
-        (ref) => SettingsNotifier(ref.watch(sharedPreferencesProvider)));
+final settingsProvider = StateNotifierProvider<SettingsNotifier, SettingsState>(
+    (ref) => SettingsNotifier(ref.watch(sharedPreferencesProvider)));

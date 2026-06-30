@@ -172,11 +172,13 @@ class _SwipeToDismissState extends State<SwipeToDismiss>
     _vCtrl.stop();
     _vCtrl.value = from ?? _offset.dy;
     final size = MediaQuery.of(context).size.height;
-    _vCtrl.animateTo(
+    _vCtrl
+        .animateTo(
       size,
       duration: const Duration(milliseconds: 240),
       curve: Curves.easeIn,
-    ).then((_) {
+    )
+        .then((_) {
       if (!mounted) return;
       widget.onDismiss?.call(dir);
     });

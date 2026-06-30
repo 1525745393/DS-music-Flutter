@@ -38,7 +38,8 @@ void main() {
     });
 
     test('reportError 不抛异常', () {
-      CrashReporter.instance.reportError(Exception('test'), StackTrace.current, tag: 'unit');
+      CrashReporter.instance
+          .reportError(Exception('test'), StackTrace.current, tag: 'unit');
     });
   });
 }

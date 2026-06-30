@@ -29,10 +29,22 @@ class _MainShellState extends ConsumerState<MainShell> {
   List<BottomTabItem> _buildTabs(BuildContext context) {
     final t = context.s;
     return [
-      BottomTabItem(icon: CupertinoIcons.house, activeIcon: CupertinoIcons.house_fill, label: t.tabMusic),
-      BottomTabItem(icon: CupertinoIcons.search, activeIcon: CupertinoIcons.search, label: t.search),
-      BottomTabItem(icon: CupertinoIcons.collections, activeIcon: CupertinoIcons.collections_solid, label: t.tabPlaylists),
-      BottomTabItem(icon: CupertinoIcons.gear, activeIcon: CupertinoIcons.gear_solid, label: t.settings),
+      BottomTabItem(
+          icon: CupertinoIcons.house,
+          activeIcon: CupertinoIcons.house_fill,
+          label: t.tabMusic),
+      BottomTabItem(
+          icon: CupertinoIcons.search,
+          activeIcon: CupertinoIcons.search,
+          label: t.search),
+      BottomTabItem(
+          icon: CupertinoIcons.collections,
+          activeIcon: CupertinoIcons.collections_solid,
+          label: t.tabPlaylists),
+      BottomTabItem(
+          icon: CupertinoIcons.gear,
+          activeIcon: CupertinoIcons.gear_solid,
+          label: t.settings),
     ];
   }
 
@@ -100,9 +112,11 @@ class _MainShellState extends ConsumerState<MainShell> {
                 setState(() => _tab = i);
                 // 切到歌单 tab 时同步通知 HomePage 内部 libraryTabProvider
                 if (i == 2) {
-                  ref.read(libraryTabProvider.notifier).state = LibraryTab.playlists;
+                  ref.read(libraryTabProvider.notifier).state =
+                      LibraryTab.playlists;
                 } else if (i == 0) {
-                  ref.read(libraryTabProvider.notifier).state = LibraryTab.albums;
+                  ref.read(libraryTabProvider.notifier).state =
+                      LibraryTab.albums;
                 }
               },
               child: Column(
@@ -111,14 +125,18 @@ class _MainShellState extends ConsumerState<MainShell> {
                   Icon(
                     selected ? tab.activeIcon : tab.icon,
                     size: 22,
-                    color: selected ? AppColors.accent : AppColors.textAssistantDark,
+                    color: selected
+                        ? AppColors.accent
+                        : AppColors.textAssistantDark,
                   ),
                   const SizedBox(height: 2),
                   Text(
                     tab.label,
                     style: TextStyle(
                       fontSize: 10,
-                      color: selected ? AppColors.accent : AppColors.textAssistantDark,
+                      color: selected
+                          ? AppColors.accent
+                          : AppColors.textAssistantDark,
                     ),
                   ),
                 ],

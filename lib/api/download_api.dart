@@ -246,8 +246,8 @@ class DownloadApi {
       final contentLen =
           int.parse(resp.headers.value(HttpHeaders.contentLengthHeader) ?? '0');
       task.totalBytes = existing + contentLen;
-      final sink = file.openWrite(
-          mode: existing > 0 ? FileMode.append : FileMode.write);
+      final sink =
+          file.openWrite(mode: existing > 0 ? FileMode.append : FileMode.write);
       try {
         await for (final chunk in resp.data!.stream) {
           if (cancelToken.isCancelled) break;

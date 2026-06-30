@@ -13,7 +13,8 @@ void main() {
     });
     tearDown(() => container.dispose());
 
-    Song _song(String id) => Song.fromJson({'id': id, 'title': 'S$id', 'duration': 60});
+    Song _song(String id) =>
+        Song.fromJson({'id': id, 'title': 'S$id', 'duration': 60});
 
     test('setQueue 设置队列与当前歌曲', () {
       final notifier = container.read(playerStateProvider.notifier);
@@ -45,8 +46,7 @@ void main() {
     test('next 随机模式不越界', () {
       final notifier = container.read(playerStateProvider.notifier);
       notifier.setMode(PlayMode.shuffle);
-      notifier.setQueue(
-          List.generate(10, (i) => _song('$i')), startIndex: 0);
+      notifier.setQueue(List.generate(10, (i) => _song('$i')), startIndex: 0);
       for (var i = 0; i < 20; i++) {
         notifier.next();
         final idx = container.read(playerStateProvider).currentIndex;

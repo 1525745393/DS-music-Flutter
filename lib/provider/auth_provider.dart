@@ -114,7 +114,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
     if (server == null) return false;
     try {
       final repo = _ref.read(libraryRepositoryProvider);
-      final sid = await repo.login(config: server, account: account, passwd: passwd);
+      final sid =
+          await repo.login(config: server, account: account, passwd: passwd);
       final sp = _ref.read(sharedPreferencesProvider);
       await sp.setString('ds_sid', sid);
       return true;

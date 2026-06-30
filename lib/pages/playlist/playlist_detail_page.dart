@@ -20,7 +20,8 @@ import 'playlist_editor_page.dart';
 class PlaylistDetailPage extends ConsumerWidget {
   final String playlistId;
   final String name;
-  const PlaylistDetailPage({super.key, required this.playlistId, required this.name});
+  const PlaylistDetailPage(
+      {super.key, required this.playlistId, required this.name});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -45,14 +46,18 @@ class PlaylistDetailPage extends ConsumerWidget {
       child: SafeArea(
         child: async.when(
           loading: () => const DSStatePage(type: StateType.loading),
-          error: (e, _) => DSStatePage(type: StateType.error, message: e.toString()),
+          error: (e, _) =>
+              DSStatePage(type: StateType.error, message: e.toString()),
           data: (pl) {
             final songs = pl.songs;
-            if (songs.isEmpty) return DSStatePage(type: StateType.empty, message: t.empty);
+            if (songs.isEmpty)
+              return DSStatePage(type: StateType.empty, message: t.empty);
             return ListView.separated(
               itemCount: songs.length,
               separatorBuilder: (_, __) => Container(
-                  margin: const EdgeInsets.only(left: 16), height: 0.5, color: AppColors.darkDivider),
+                  margin: const EdgeInsets.only(left: 16),
+                  height: 0.5,
+                  color: AppColors.darkDivider),
               itemBuilder: (_, i) {
                 final Song s = songs[i];
                 return GestureDetector(
@@ -61,15 +66,19 @@ class PlaylistDetailPage extends ConsumerWidget {
                   child: SongListTile(
                     song: s,
                     coverUrl: s.albumId != null
-                        ? ref.read(libraryRepositoryProvider).coverUrl(s.albumId!)
+                        ? ref
+                            .read(libraryRepositoryProvider)
+                            .coverUrl(s.albumId!)
                         : null,
                     trailing: s.rating > 0
-                        ? StarRating(value: s.rating, size: 12, onChanged: (_) {})
+                        ? StarRating(
+                            value: s.rating, size: 12, onChanged: (_) {})
                         : null,
                     onTap: () async {
                       final h = ref.read(audioHandlerProvider);
                       await h.setQueueAndPlay(songs, startIndex: i);
-                      ref.read(playerStateProvider.notifier)
+                      ref
+                          .read(playerStateProvider.notifier)
                           .setQueue(songs, startIndex: i);
                       ref.read(playerStateProvider.notifier).setPlaying(true);
                       if (context.mounted) {
@@ -113,7 +122,9 @@ class PlaylistDetailPage extends ConsumerWidget {
                       CupertinoButton(
                         onPressed: () async {
                           try {
-                            await ref.read(libraryRepositoryProvider).rate(s, current);
+                            await ref
+                                .read(libraryRepositoryProvider)
+                                .rate(s, current);
                             ref.invalidate(playlistDetailProvider(playlistId));
                             if (ctx.mounted) Navigator.pop(ctx);
                           } catch (e) {

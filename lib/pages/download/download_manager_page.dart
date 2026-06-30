@@ -18,10 +18,12 @@ import '../../utils/file_utils.dart';
 class DownloadManagerPage extends ConsumerStatefulWidget {
   final String title;
   final List<Song> songs;
-  const DownloadManagerPage({super.key, required this.title, required this.songs});
+  const DownloadManagerPage(
+      {super.key, required this.title, required this.songs});
 
   @override
-  ConsumerState<DownloadManagerPage> createState() => _DownloadManagerPageState();
+  ConsumerState<DownloadManagerPage> createState() =>
+      _DownloadManagerPageState();
 }
 
 class _DownloadManagerPageState extends ConsumerState<DownloadManagerPage> {
@@ -63,7 +65,10 @@ class _DownloadManagerPageState extends ConsumerState<DownloadManagerPage> {
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: _selected.isEmpty ? null : _downloadSelected,
-          child: DSText('下载(${_selected.length})', color: _selected.isEmpty ? AppColors.textAssistantDark : AppColors.accent),
+          child: DSText('下载(${_selected.length})',
+              color: _selected.isEmpty
+                  ? AppColors.textAssistantDark
+                  : AppColors.accent),
         ),
       ),
       child: SafeArea(
@@ -166,9 +171,11 @@ class _DownloadManagerPageState extends ConsumerState<DownloadManagerPage> {
                   const SizedBox(height: 2),
                   Row(
                     children: [
-                      DSText.assistant(s.artist ?? '', maxLines: 1, overflow: TextOverflow.ellipsis),
+                      DSText.assistant(s.artist ?? '',
+                          maxLines: 1, overflow: TextOverflow.ellipsis),
                       const SizedBox(width: 8),
-                      DSText.assistant('${FileUtils.humanReadableSize(s.size)}'),
+                      DSText.assistant(
+                          '${FileUtils.humanReadableSize(s.size)}'),
                     ],
                   ),
                   if (downloading || completed) ...[
@@ -185,7 +192,9 @@ class _DownloadManagerPageState extends ConsumerState<DownloadManagerPage> {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        DSText.assistant(completed ? '已完成' : '${(progress * 100).toStringAsFixed(0)}%'),
+                        DSText.assistant(completed
+                            ? '已完成'
+                            : '${(progress * 100).toStringAsFixed(0)}%'),
                         const Spacer(),
                         if (p != null)
                           DSText.assistant(
@@ -199,21 +208,25 @@ class _DownloadManagerPageState extends ConsumerState<DownloadManagerPage> {
             ),
             const SizedBox(width: 8),
             if (completed)
-              const Icon(CupertinoIcons.checkmark_alt_circle_fill, color: AppColors.success, size: 20)
+              const Icon(CupertinoIcons.checkmark_alt_circle_fill,
+                  color: AppColors.success, size: 20)
             else if (downloading)
               GestureDetector(
                 onTap: () => api.pause(s.id),
                 child: const Padding(
                   padding: EdgeInsets.all(6),
-                  child: Icon(CupertinoIcons.pause_circle_fill, color: AppColors.accent, size: 22),
+                  child: Icon(CupertinoIcons.pause_circle_fill,
+                      color: AppColors.accent, size: 22),
                 ),
               )
-            else if (p?.status == DownloadStatus.paused || p?.status == DownloadStatus.failed)
+            else if (p?.status == DownloadStatus.paused ||
+                p?.status == DownloadStatus.failed)
               GestureDetector(
                 onTap: () => api.resume(s.id),
                 child: const Padding(
                   padding: EdgeInsets.all(6),
-                  child: Icon(CupertinoIcons.play_circle_fill, color: AppColors.accent, size: 22),
+                  child: Icon(CupertinoIcons.play_circle_fill,
+                      color: AppColors.accent, size: 22),
                 ),
               )
             else
@@ -221,7 +234,8 @@ class _DownloadManagerPageState extends ConsumerState<DownloadManagerPage> {
                 onTap: () => _downloadOne(s),
                 child: const Padding(
                   padding: EdgeInsets.all(6),
-                  child: Icon(CupertinoIcons.arrow_down_circle, color: AppColors.accent, size: 22),
+                  child: Icon(CupertinoIcons.arrow_down_circle,
+                      color: AppColors.accent, size: 22),
                 ),
               ),
           ],
@@ -287,6 +301,7 @@ class _DownloadProgress {
   final int received;
   final int total;
   final DownloadStatus status;
-  const _DownloadProgress({required this.received, required this.total, required this.status});
+  const _DownloadProgress(
+      {required this.received, required this.total, required this.status});
   double get progress => total > 0 ? received / total : 0;
 }

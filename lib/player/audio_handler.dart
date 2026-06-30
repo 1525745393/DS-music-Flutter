@@ -47,20 +47,22 @@ class DSPlayerHandler extends BaseAudioHandler with SeekHandler {
     networkTypeWatcher.stream.listen((type) {
       if (type == _currentNetType) return;
       _currentNetType = type;
-      AppLogger.i('音频码流策略: ${type.label} → ${type.isHighBandwidth ? "原始" : "转码"}');
+      AppLogger.i(
+          '音频码流策略: ${type.label} → ${type.isHighBandwidth ? "原始" : "转码"}');
     });
   }
 
   Future<void> _init() async {
-    _player.playbackEventStream.listen(_broadcastState, onError: (Object e, StackTrace st) {
+    _player.playbackEventStream.listen(_broadcastState,
+        onError: (Object e, StackTrace st) {
       AppLogger.e('Player 错误', e, st);
     });
     _player.positionStream.listen((p) =>
         playbackState.add(playbackState.value.copyWith(updatePosition: p)));
     _player.bufferedPositionStream.listen((b) =>
         playbackState.add(playbackState.value.copyWith(bufferedPosition: b)));
-    _player.speedStream.listen((s) =>
-        playbackState.add(playbackState.value.copyWith(speed: s)));
+    _player.speedStream.listen(
+        (s) => playbackState.add(playbackState.value.copyWith(speed: s)));
     _player.durationStream.listen((d) => _updateMediaItem(d));
 
     try {
@@ -148,13 +150,13 @@ class DSPlayerHandler extends BaseAudioHandler with SeekHandler {
     bytes.addAll('WAVE'.codeUnits);
     // fmt chunk
     bytes.addAll('fmt '.codeUnits);
-    bytes.addAll(_u32(16));      // chunk size
-    bytes.addAll(_u16(1));       // PCM
-    bytes.addAll(_u16(1));       // mono
+    bytes.addAll(_u32(16)); // chunk size
+    bytes.addAll(_u16(1)); // PCM
+    bytes.addAll(_u16(1)); // mono
     bytes.addAll(_u32(sampleRate));
     bytes.addAll(_u32(sampleRate * 2));
-    bytes.addAll(_u16(2));       // block align
-    bytes.addAll(_u16(16));      // bits per sample
+    bytes.addAll(_u16(2)); // block align
+    bytes.addAll(_u16(16)); // bits per sample
     // data chunk
     bytes.addAll('data'.codeUnits);
     bytes.addAll(_u32(dataSize));
@@ -165,8 +167,7 @@ class DSPlayerHandler extends BaseAudioHandler with SeekHandler {
     return bytes;
   }
 
-  static List<int> _u16(int v) =>
-      [(v & 0xFF), ((v >> 8) & 0xFF)];
+  static List<int> _u16(int v) => [(v & 0xFF), ((v >> 8) & 0xFF)];
 
   static List<int> _u32(int v) => [
         (v & 0xFF),
@@ -199,7 +200,8 @@ class DSPlayerHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> setShuffleMode(AudioServiceShuffleMode shuffleMode) async {
-    await _player.setShuffleModeEnabled(shuffleMode != AudioServiceShuffleMode.none);
+    await _player
+        .setShuffleModeEnabled(shuffleMode != AudioServiceShuffleMode.none);
   }
 
   @override
@@ -232,7 +234,8 @@ class DSPlayerHandler extends BaseAudioHandler with SeekHandler {
     }
     // WiFi/有线 → 原始码流（无损）；蜂窝/未知/无网络 → 转码
     final settings = _settingsGetter();
-    final forceTranscode = !_currentNetType.isHighBandwidth || settings.forceTranscodeOnMobile;
+    final forceTranscode =
+        !_currentNetType.isHighBandwidth || settings.forceTranscodeOnMobile;
     final url = _repoGetter().streamUrl(
       song,
       forceTranscode: forceTranscode,
@@ -352,6 +355,7 @@ class SettingsPort {
   final bool forceLossless;
   final bool normalizeVolume;
   final bool gaplessEnabled;
+
   /// 强制在移动网络下转码（与"高带宽判断"独立；用于用户手动覆盖）
   final bool forceTranscodeOnMobile;
   const SettingsPort({

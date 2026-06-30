@@ -54,7 +54,8 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
     final state = ref.read(playerStateProvider);
     final handler = ref.read(audioHandlerProvider);
     if (state.queue.isNotEmpty) {
-      await handler.setQueueAndPlay(state.queue, startIndex: state.currentIndex);
+      await handler.setQueueAndPlay(state.queue,
+          startIndex: state.currentIndex);
     } else {
       await handler.setSingleAndPlay(song);
     }
@@ -94,7 +95,9 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
     for (final l in lyrics.lines) {
       final m = l.time.inMinutes.remainder(60).toString().padLeft(2, '0');
       final sec = l.time.inSeconds.remainder(60).toString().padLeft(2, '0');
-      final ms = (l.time.inMilliseconds.remainder(1000) ~/ 10).toString().padLeft(2, '0');
+      final ms = (l.time.inMilliseconds.remainder(1000) ~/ 10)
+          .toString()
+          .padLeft(2, '0');
       buf.writeln('[$m:$sec.$ms]${l.text}');
     }
     return buf.toString();
@@ -123,7 +126,8 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
       return DSStatePage(type: StateType.empty, message: context.s.empty);
     }
     final repo = ref.read(libraryRepositoryProvider);
-    final coverUrl = song.albumId != null ? repo.coverUrl(song.albumId!, size: 'big') : null;
+    final coverUrl =
+        song.albumId != null ? repo.coverUrl(song.albumId!, size: 'big') : null;
 
     return CupertinoPageScaffold(
       backgroundColor: AppColors.darkBg,
@@ -160,7 +164,8 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
   }
 
   /// 竖屏/手机：上下排布（封面 + 信息 + 控制）
-  Widget _portraitLayout(BuildContext context, PlayerStateData state, Song song, String? coverUrl) {
+  Widget _portraitLayout(BuildContext context, PlayerStateData state, Song song,
+      String? coverUrl) {
     return Column(
       children: [
         _topBar(context),
@@ -188,7 +193,10 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
                         await h.seek(p);
                       },
                     )
-                  : _albumArt(key: const ValueKey('art'), coverUrl: coverUrl, song: song),
+                  : _albumArt(
+                      key: const ValueKey('art'),
+                      coverUrl: coverUrl,
+                      song: song),
             ),
           ),
         ),
@@ -205,7 +213,8 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
   }
 
   /// 横屏/平板：左右分栏（左侧封面 + 右侧信息/歌词/控制）
-  Widget _wideLayout(BuildContext context, PlayerStateData state, Song song, String? coverUrl) {
+  Widget _wideLayout(BuildContext context, PlayerStateData state, Song song,
+      String? coverUrl) {
     return Row(
       children: [
         // 左侧：封面 + 标题
@@ -215,7 +224,10 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const _WideSpacer(),
-              _albumArt(key: const ValueKey('art_wide'), coverUrl: coverUrl, song: song),
+              _albumArt(
+                  key: const ValueKey('art_wide'),
+                  coverUrl: coverUrl,
+                  song: song),
               const SizedBox(height: 24),
               _info(song),
             ],
@@ -259,7 +271,9 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
     return Positioned.fill(
       child: ImageFiltered(
         imageFilter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-        child: Image.network(coverUrl, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+        child: Image.network(coverUrl,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => const SizedBox.shrink()),
       ),
     );
   }
@@ -272,7 +286,8 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
           CupertinoButton(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             onPressed: () => Navigator.of(context).pop(),
-            child: const Icon(CupertinoIcons.chevron_down, color: CupertinoColors.white, size: 24),
+            child: const Icon(CupertinoIcons.chevron_down,
+                color: CupertinoColors.white, size: 24),
           ),
           Expanded(
             child: Center(
@@ -296,14 +311,16 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
           CupertinoButton(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             onPressed: () {},
-            child: const Icon(CupertinoIcons.ellipsis, color: CupertinoColors.white, size: 24),
+            child: const Icon(CupertinoIcons.ellipsis,
+                color: CupertinoColors.white, size: 24),
           ),
         ],
       ),
     );
   }
 
-  Widget _albumArt({required Key key, required String? coverUrl, required Song song}) {
+  Widget _albumArt(
+      {required Key key, required String? coverUrl, required Song song}) {
     final r = Responsive(context);
     final size = r.isWideLayout ? r.playerCoverSize : AppDimens.playerCoverSize;
     return Center(
@@ -312,7 +329,8 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
         duration: const Duration(milliseconds: 300),
         child: Container(
           key: ValueKey(song.id + '_art'),
-          margin: EdgeInsets.only(top: r.isWideLayout ? 0 : AppDimens.playerCoverOffset),
+          margin: EdgeInsets.only(
+              top: r.isWideLayout ? 0 : AppDimens.playerCoverOffset),
           width: size,
           height: size,
           child: CoverImage(url: coverUrl, size: size, withShadow: true),
@@ -357,7 +375,8 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               DSText.assistant(DateTimeUtils.formatDuration(state.position)),
-              DSText.assistant(DateTimeUtils.formatSeconds(state.current?.duration ?? 0)),
+              DSText.assistant(
+                  DateTimeUtils.formatSeconds(state.current?.duration ?? 0)),
             ],
           ),
         ],
@@ -372,7 +391,8 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
-            icon: const Icon(CupertinoIcons.backward_fill, size: AppDimens.controlIconSize, color: CupertinoColors.white),
+            icon: const Icon(CupertinoIcons.backward_fill,
+                size: AppDimens.controlIconSize, color: CupertinoColors.white),
             onPressed: () async {
               ref.read(playerStateProvider.notifier).prev();
               final h = ref.read(audioHandlerProvider);
@@ -381,7 +401,8 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
           ),
           _playPauseButton(),
           IconButton(
-            icon: const Icon(CupertinoIcons.forward_fill, size: AppDimens.controlIconSize, color: CupertinoColors.white),
+            icon: const Icon(CupertinoIcons.forward_fill,
+                size: AppDimens.controlIconSize, color: CupertinoColors.white),
             onPressed: () async {
               ref.read(playerStateProvider.notifier).next();
               final h = ref.read(audioHandlerProvider);
@@ -433,21 +454,29 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
         children: [
           GestureDetector(
             onTap: () {
-              ref.read(playerStateProvider.notifier)
-                  .setMode(mode == PlayMode.singleLoop ? PlayMode.sequence : PlayMode.singleLoop);
+              ref.read(playerStateProvider.notifier).setMode(
+                  mode == PlayMode.singleLoop
+                      ? PlayMode.sequence
+                      : PlayMode.singleLoop);
             },
             child: Icon(loopIcon,
                 size: AppDimens.smallIconSize,
-                color: mode == PlayMode.singleLoop ? AppColors.accent : CupertinoColors.white),
+                color: mode == PlayMode.singleLoop
+                    ? AppColors.accent
+                    : CupertinoColors.white),
           ),
           GestureDetector(
             onTap: () {
-              ref.read(playerStateProvider.notifier)
-                  .setMode(mode == PlayMode.shuffle ? PlayMode.sequence : PlayMode.shuffle);
+              ref.read(playerStateProvider.notifier).setMode(
+                  mode == PlayMode.shuffle
+                      ? PlayMode.sequence
+                      : PlayMode.shuffle);
             },
             child: Icon(CupertinoIcons.shuffle,
                 size: AppDimens.smallIconSize,
-                color: mode == PlayMode.shuffle ? AppColors.accent : CupertinoColors.white),
+                color: mode == PlayMode.shuffle
+                    ? AppColors.accent
+                    : CupertinoColors.white),
           ),
           GestureDetector(
             onTap: () {
@@ -455,12 +484,15 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
                 builder: (_) => const QueuePage(),
               ));
             },
-            child: const Icon(CupertinoIcons.list_bullet, size: AppDimens.smallIconSize, color: CupertinoColors.white),
+            child: const Icon(CupertinoIcons.list_bullet,
+                size: AppDimens.smallIconSize, color: CupertinoColors.white),
           ),
           GestureDetector(
             onTap: () => _toggleOverlayLyrics(song),
             child: Icon(
-              _overlayOn ? CupertinoIcons.text_bubble_fill : CupertinoIcons.text_bubble,
+              _overlayOn
+                  ? CupertinoIcons.text_bubble_fill
+                  : CupertinoIcons.text_bubble,
               size: AppDimens.smallIconSize,
               color: _overlayOn ? AppColors.accent : CupertinoColors.white,
             ),
@@ -507,7 +539,9 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
                   CupertinoButton(
                     onPressed: () {
                       // onSelectedItemChanged 已经写入 _selectedMinutes
-                      ref.read(sleepTimerProvider.notifier).start(_selectedMinutes);
+                      ref
+                          .read(sleepTimerProvider.notifier)
+                          .start(_selectedMinutes);
                       Navigator.pop(context);
                     },
                     child: DSText(t.confirm),
@@ -519,11 +553,15 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
               child: CupertinoPicker(
                 itemExtent: 32,
                 scrollController: FixedExtentScrollController(
-                  initialItem: AppConstants.sleepOptions.indexOf(_selectedMinutes).clamp(0, AppConstants.sleepOptions.length - 1),
+                  initialItem: AppConstants.sleepOptions
+                      .indexOf(_selectedMinutes)
+                      .clamp(0, AppConstants.sleepOptions.length - 1),
                 ),
-                onSelectedItemChanged: (i) => _selectedMinutes = AppConstants.sleepOptions[i],
+                onSelectedItemChanged: (i) =>
+                    _selectedMinutes = AppConstants.sleepOptions[i],
                 children: [
-                  for (final m in AppConstants.sleepOptions) Center(child: DSText('$m 分钟')),
+                  for (final m in AppConstants.sleepOptions)
+                    Center(child: DSText('$m 分钟')),
                 ],
               ),
             ),

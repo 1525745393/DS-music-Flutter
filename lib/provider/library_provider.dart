@@ -9,7 +9,8 @@ import 'auth_provider.dart';
 /// 曲库 Tab 索引
 enum LibraryTab { albums, artists, songs, folders, playlists }
 
-final libraryTabProvider = StateProvider<LibraryTab>((ref) => LibraryTab.albums);
+final libraryTabProvider =
+    StateProvider<LibraryTab>((ref) => LibraryTab.albums);
 
 /// 专辑列表
 final albumsProvider = FutureProvider.autoDispose<List<Album>>((ref) async {
@@ -33,14 +34,16 @@ final songsProvider = FutureProvider.autoDispose<List<Song>>((ref) async {
 });
 
 /// 文件夹
-final foldersProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+final foldersProvider =
+    FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
   ref.watch(authStateProvider);
   final repo = ref.watch(libraryRepositoryProvider);
   return repo.folders();
 });
 
 /// 歌单
-final playlistsProvider = FutureProvider.autoDispose<List<Playlist>>((ref) async {
+final playlistsProvider =
+    FutureProvider.autoDispose<List<Playlist>>((ref) async {
   ref.watch(authStateProvider);
   final repo = ref.watch(libraryRepositoryProvider);
   return repo.playlists();
@@ -55,7 +58,8 @@ final albumDetailProvider = FutureProvider.autoDispose
 
 /// 歌手详情
 final artistDetailProvider = FutureProvider.autoDispose
-    .family<({Artist artist, List<Album> albums}), String>((ref, artistId) async {
+    .family<({Artist artist, List<Album> albums}), String>(
+        (ref, artistId) async {
   final repo = ref.watch(libraryRepositoryProvider);
   return repo.artistDetail(artistId);
 });

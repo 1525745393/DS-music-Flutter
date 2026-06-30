@@ -43,7 +43,9 @@ class _DSButtonState extends State<DSButton> {
     final disabled = widget.onPressed == null || widget.loading;
     final bg = widget.primary
         ? AppColors.accent
-        : (brightness == Brightness.dark ? AppColors.darkElevated : AppColors.lightElevated);
+        : (brightness == Brightness.dark
+            ? AppColors.darkElevated
+            : AppColors.lightElevated);
     final fg = widget.primary
         ? CupertinoColors.white
         : (brightness == Brightness.dark

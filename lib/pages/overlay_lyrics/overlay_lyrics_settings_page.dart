@@ -57,30 +57,34 @@ class _OverlayLyricsSettingsPageState
           padding: const EdgeInsets.symmetric(vertical: 16),
           children: [
             _section('开关', [
-              _row('启用悬浮歌词', trailing: CupertinoSwitch(
-                value: _enabled,
-                onChanged: (v) async {
-                  setState(() => _enabled = v);
-                  if (v) {
-                    // 提示用户先开启系统层叠权限
-                    await OverlayLyricsController.instance.resetPosition();
-                  }
-                },
-              )),
+              _row('启用悬浮歌词',
+                  trailing: CupertinoSwitch(
+                    value: _enabled,
+                    onChanged: (v) async {
+                      setState(() => _enabled = v);
+                      if (v) {
+                        // 提示用户先开启系统层叠权限
+                        await OverlayLyricsController.instance.resetPosition();
+                      }
+                    },
+                  )),
             ]),
             _section('字号 (${_fontSize.toStringAsFixed(0)})', [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: CupertinoSlider(
                   min: 12,
                   max: 36,
                   value: _fontSize,
                   onChanged: (v) => setState(() => _fontSize = v),
-                  onChangeEnd: (v) => OverlayLyricsController.instance.setFontSize(v),
+                  onChangeEnd: (v) =>
+                      OverlayLyricsController.instance.setFontSize(v),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -95,13 +99,13 @@ class _OverlayLyricsSettingsPageState
               for (final g in OverlayGravity.values)
                 _row(g.label,
                     trailing: _gravity == g
-                        ? const Icon(CupertinoIcons.checkmark, color: AppColors.accent)
-                        : null,
-                    onTap: () {
-                      setState(() => _gravity = g);
-                      // 通过 resetPosition 让原生层重新落位
-                      OverlayLyricsController.instance.resetPosition();
-                    }),
+                        ? const Icon(CupertinoIcons.checkmark,
+                            color: AppColors.accent)
+                        : null, onTap: () {
+                  setState(() => _gravity = g);
+                  // 通过 resetPosition 让原生层重新落位
+                  OverlayLyricsController.instance.resetPosition();
+                }),
             ]),
             _section('操作', [
               _row('重置为默认位置', onTap: () {

@@ -41,67 +41,85 @@ class SettingsPage extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(vertical: 16),
           children: [
             _section(context, t.appearance, [
-              _row(context, t.followSystemTheme, trailing: CupertinoSwitch(
-                value: s.followSystemTheme,
-                onChanged: (v) => notifier.setFollowSystemTheme(v),
-              )),
-              _row(context, t.darkMode, trailing: CupertinoSwitch(
-                value: s.isDark,
-                onChanged: (v) => notifier.setDark(v),
-              )),
-              _row(context, '语言', trailing: DSText.assistant(_localeLabel(context, s.localeCode)), onTap: () {
+              _row(context, t.followSystemTheme,
+                  trailing: CupertinoSwitch(
+                    value: s.followSystemTheme,
+                    onChanged: (v) => notifier.setFollowSystemTheme(v),
+                  )),
+              _row(context, t.darkMode,
+                  trailing: CupertinoSwitch(
+                    value: s.isDark,
+                    onChanged: (v) => notifier.setDark(v),
+                  )),
+              _row(context, '语言',
+                  trailing:
+                      DSText.assistant(_localeLabel(context, s.localeCode)),
+                  onTap: () {
                 Navigator.of(context).push(CupertinoPageRoute(
                   builder: (_) => const LocalePickerPage(),
                 ));
               }),
             ]),
             _section(context, t.playback, [
-              _row(context, t.gapless, trailing: CupertinoSwitch(
-                value: s.gaplessEnabled,
-                onChanged: (v) => notifier.setGapless(v),
-              )),
-              _row(context, t.volumeNormalize, trailing: CupertinoSwitch(
-                value: s.normalizeVolume,
-                onChanged: (v) => notifier.setNormalize(v),
-              )),
-              _row(context, '外网强制无损', trailing: CupertinoSwitch(
-                value: s.forceLossless,
-                onChanged: (v) => notifier.setForceLossless(v),
-              )),
-              _row(context, t.equalizer, trailing: CupertinoSwitch(
-                value: s.equalizerEnabled,
-                onChanged: (v) => notifier.setEqEnabled(v),
-              )),
-              _row(context, '均衡器调节', trailing: const Icon(CupertinoIcons.chevron_right,
-                  color: AppColors.textAssistantDark, size: 16), onTap: () {
+              _row(context, t.gapless,
+                  trailing: CupertinoSwitch(
+                    value: s.gaplessEnabled,
+                    onChanged: (v) => notifier.setGapless(v),
+                  )),
+              _row(context, t.volumeNormalize,
+                  trailing: CupertinoSwitch(
+                    value: s.normalizeVolume,
+                    onChanged: (v) => notifier.setNormalize(v),
+                  )),
+              _row(context, '外网强制无损',
+                  trailing: CupertinoSwitch(
+                    value: s.forceLossless,
+                    onChanged: (v) => notifier.setForceLossless(v),
+                  )),
+              _row(context, t.equalizer,
+                  trailing: CupertinoSwitch(
+                    value: s.equalizerEnabled,
+                    onChanged: (v) => notifier.setEqEnabled(v),
+                  )),
+              _row(context, '均衡器调节',
+                  trailing: const Icon(CupertinoIcons.chevron_right,
+                      color: AppColors.textAssistantDark, size: 16), onTap: () {
                 Navigator.of(context).push(CupertinoPageRoute(
                   builder: (_) => const EqualizerPage(),
                 ));
               }),
               _row(context, t.sleepTimer,
-                  trailing: DSText.assistant(sleep.inMinutes == 0
-                      ? t.close : '${sleep.inMinutes} 分钟'),
+                  trailing: DSText.assistant(
+                      sleep.inMinutes == 0 ? t.close : '${sleep.inMinutes} 分钟'),
                   onTap: () => _showSleepPicker(context, ref)),
             ]),
             _section(context, '转码设置', [
-              _row(context, '格式', trailing: DSText.assistant(s.transcodeFormat), onTap: () {
+              _row(context, '格式', trailing: DSText.assistant(s.transcodeFormat),
+                  onTap: () {
                 Navigator.of(context).push(CupertinoPageRoute(
-                  builder: (_) => const TranscodePickerPage(type: TranscodePickerType.format),
+                  builder: (_) => const TranscodePickerPage(
+                      type: TranscodePickerType.format),
                 ));
               }),
-              _row(context, '码率', trailing: DSText.assistant('${s.transcodeBitrate ~/ 1000} kbps'), onTap: () {
+              _row(context, '码率',
+                  trailing:
+                      DSText.assistant('${s.transcodeBitrate ~/ 1000} kbps'),
+                  onTap: () {
                 Navigator.of(context).push(CupertinoPageRoute(
-                  builder: (_) => const TranscodePickerPage(type: TranscodePickerType.bitrate),
+                  builder: (_) => const TranscodePickerPage(
+                      type: TranscodePickerType.bitrate),
                 ));
               }),
-              _row(context, '移动网络强制转码', trailing: CupertinoSwitch(
-                value: s.forceTranscodeOnMobile,
-                onChanged: (v) => notifier.setForceTranscodeOnMobile(v),
-              )),
+              _row(context, '移动网络强制转码',
+                  trailing: CupertinoSwitch(
+                    value: s.forceTranscodeOnMobile,
+                    onChanged: (v) => notifier.setForceTranscodeOnMobile(v),
+                  )),
             ]),
             _section(context, t.storage, [
               _row(context, t.cacheManagement, onTap: () {
-                Navigator.of(context).push(CupertinoPageRoute(builder: (_) => const CacheManagePage()));
+                Navigator.of(context).push(CupertinoPageRoute(
+                    builder: (_) => const CacheManagePage()));
               }),
               _row(context, '悬浮歌词', onTap: () {
                 Navigator.of(context).push(CupertinoPageRoute(
@@ -110,12 +128,15 @@ class SettingsPage extends ConsumerWidget {
             ]),
             _section(context, t.accountGroup, [
               _row(context, t.servers, onTap: () {
-                Navigator.of(context).push(CupertinoPageRoute(builder: (_) => const ServersPage()));
+                Navigator.of(context).push(
+                    CupertinoPageRoute(builder: (_) => const ServersPage()));
               }),
               _row(context, t.dlnaDevices, onTap: () {
-                Navigator.of(context).push(CupertinoPageRoute(builder: (_) => const DlnaDevicesPage()));
+                Navigator.of(context).push(CupertinoPageRoute(
+                    builder: (_) => const DlnaDevicesPage()));
               }),
-              _row(context, t.logout, onTap: () => _confirmLogout(context, ref)),
+              _row(context, t.logout,
+                  onTap: () => _confirmLogout(context, ref)),
             ]),
           ],
         ),
@@ -168,7 +189,8 @@ class SettingsPage extends ConsumerWidget {
     return result;
   }
 
-  Widget _row(BuildContext context, String title, {Widget? trailing, VoidCallback? onTap}) {
+  Widget _row(BuildContext context, String title,
+      {Widget? trailing, VoidCallback? onTap}) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
@@ -179,8 +201,9 @@ class SettingsPage extends ConsumerWidget {
           children: [
             Expanded(child: DSText(title)),
             if (trailing != null) trailing,
-            if (onTap != null && trailing == null) const Icon(CupertinoIcons.chevron_right,
-                color: AppColors.textAssistantDark, size: 16),
+            if (onTap != null && trailing == null)
+              const Icon(CupertinoIcons.chevron_right,
+                  color: AppColors.textAssistantDark, size: 16),
           ],
         ),
       ),
@@ -190,9 +213,12 @@ class SettingsPage extends ConsumerWidget {
   String _localeLabel(BuildContext context, String code) {
     final t = context.s;
     switch (code) {
-      case 'zh': return '简体中文';
-      case 'en': return 'English';
-      default: return t.followSystemTheme; // 复用 "跟随系统" 含义相近
+      case 'zh':
+        return '简体中文';
+      case 'en':
+        return 'English';
+      default:
+        return t.followSystemTheme; // 复用 "跟随系统" 含义相近
     }
   }
 
@@ -220,7 +246,8 @@ class SettingsPage extends ConsumerWidget {
                   const Spacer(),
                   CupertinoButton(
                     onPressed: () {
-                      ref.read(sleepTimerProvider.notifier)
+                      ref
+                          .read(sleepTimerProvider.notifier)
                           .start(AppConstants.sleepOptions[currentIndex]);
                       Navigator.pop(context);
                     },
@@ -234,7 +261,8 @@ class SettingsPage extends ConsumerWidget {
                 itemExtent: 32,
                 onSelectedItemChanged: (i) => currentIndex = i,
                 children: [
-                  for (final m in AppConstants.sleepOptions) Center(child: DSText('$m 分钟')),
+                  for (final m in AppConstants.sleepOptions)
+                    Center(child: DSText('$m 分钟')),
                 ],
               ),
             ),

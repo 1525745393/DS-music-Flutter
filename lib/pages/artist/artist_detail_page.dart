@@ -14,7 +14,8 @@ import '../album/album_detail_page.dart';
 class ArtistDetailPage extends ConsumerWidget {
   final String artistId;
   final String artistName;
-  const ArtistDetailPage({super.key, required this.artistId, required this.artistName});
+  const ArtistDetailPage(
+      {super.key, required this.artistId, required this.artistName});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,10 +30,12 @@ class ArtistDetailPage extends ConsumerWidget {
       child: SafeArea(
         child: async.when(
           loading: () => const DSStatePage(type: StateType.loading),
-          error: (e, _) => DSStatePage(type: StateType.error, message: e.toString()),
+          error: (e, _) =>
+              DSStatePage(type: StateType.error, message: e.toString()),
           data: (data) {
             return GridView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, AppDimens.miniPlayerHeight + 16),
+              padding: const EdgeInsets.fromLTRB(
+                  16, 16, 16, AppDimens.miniPlayerHeight + 16),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 mainAxisSpacing: 16,
@@ -46,7 +49,8 @@ class ArtistDetailPage extends ConsumerWidget {
                   album: a,
                   coverUrl: ref.read(libraryRepositoryProvider).coverUrl(a.id),
                   onTap: () => Navigator.of(context).push(CupertinoPageRoute(
-                    builder: (_) => AlbumDetailPage(albumId: a.id, albumName: a.name),
+                    builder: (_) =>
+                        AlbumDetailPage(albumId: a.id, albumName: a.name),
                   )),
                 );
               },

@@ -113,7 +113,8 @@ class PerfMonitor {
   }
 
   /// 包装一个 Future 自动打点耗时
-  Future<T> track<T>(String key, Future<T> Function() task, {String? tag}) async {
+  Future<T> track<T>(String key, Future<T> Function() task,
+      {String? tag}) async {
     start(key);
     try {
       return await task();

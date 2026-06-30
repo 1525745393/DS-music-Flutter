@@ -36,7 +36,9 @@ class MiniPlayerBar extends ConsumerWidget {
         ? AppColors.darkDivider
         : AppColors.lightDivider;
     final repo = ref.read(libraryRepositoryProvider);
-    final coverUrl = song.albumId != null ? repo.coverUrl(song.albumId!, size: 'small') : null;
+    final coverUrl = song.albumId != null
+        ? repo.coverUrl(song.albumId!, size: 'small')
+        : null;
 
     return GlassContainer(
       padding: EdgeInsets.zero,
@@ -50,7 +52,10 @@ class MiniPlayerBar extends ConsumerWidget {
             child: Row(
               children: [
                 const SizedBox(width: 8),
-                CoverImage(url: coverUrl, size: AppDimens.miniCoverSize, withShadow: false),
+                CoverImage(
+                    url: coverUrl,
+                    size: AppDimens.miniCoverSize,
+                    withShadow: false),
                 const SizedBox(width: 10),
                 Expanded(
                   child: GestureDetector(
@@ -86,7 +91,9 @@ class MiniPlayerBar extends ConsumerWidget {
                     } else {
                       await h.play();
                     }
-                    ref.read(playerStateProvider.notifier).setPlaying(!playerState.playing);
+                    ref
+                        .read(playerStateProvider.notifier)
+                        .setPlaying(!playerState.playing);
                   },
                 ),
                 _IconBtn(
@@ -119,13 +126,16 @@ class _NetBadge extends StatelessWidget {
       initialData: networkTypeWatcher.current,
       builder: (_, snap) {
         final type = snap.data ?? NetType.unknown;
-        if (type == NetType.wifi || type == NetType.ethernet || type == NetType.vpn) {
+        if (type == NetType.wifi ||
+            type == NetType.ethernet ||
+            type == NetType.vpn) {
           return const SizedBox.shrink();
         }
         if (type == NetType.none) {
           return const Padding(
             padding: EdgeInsets.symmetric(horizontal: 4),
-            child: Icon(CupertinoIcons.wifi_slash, size: 16, color: AppColors.textAssistantDark),
+            child: Icon(CupertinoIcons.wifi_slash,
+                size: 16, color: AppColors.textAssistantDark),
           );
         }
         return const Padding(
@@ -148,11 +158,12 @@ class _Chip extends StatelessWidget {
         color: AppColors.accent.withOpacity(0.18),
         borderRadius: BorderRadius.circular(4),
       ),
-      child: DSText.assistant(text, style: const TextStyle(
-        color: AppColors.accent,
-        fontSize: 10,
-        fontWeight: FontWeight.w600,
-      )),
+      child: DSText.assistant(text,
+          style: const TextStyle(
+            color: AppColors.accent,
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+          )),
     );
   }
 }

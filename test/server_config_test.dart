@@ -25,24 +25,36 @@ void main() {
 
     test('baseUrl 拼接正确', () {
       final s = ServerConfig(
-        id: '1', name: 'x', mode: ServerMode.lan,
-        host: '192.168.1.1', port: 5000, useHttps: false,
+        id: '1',
+        name: 'x',
+        mode: ServerMode.lan,
+        host: '192.168.1.1',
+        port: 5000,
+        useHttps: false,
       );
       expect(s.baseUrl, 'http://192.168.1.1:5000');
     });
 
     test('baseUrl HTTPS 拼接', () {
       final s = ServerConfig(
-        id: '1', name: 'x', mode: ServerMode.ddns,
-        host: 'nas.example.com', port: 5001, useHttps: true,
+        id: '1',
+        name: 'x',
+        mode: ServerMode.ddns,
+        host: 'nas.example.com',
+        port: 5001,
+        useHttps: true,
       );
       expect(s.baseUrl, 'https://nas.example.com:5001');
     });
 
     test('copyWith 不影响原对象', () {
       final s = ServerConfig(
-        id: '1', name: 'x', mode: ServerMode.lan,
-        host: '1.1.1.1', port: 5000, useHttps: false,
+        id: '1',
+        name: 'x',
+        mode: ServerMode.lan,
+        host: '1.1.1.1',
+        port: 5000,
+        useHttps: false,
       );
       final s2 = s.copyWith(port: 5001);
       expect(s.port, 5000);

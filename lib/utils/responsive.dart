@@ -5,9 +5,9 @@ import '../theme/app_dimens.dart';
 enum DeviceClass { compact, medium, expanded, large }
 
 class Breakpoints {
-  static const double compact = 600;     // 手机竖屏
-  static const double medium = 840;      // 平板/折叠屏展开
-  static const double expanded = 1200;   // 桌面/大屏平板
+  static const double compact = 600; // 手机竖屏
+  static const double medium = 840; // 平板/折叠屏展开
+  static const double expanded = 1200; // 桌面/大屏平板
 }
 
 /// 根据宽度判断设备类型

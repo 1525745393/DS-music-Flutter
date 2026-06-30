@@ -73,5 +73,5 @@ class LyricsNotifier extends StateNotifier<LyricsState> {
   }
 }
 
-final lyricsProvider =
-    StateNotifierProvider<LyricsNotifier, LyricsState>((ref) => LyricsNotifier(ref));
+final lyricsProvider = StateNotifierProvider<LyricsNotifier, LyricsState>(
+    (ref) => LyricsNotifier(ref));

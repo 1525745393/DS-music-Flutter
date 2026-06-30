@@ -67,15 +67,18 @@ class LibraryRepository implements LibraryAccess {
   Future<({Artist artist, List<Album> albums})> artistDetail(String id) =>
       _audioApi.getArtistDetail(id);
 
-  Future<List<Song>> songs({String? keyword, String? albumId, String? artistId}) =>
-      _audioApi.listSongs(keyword: keyword, albumId: albumId, artistId: artistId);
+  Future<List<Song>> songs(
+          {String? keyword, String? albumId, String? artistId}) =>
+      _audioApi.listSongs(
+          keyword: keyword, albumId: albumId, artistId: artistId);
 
   Future<List<Map<String, dynamic>>> folders({String? parentId}) =>
       _audioApi.listFolders(parentId: parentId);
 
   Future<List<Playlist>> playlists() => _audioApi.listPlaylists();
   Future<Playlist> playlistDetail(String id) => _audioApi.getPlaylistDetail(id);
-  Future<Playlist> createPlaylist(String name) => _audioApi.createPlaylist(name);
+  Future<Playlist> createPlaylist(String name) =>
+      _audioApi.createPlaylist(name);
   Future<void> deletePlaylist(String id) => _audioApi.deletePlaylist(id);
   Future<void> updatePlaylist({
     required String id,
@@ -120,7 +123,8 @@ class LibraryRepository implements LibraryAccess {
 
   // —— 流媒体 / 封面 URL ——
   @override
-  String streamUrl(Song song, {bool forceTranscode = false, bool preferLossless = false}) {
+  String streamUrl(Song song,
+      {bool forceTranscode = false, bool preferLossless = false}) {
     return _audioApi.buildStreamUrl(
       song,
       forceTranscode: forceTranscode,

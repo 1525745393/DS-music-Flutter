@@ -5,7 +5,7 @@ class Album {
   final String? artist;
   final String? coverUrl;
   final int songCount;
-  final int duration;       // 秒
+  final int duration; // 秒
   final int? year;
   final String? genre;
 

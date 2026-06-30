@@ -6,10 +6,10 @@ class Playlist {
   final String name;
   final String? coverUrl;
   final int songCount;
-  final int duration;          // 总时长
+  final int duration; // 总时长
   final String? owner;
   final bool isShared;
-  final bool isOwn;            // 是否本账号创建
+  final bool isOwn; // 是否本账号创建
   final List<Song> songs;
 
   const Playlist({
@@ -44,27 +44,27 @@ class Playlist {
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'cover': coverUrl,
-    'song_count': songCount,
-    'duration': duration,
-    'owner': owner,
-    'shared': isShared,
-    'own': isOwn,
-  };
+        'id': id,
+        'name': name,
+        'cover': coverUrl,
+        'song_count': songCount,
+        'duration': duration,
+        'owner': owner,
+        'shared': isShared,
+        'own': isOwn,
+      };
 
   Playlist copyWith({List<Song>? songs}) => Playlist(
-    id: id,
-    name: name,
-    coverUrl: coverUrl,
-    songCount: songs?.length ?? songCount,
-    duration: duration,
-    owner: owner,
-    isShared: isShared,
-    isOwn: isOwn,
-    songs: songs ?? this.songs,
-  );
+        id: id,
+        name: name,
+        coverUrl: coverUrl,
+        songCount: songs?.length ?? songCount,
+        duration: duration,
+        owner: owner,
+        isShared: isShared,
+        isOwn: isOwn,
+        songs: songs ?? this.songs,
+      );
 
   static int? _asInt(dynamic v) {
     if (v == null) return null;

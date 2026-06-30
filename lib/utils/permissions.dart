@@ -30,9 +30,12 @@ class AppPermissions {
   /// 申请所有必要权限（一次性引导）
   static Future<Map<String, bool>> requestAll() async {
     return {
-      'notification': await Permission.notification.request().then((s) => s.isGranted),
+      'notification':
+          await Permission.notification.request().then((s) => s.isGranted),
       'storage': await Permission.storage.request().then((s) => s.isGranted),
-      'battery': await Permission.ignoreBatteryOptimizations.request().then((s) => s.isGranted),
+      'battery': await Permission.ignoreBatteryOptimizations
+          .request()
+          .then((s) => s.isGranted),
       'overlay': await requestOverlay(),
       'mediaAudio': await requestMediaAudio(),
     };

@@ -137,7 +137,8 @@ class _CacheManagePageState extends ConsumerState<CacheManagePage> {
                       height: 48,
                       child: CupertinoButton(
                         color: AppColors.danger,
-                        borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+                        borderRadius:
+                            BorderRadius.circular(AppDimens.radiusMedium),
                         onPressed: _totalBytes == 0 ? null : _clearAll,
                         child: DSText(
                           _totalBytes == 0 ? '缓存为空' : '一键清理全部缓存',
@@ -162,7 +163,8 @@ class _CacheManagePageState extends ConsumerState<CacheManagePage> {
       ),
       child: Column(
         children: [
-          const Icon(CupertinoIcons.archivebox_fill, size: 48, color: AppColors.accent),
+          const Icon(CupertinoIcons.archivebox_fill,
+              size: 48, color: AppColors.accent),
           const SizedBox(height: 12),
           DSText.largeTitle(FileUtils.humanReadableSize(_totalBytes)),
           const SizedBox(height: 4),
@@ -211,7 +213,8 @@ class _CacheManagePageState extends ConsumerState<CacheManagePage> {
           DSText.assistant(value, maxLines: 1, overflow: TextOverflow.ellipsis),
           if (showArrow) ...[
             const SizedBox(width: 4),
-            const Icon(CupertinoIcons.chevron_right, color: AppColors.textAssistantDark, size: 16),
+            const Icon(CupertinoIcons.chevron_right,
+                color: AppColors.textAssistantDark, size: 16),
           ],
         ],
       ),

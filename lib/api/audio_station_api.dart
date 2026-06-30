@@ -32,25 +32,32 @@ class AudioStationApi {
     String sortDirection = 'asc',
     String? keyword,
   }) async {
-    final data = await _call(ApiConstants.audioStationAlbum, 'list', version: 3, extra: {
+    final data =
+        await _call(ApiConstants.audioStationAlbum, 'list', version: 3, extra: {
       'limit': limit,
       'offset': offset,
       'sort_by': sortBy,
       'sort_direction': sortDirection,
       if (keyword != null && keyword.isNotEmpty) 'filter': keyword,
     });
-    final albums = (data['albums'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+    final albums =
+        (data['albums'] as List?)?.cast<Map<String, dynamic>>() ?? [];
     return albums.map(Album.fromJson).toList();
   }
 
   /// 专辑详情 + 包含的歌曲
-  Future<({Album album, List<Song> songs})> getAlbumDetail(String albumId) async {
-    final data = await _call(ApiConstants.audioStationAlbum, 'getinfo', version: 3, extra: {
-      'id': albumId,
-      'additional': 'song_count,all_songs',
-    });
-    final album = Album.fromJson(Map<String, dynamic>.from(data['album'] ?? {}));
-    final songsList = (data['songs'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+  Future<({Album album, List<Song> songs})> getAlbumDetail(
+      String albumId) async {
+    final data = await _call(ApiConstants.audioStationAlbum, 'getinfo',
+        version: 3,
+        extra: {
+          'id': albumId,
+          'additional': 'song_count,all_songs',
+        });
+    final album =
+        Album.fromJson(Map<String, dynamic>.from(data['album'] ?? {}));
+    final songsList =
+        (data['songs'] as List?)?.cast<Map<String, dynamic>>() ?? [];
     return (album: album, songs: songsList.map(Song.fromJson).toList());
   }
 
@@ -63,21 +70,27 @@ class AudioStationApi {
     String sortDirection = 'asc',
     String? keyword,
   }) async {
-    final data = await _call(ApiConstants.audioStationArtist, 'list', version: 1, extra: {
-      'limit': limit,
-      'offset': offset,
-      if (keyword != null && keyword.isNotEmpty) 'filter': keyword,
-    });
+    final data = await _call(ApiConstants.audioStationArtist, 'list',
+        version: 1,
+        extra: {
+          'limit': limit,
+          'offset': offset,
+          if (keyword != null && keyword.isNotEmpty) 'filter': keyword,
+        });
     final list = (data['artists'] as List?)?.cast<Map<String, dynamic>>() ?? [];
     return list.map(Artist.fromJson).toList();
   }
 
-  Future<({Artist artist, List<Album> albums})> getArtistDetail(String artistId) async {
-    final data = await _call(ApiConstants.audioStationArtist, 'getinfo', version: 1, extra: {
-      'id': artistId,
-      'additional': 'albums',
-    });
-    final artist = Artist.fromJson(Map<String, dynamic>.from(data['artist'] ?? {}));
+  Future<({Artist artist, List<Album> albums})> getArtistDetail(
+      String artistId) async {
+    final data = await _call(ApiConstants.audioStationArtist, 'getinfo',
+        version: 1,
+        extra: {
+          'id': artistId,
+          'additional': 'albums',
+        });
+    final artist =
+        Artist.fromJson(Map<String, dynamic>.from(data['artist'] ?? {}));
     final albums = ((data['albums'] as List?) ?? [])
         .cast<Map<String, dynamic>>()
         .map(Album.fromJson)
@@ -97,7 +110,8 @@ class AudioStationApi {
     String? albumId,
     String? artistId,
   }) async {
-    final data = await _call(ApiConstants.audioStationSong, 'list', version: 2, extra: {
+    final data =
+        await _call(ApiConstants.audioStationSong, 'list', version: 2, extra: {
       'limit': limit,
       'offset': offset,
       'sort_by': sortBy,
@@ -118,37 +132,47 @@ class AudioStationApi {
     int limit = 200,
     int offset = 0,
   }) async {
-    final data = await _call(ApiConstants.audioStationFolder, 'list', version: 2, extra: {
-      if (parentId != null) 'id': parentId,
-      'limit': limit,
-      'offset': offset,
-    });
+    final data = await _call(ApiConstants.audioStationFolder, 'list',
+        version: 2,
+        extra: {
+          if (parentId != null) 'id': parentId,
+          'limit': limit,
+          'offset': offset,
+        });
     return (data['folders'] as List?)?.cast<Map<String, dynamic>>() ?? [];
   }
 
   // ==================== Playlists ====================
 
-  Future<List<Playlist>> listPlaylists({int limit = 100, int offset = 0}) async {
-    final data = await _call(ApiConstants.audioStationPlaylist, 'list', version: 3, extra: {
-      'limit': limit,
-      'offset': offset,
-    });
-    final list = (data['playlists'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+  Future<List<Playlist>> listPlaylists(
+      {int limit = 100, int offset = 0}) async {
+    final data = await _call(ApiConstants.audioStationPlaylist, 'list',
+        version: 3,
+        extra: {
+          'limit': limit,
+          'offset': offset,
+        });
+    final list =
+        (data['playlists'] as List?)?.cast<Map<String, dynamic>>() ?? [];
     return list.map(Playlist.fromJson).toList();
   }
 
   Future<Playlist> getPlaylistDetail(String playlistId) async {
-    final data = await _call(ApiConstants.audioStationPlaylist, 'getinfo', version: 3, extra: {
-      'id': playlistId,
-      'additional': 'songs',
-    });
+    final data = await _call(ApiConstants.audioStationPlaylist, 'getinfo',
+        version: 3,
+        extra: {
+          'id': playlistId,
+          'additional': 'songs',
+        });
     return Playlist.fromJson(Map<String, dynamic>.from(data['playlist'] ?? {}));
   }
 
   Future<Playlist> createPlaylist(String name) async {
-    final data = await _call(ApiConstants.audioStationPlaylist, 'create', version: 3, extra: {
-      'name': name,
-    });
+    final data = await _call(ApiConstants.audioStationPlaylist, 'create',
+        version: 3,
+        extra: {
+          'name': name,
+        });
     return Playlist.fromJson(Map<String, dynamic>.from(data['playlist'] ?? {}));
   }
 
@@ -158,20 +182,24 @@ class AudioStationApi {
     List<String>? songIdsToAdd,
     List<String>? songIdsToRemove,
   }) async {
-    await _call(ApiConstants.audioStationPlaylist, 'update', version: 3, extra: {
-      'id': playlistId,
-      if (name != null) 'name': name,
-      if (songIdsToAdd != null && songIdsToAdd.isNotEmpty)
-        'song_id_to_add': songIdsToAdd.join(','),
-      if (songIdsToRemove != null && songIdsToRemove.isNotEmpty)
-        'song_id_to_remove': songIdsToRemove.join(','),
-    });
+    await _call(ApiConstants.audioStationPlaylist, 'update',
+        version: 3,
+        extra: {
+          'id': playlistId,
+          if (name != null) 'name': name,
+          if (songIdsToAdd != null && songIdsToAdd.isNotEmpty)
+            'song_id_to_add': songIdsToAdd.join(','),
+          if (songIdsToRemove != null && songIdsToRemove.isNotEmpty)
+            'song_id_to_remove': songIdsToRemove.join(','),
+        });
   }
 
   Future<void> deletePlaylist(String playlistId) async {
-    await _call(ApiConstants.audioStationPlaylist, 'delete', version: 3, extra: {
-      'id': playlistId,
-    });
+    await _call(ApiConstants.audioStationPlaylist, 'delete',
+        version: 3,
+        extra: {
+          'id': playlistId,
+        });
   }
 
   // ==================== Search ====================
@@ -181,11 +209,13 @@ class AudioStationApi {
     String keyword, {
     int limit = 50,
   }) async {
-    final data = await _call(ApiConstants.audioStationSearch, 'list', version: 3, extra: {
-      'filter': keyword,
-      'limit': limit,
-      'additional': 'song_album, song_artist',
-    });
+    final data = await _call(ApiConstants.audioStationSearch, 'list',
+        version: 3,
+        extra: {
+          'filter': keyword,
+          'limit': limit,
+          'additional': 'song_album, song_artist',
+        });
     final albums = ((data['albums'] as List?) ?? [])
         .cast<Map<String, dynamic>>()
         .map(Album.fromJson)
@@ -329,7 +359,8 @@ class AudioStationApi {
 
   String _buildQuery(Map<String, dynamic> params) {
     return params.entries
-        .map((e) => '${Uri.encodeQueryComponent(e.key)}=${Uri.encodeQueryComponent(e.value.toString())}')
+        .map((e) =>
+            '${Uri.encodeQueryComponent(e.key)}=${Uri.encodeQueryComponent(e.value.toString())}')
         .join('&');
   }
 }

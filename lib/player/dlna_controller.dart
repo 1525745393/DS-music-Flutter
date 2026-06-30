@@ -31,8 +31,10 @@ class DlnaController {
       _sub?.cancel();
       _sub = UpnpDiscovery.devices().listen((device) {
         // MediaRenderer：被推送端
-        if (device.deviceType == 'urn:schemas-upnp-org:device:MediaRenderer:1' ||
-            device.deviceType == 'urn:schemas-upnp-org:device:MediaRenderer:2') {
+        if (device.deviceType ==
+                'urn:schemas-upnp-org:device:MediaRenderer:1' ||
+            device.deviceType ==
+                'urn:schemas-upnp-org:device:MediaRenderer:2') {
           if (!_devices.any((d) => d.uuid == device.uuid)) {
             _devices.add(device);
           }
@@ -85,24 +87,35 @@ class DlnaController {
 
   /// 暂停：尝试 pause / PauseTransport / doPause
   Future<bool> pause() async => UpnpCommand(
-    'pause',
-    target: selectedRenderer,
-    candidates: const ['pause', 'PauseTransport', 'doPause', 'pausePlayback'],
-  ).invoke();
+        'pause',
+        target: selectedRenderer,
+        candidates: const [
+          'pause',
+          'PauseTransport',
+          'doPause',
+          'pausePlayback'
+        ],
+      ).invoke();
 
   /// 恢复播放
   Future<bool> resume() async => UpnpCommand(
-    'play',
-    target: selectedRenderer,
-    candidates: const ['play', 'PlayTransport', 'doPlay', 'resume', 'resumePlayback'],
-  ).invoke();
+        'play',
+        target: selectedRenderer,
+        candidates: const [
+          'play',
+          'PlayTransport',
+          'doPlay',
+          'resume',
+          'resumePlayback'
+        ],
+      ).invoke();
 
   /// 停止
   Future<bool> stop() async => UpnpCommand(
-    'stop',
-    target: selectedRenderer,
-    candidates: const ['stop', 'StopTransport', 'doStop'],
-  ).invoke();
+        'stop',
+        target: selectedRenderer,
+        candidates: const ['stop', 'StopTransport', 'doStop'],
+      ).invoke();
 
   /// 跳转到指定位置（秒）
   /// UPnP 标准格式：HH:MM:SS
@@ -158,11 +171,17 @@ class DlnaController {
     if (selectedServer == null) return const [];
     // 尝试位置参数
     return UpnpCommand(
-      'browse',
-      target: selectedServer,
-      candidates: const ['browse', 'Browse', 'browseServer', 'listChildren'],
-      positionalArgs: [objectId],
-    ).invokeList() ?? const [];
+          'browse',
+          target: selectedServer,
+          candidates: const [
+            'browse',
+            'Browse',
+            'browseServer',
+            'listChildren'
+          ],
+          positionalArgs: [objectId],
+        ).invokeList() ??
+        const [];
   }
 
   /// 直接从已选 Renderer 投射播放 URL（dlna_browse_page 内部用）
@@ -192,7 +211,7 @@ class DlnaController {
 /// - 改用 try/catch NoSuchMethodError + 重新 dynamic 调用
 /// - 失败时返回 null/false 不抛异常，调用方按降级路径处理
 class UpnpCommand {
-  final String opName;        // 用于日志
+  final String opName; // 用于日志
   final Object? target;
   final List<String> candidates;
   final List<dynamic> positionalArgs;

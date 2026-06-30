@@ -100,7 +100,8 @@ class _DlnaBrowsePageState extends ConsumerState<DlnaBrowsePage> {
                       await (widget.controller.selectedRenderer as dynamic)
                           .setAVTransportURI(item.resourceUrl!, item.title);
                       // ignore: avoid_dynamic_calls
-                      await (widget.controller.selectedRenderer as dynamic).play();
+                      await (widget.controller.selectedRenderer as dynamic)
+                          .play();
                     } catch (e) {
                       // 静默失败
                     }
@@ -117,8 +118,11 @@ class _DlnaBrowsePageState extends ConsumerState<DlnaBrowsePage> {
         child: Row(
           children: [
             Icon(
-              isContainer ? CupertinoIcons.folder_fill : CupertinoIcons.music_note,
-              color: isContainer ? AppColors.accent : AppColors.textAssistantDark,
+              isContainer
+                  ? CupertinoIcons.folder_fill
+                  : CupertinoIcons.music_note,
+              color:
+                  isContainer ? AppColors.accent : AppColors.textAssistantDark,
               size: 22,
             ),
             const SizedBox(width: 12),

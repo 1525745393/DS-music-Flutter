@@ -46,10 +46,11 @@ class EqualizerPage extends ConsumerWidget {
           children: [
             // 1. 总开关
             _section('开关', [
-              _row('启用均衡器', trailing: CupertinoSwitch(
-                value: eq.enabled,
-                onChanged: (v) => notifier.setEnabled(v),
-              )),
+              _row('启用均衡器',
+                  trailing: CupertinoSwitch(
+                    value: eq.enabled,
+                    onChanged: (v) => notifier.setEnabled(v),
+                  )),
             ]),
             // 2. 预设
             _section('预设', [
@@ -128,7 +129,8 @@ class EqualizerPage extends ConsumerWidget {
                 ),
                 // 重置按钮
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   child: CupertinoButton(
                     onPressed: () {
                       for (int i = 0; i < bands.length; i++) {

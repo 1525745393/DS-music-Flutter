@@ -53,14 +53,16 @@ class _QueuePageState extends ConsumerState<QueuePage> {
       ),
       child: SafeArea(
         child: queue.isEmpty
-            ? DSStatePage(type: StateType.empty, message: '${t.queue} ${t.empty}')
+            ? DSStatePage(
+                type: StateType.empty, message: '${t.queue} ${t.empty}')
             : Column(
                 children: [
                   _summary(state.current, totalDuration),
                   if (_editing) _batchBar(),
                   Expanded(
                     child: ReorderableListView.builder(
-                      padding: const EdgeInsets.only(bottom: AppDimens.miniPlayerHeight + 16),
+                      padding: const EdgeInsets.only(
+                          bottom: AppDimens.miniPlayerHeight + 16),
                       proxyDecorator: (child, index, animation) {
                         return Material(
                           color: AppColors.darkBg,
@@ -70,7 +72,9 @@ class _QueuePageState extends ConsumerState<QueuePage> {
                       buildDefaultDragHandles: !_editing,
                       onReorder: (oldIndex, newIndex) {
                         if (newIndex > oldIndex) newIndex -= 1;
-                        ref.read(playerStateProvider.notifier).move(oldIndex, newIndex);
+                        ref
+                            .read(playerStateProvider.notifier)
+                            .move(oldIndex, newIndex);
                       },
                       itemCount: queue.length,
                       itemBuilder: (_, i) {
@@ -99,7 +103,8 @@ class _QueuePageState extends ConsumerState<QueuePage> {
           CupertinoButton(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             onPressed: () {
-              final sorted = _selectedIndexes.toList()..sort((a, b) => b.compareTo(a));
+              final sorted = _selectedIndexes.toList()
+                ..sort((a, b) => b.compareTo(a));
               for (final i in sorted) {
                 ref.read(playerStateProvider.notifier).removeAt(i);
               }
@@ -126,7 +131,8 @@ class _QueuePageState extends ConsumerState<QueuePage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.darkDivider, width: 0.5)),
+        border: Border(
+            bottom: BorderSide(color: AppColors.darkDivider, width: 0.5)),
       ),
       child: Row(
         children: [
@@ -137,7 +143,8 @@ class _QueuePageState extends ConsumerState<QueuePage> {
               color: AppColors.accent,
               borderRadius: BorderRadius.circular(6),
             ),
-            child: const Icon(CupertinoIcons.music_note_2, color: CupertinoColors.white, size: 18),
+            child: const Icon(CupertinoIcons.music_note_2,
+                color: CupertinoColors.white, size: 18),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -145,9 +152,11 @@ class _QueuePageState extends ConsumerState<QueuePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                DSText(current.title, maxLines: 1, overflow: TextOverflow.ellipsis),
+                DSText(current.title,
+                    maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 2),
-                DSText.assistant('共 ${ref.read(playerStateProvider).queue.length} 首 · 总时长 ${_formatTotal(totalSeconds)}'),
+                DSText.assistant(
+                    '共 ${ref.read(playerStateProvider).queue.length} 首 · 总时长 ${_formatTotal(totalSeconds)}'),
               ],
             ),
           ),
@@ -157,7 +166,8 @@ class _QueuePageState extends ConsumerState<QueuePage> {
             },
             child: const Padding(
               padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Icon(CupertinoIcons.trash, color: AppColors.danger, size: 20),
+              child:
+                  Icon(CupertinoIcons.trash, color: AppColors.danger, size: 20),
             ),
           ),
         ],
@@ -173,11 +183,14 @@ class _QueuePageState extends ConsumerState<QueuePage> {
         children: [
           GestureDetector(
             onTap: () => setState(() {
-              if (_selectedIndexes.length == ref.read(playerStateProvider).queue.length) {
+              if (_selectedIndexes.length ==
+                  ref.read(playerStateProvider).queue.length) {
                 _selectedIndexes.clear();
               } else {
                 _selectedIndexes.clear();
-                for (var i = 0; i < ref.read(playerStateProvider).queue.length; i++) {
+                for (var i = 0;
+                    i < ref.read(playerStateProvider).queue.length;
+                    i++) {
                   _selectedIndexes.add(i);
                 }
               }
@@ -185,7 +198,8 @@ class _QueuePageState extends ConsumerState<QueuePage> {
             child: Row(
               children: [
                 Icon(
-                  _selectedIndexes.length == ref.read(playerStateProvider).queue.length
+                  _selectedIndexes.length ==
+                          ref.read(playerStateProvider).queue.length
                       ? CupertinoIcons.checkmark_square_fill
                       : CupertinoIcons.square,
                   color: AppColors.accent,
@@ -212,7 +226,9 @@ class _QueuePageState extends ConsumerState<QueuePage> {
     required bool isCurrent,
   }) {
     final repo = ref.read(libraryRepositoryProvider);
-    final coverUrl = song.albumId != null ? repo.coverUrl(song.albumId!, size: 'small') : null;
+    final coverUrl = song.albumId != null
+        ? repo.coverUrl(song.albumId!, size: 'small')
+        : null;
 
     Widget content = Container(
       color: isCurrent ? AppColors.accent.withOpacity(0.12) : null,
@@ -233,7 +249,9 @@ class _QueuePageState extends ConsumerState<QueuePage> {
                   _selectedIndexes.contains(index)
                       ? CupertinoIcons.checkmark_circle_fill
                       : CupertinoIcons.circle,
-                  color: _selectedIndexes.contains(index) ? AppColors.accent : AppColors.textAssistantDark,
+                  color: _selectedIndexes.contains(index)
+                      ? AppColors.accent
+                      : AppColors.textAssistantDark,
                   size: 22,
                 ),
               ),
@@ -242,8 +260,11 @@ class _QueuePageState extends ConsumerState<QueuePage> {
             SizedBox(
               width: 40,
               child: isCurrent
-                  ? const Icon(CupertinoIcons.speaker_2_fill, color: AppColors.accent, size: 18)
-                  : Center(child: DSText('${index + 1}', color: AppColors.textAssistantDark)),
+                  ? const Icon(CupertinoIcons.speaker_2_fill,
+                      color: AppColors.accent, size: 18)
+                  : Center(
+                      child: DSText('${index + 1}',
+                          color: AppColors.textAssistantDark)),
             ),
           Expanded(
             child: SongListTile(
@@ -253,7 +274,9 @@ class _QueuePageState extends ConsumerState<QueuePage> {
               onTap: _editing
                   ? null
                   : () async {
-                      ref.read(playerStateProvider.notifier).setCurrentIndex(index);
+                      ref
+                          .read(playerStateProvider.notifier)
+                          .setCurrentIndex(index);
                       final h = ref.read(audioHandlerProvider);
                       await h.skipToQueueItem(index);
                     },
@@ -273,7 +296,8 @@ class _QueuePageState extends ConsumerState<QueuePage> {
             color: AppColors.danger,
             alignment: Alignment.centerRight,
             padding: const EdgeInsets.only(right: 24),
-            child: const Icon(CupertinoIcons.trash, color: CupertinoColors.white),
+            child:
+                const Icon(CupertinoIcons.trash, color: CupertinoColors.white),
           ),
           onDismissed: (_) {
             ref.read(playerStateProvider.notifier).removeAt(index);

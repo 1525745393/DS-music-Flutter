@@ -61,6 +61,5 @@ class SleepTimerNotifier extends StateNotifier<Duration> {
   }
 }
 
-final sleepTimerProvider =
-    StateNotifierProvider<SleepTimerNotifier, Duration>(
-        (ref) => SleepTimerNotifier(ref));
+final sleepTimerProvider = StateNotifierProvider<SleepTimerNotifier, Duration>(
+    (ref) => SleepTimerNotifier(ref));
