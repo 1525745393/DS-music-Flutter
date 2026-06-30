@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show ListTile;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/cards/album_grid_item.dart';
 import '../../components/ds_state_page.dart';
@@ -10,8 +11,10 @@ import '../../model/album.dart';
 import '../../model/artist.dart';
 import '../../model/playlist.dart';
 import '../../model/song.dart';
+import '../../pages/folder/folder_browse_page.dart';
 import '../../provider/core_providers.dart';
 import '../../provider/library_provider.dart';
+import '../../provider/player_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_dimens.dart';
 import '../../utils/responsive.dart';
@@ -244,6 +247,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Widget _songsView({required Key key}) {
+    final t = context.s;
     final async = ref.watch(songsProvider);
     return async.when(
       loading: () => const DSStatePage(type: StateType.loading, message: '加载歌曲中...'),

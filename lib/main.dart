@@ -165,7 +165,7 @@ class _DSPlayerAppState extends ConsumerState<DSPlayerApp> {
   /// 检查是否首次启动：仅一次，读取 SharedPreferences
   Future<void> _checkFirstLaunch() async {
     try {
-      final sp = await ref.read(sharedPreferencesProvider.future);
+      final sp = ref.read(sharedPreferencesProvider);
       final launched = sp.getBool(StorageKeys.firstLaunch) ?? true;
       if (mounted) {
         setState(() {

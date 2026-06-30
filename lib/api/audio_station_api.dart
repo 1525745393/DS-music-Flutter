@@ -50,8 +50,8 @@ class AudioStationApi {
       'additional': 'song_count,all_songs',
     });
     final album = Album.fromJson(Map<String, dynamic>.from(data['album'] ?? {}));
-    final songs = (data['songs'] as List?)?..cast<Map<String, dynamic>>() ?? [];
-    return (album: album, songs: songs.map(Song.fromJson).toList());
+    final songsList = (data['songs'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+    return (album: album, songs: songsList.map(Song.fromJson).toList());
   }
 
   // ==================== Artists ====================
@@ -233,9 +233,9 @@ class AudioStationApi {
       'id': song.id,
     };
     if (forceTranscode && !preferLossless) {
-      params['format'] = format ?? AppConstants.transcodeMp3;
-      params['bitrate'] = bitrate ?? AppConstants.transcodeBitrate;
-      params['samplerate'] = AppConstants.transcodeSampleRate;
+      params['format'] = format ?? ApiConstants.transcodeMp3;
+      params['bitrate'] = bitrate ?? ApiConstants.transcodeBitrate;
+      params['samplerate'] = ApiConstants.transcodeSampleRate;
     }
     final query = _buildQuery(params);
     return '${_client.baseUrl}/${ApiConstants.streamPath}?$query';

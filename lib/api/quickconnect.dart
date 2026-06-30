@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import '../constants/api_constants.dart';
 import '../model/exception.dart';
 import '../utils/logger.dart';
@@ -13,9 +14,22 @@ class QuickConnect {
     baseUrl: 'https://$_apiHost',
     connectTimeout: const Duration(seconds: 8),
     receiveTimeout: const Duration(seconds: 8),
-  ))
-    ..httpClientAdapter = (HttpClient()
-          ..badCertificateCallback = (cert, host, port) => true);
+  ))..httpClientAdapter = _insecureAdapter();
+  // 关键：使用 IOHttpClientAdapter 配置自签证书接受，
+  // 旧 API 直接赋 HttpClient 在 Dio 5.x 会类型不匹配（HttpClient vs HttpClientAdapter）
+
+  /// 构建一个接受自签证书的 Dio HTTP 适配器
+  /// 安全性说明：仅用于 QuickConnect 中继接口（公网服务器），
+  /// 自签证书接受仅影响本次会话，不会落盘到全局 Dio 实例。
+  static HttpClientAdapter _insecureAdapter() {
+    final adapter = IOHttpClientAdapter();
+    adapter.createHttpClient = () {
+      final client = HttpClient();
+      client.badCertificateCallback = (cert, host, port) => true;
+      return client;
+    };
+    return adapter;
+  }
 
   /// 第一步：开始 QuickConnect
   /// 返回 {server_id, session_id, ...}

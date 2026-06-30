@@ -41,4 +41,9 @@ class ApiConstants {
   static const int defaultHttpsPort = 5001;
   static const int timeoutSeconds = 15;
   static const int retryCount = 2;
+
+  // —— 默认转码参数（蜂窝网络下使用）——
+  static const String transcodeMp3 = 'mp3';
+  static const int transcodeBitrate = 128000; // 128kbps
+  static const int transcodeSampleRate = 44100; // 44.1kHz
 }

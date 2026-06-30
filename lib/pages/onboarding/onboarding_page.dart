@@ -58,7 +58,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   }
 
   Future<void> _complete() async {
-    final sp = await ref.read(sharedPreferencesProvider.future);
+    final sp = ref.read(sharedPreferencesProvider);
     await sp.setBool(StorageKeys.firstLaunch, false);
     widget.onCompleted();
   }

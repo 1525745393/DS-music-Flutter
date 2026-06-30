@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_dimens.dart';
-import 'ds_text.dart';
+import '../ds_text.dart';
 
 /// iOS 风格按钮：透明度反馈，无波纹
 class DSButton extends StatefulWidget {

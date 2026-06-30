@@ -32,6 +32,9 @@ class PlayerStateData {
     this.isFullScreen = false,
   });
 
+  /// 别名：与 just_audio 等外部 API 命名习惯保持一致
+  bool get isPlaying => playing;
+
   PlayerStateData copyWith({
     List<Song>? queue,
     int? currentIndex,

@@ -112,15 +112,11 @@ class AppStrings {
   String get retryLater => isEnglish ? 'Please try again later' : '请稍后重试';
 
   // —— 登录页 ——
-  String get connectToNas => isEnglish
-      ? 'Connect to your Synology AudioStation'
-      : '连接你的群晖 AudioStation';
   String get modeLan => isEnglish ? 'LAN' : '内网';
   String get modeDdns => isEnglish ? 'Domain' : '域名';
   String get quickConnect => 'QuickConnect';
   String get hintAccount => isEnglish ? 'Synology account' : '群晖账号';
   String get hintPassword => isEnglish ? 'Enter password' : '请输入密码';
-  String get useHttps => isEnglish ? 'Use HTTPS (self-signed)' : '使用 HTTPS（自签证书）';
   String get pleaseFillAccount => isEnglish
       ? 'Please enter account and password'
       : '请填写账号和密码';

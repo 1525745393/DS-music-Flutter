@@ -24,29 +24,45 @@ class DSText extends StatelessWidget {
     this.style,
   });
 
-  const DSText.largeTitle(this.text, {super.key, this.color, this.maxLines})
-      : type = TextStyleType.largeTitle,
-        textAlign = null,
-        style = null,
-        overflow = null;
+  const DSText.largeTitle(
+    this.text, {
+    super.key,
+    this.color,
+    this.maxLines,
+    this.textAlign,
+    this.overflow,
+    this.style,
+  }) : type = TextStyleType.largeTitle;
 
-  const DSText.title(this.text, {super.key, this.color, this.maxLines})
-      : type = TextStyleType.title,
-        textAlign = null,
-        style = null,
-        overflow = null;
+  const DSText.title(
+    this.text, {
+    super.key,
+    this.color,
+    this.maxLines,
+    this.textAlign,
+    this.overflow,
+    this.style,
+  }) : type = TextStyleType.title;
 
-  const DSText.body(this.text, {super.key, this.color, this.maxLines})
-      : type = TextStyleType.body,
-        textAlign = null,
-        style = null,
-        overflow = null;
+  const DSText.body(
+    this.text, {
+    super.key,
+    this.color,
+    this.maxLines,
+    this.textAlign,
+    this.overflow,
+    this.style,
+  }) : type = TextStyleType.body;
 
-  const DSText.assistant(this.text, {super.key, this.color, this.maxLines})
-      : type = TextStyleType.assistant,
-        textAlign = null,
-        style = null,
-        overflow = null;
+  const DSText.assistant(
+    this.text, {
+    super.key,
+    this.color,
+    this.maxLines,
+    this.textAlign,
+    this.overflow,
+    this.style,
+  }) : type = TextStyleType.assistant;
 
   @override
   Widget build(BuildContext context) {
