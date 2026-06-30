@@ -51,8 +51,9 @@ dependencies:
   # 写 ^1.0.0 导致 pub 解析失败退出 69
   upnp2: ^3.0.0
 
-  # 均衡器
-  flutter_equalizer: ^0.1.2
+  # 均衡器：原生插件走 graceful degradation
+  # 不依赖任何 native 插件，UI 仅维护状态
+  # 后续可接 audio_session 提供的 native equalizer capabilities
 
   # UI 辅助
   shimmer: ^3.0.0
