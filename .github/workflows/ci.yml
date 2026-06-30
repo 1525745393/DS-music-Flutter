@@ -81,7 +81,12 @@ jobs:
     name: Build Android (APK)
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')
+    # 关键：main 分支、release/* 分支、v* tag push 都要构建 APK
+    # tag push 场景：合 main → 打 tag v1.1.0 → push tag 触发本 job + release job
+    if: |
+      github.ref == 'refs/heads/main' ||
+      startsWith(github.ref, 'refs/heads/release/') ||
+      startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
