@@ -24,10 +24,8 @@ dependencies:
   # 播放核心
   just_audio: ^0.9.36
   just_audio_background: ^0.0.1-beta.11
-  just_audio_media_kit: ^0.0.2
   audio_service: ^0.18.12
   audio_session: ^0.1.18
-  audio_handler: ^0.1.0
 
   # 状态管理
   flutter_riverpod: ^2.5.1
@@ -53,13 +51,11 @@ dependencies:
   upnp2: ^1.0.0
   multicast: ^0.3.0+1
   network_info_plus: ^5.0.3
-  socket_io_client: ^2.0.3+1
 
   # 均衡器
   flutter_equalizer: ^0.1.2
 
   # UI 辅助
-  flutter_svg: ^2.0.10+1
   shimmer: ^3.0.0
   animations: ^2.0.10
   flutter_staggered_grid_view: ^0.7.0
@@ -71,7 +67,6 @@ dependencies:
   uuid: ^4.4.0
   rxdart: ^0.27.7
   url_launcher: ^6.3.0
-  get_it: ^7.7.0
 
 dev_dependencies:
   flutter_test:
