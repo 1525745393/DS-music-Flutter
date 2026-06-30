@@ -16,6 +16,8 @@ class SettingsState {
   final bool equalizerEnabled;
   final int equalizerPreset;
   final double volume;
+  /// 语言：'system' / 'zh' / 'en'
+  final String localeCode;
 
   const SettingsState({
     this.followSystemTheme = true,
@@ -30,6 +32,7 @@ class SettingsState {
     this.equalizerEnabled = false,
     this.equalizerPreset = 0,
     this.volume = 1.0,
+    this.localeCode = 'system',
   });
 
   SettingsState copyWith({
@@ -45,6 +48,7 @@ class SettingsState {
     bool? equalizerEnabled,
     int? equalizerPreset,
     double? volume,
+    String? localeCode,
   }) {
     return SettingsState(
       followSystemTheme: followSystemTheme ?? this.followSystemTheme,
@@ -60,6 +64,7 @@ class SettingsState {
       equalizerEnabled: equalizerEnabled ?? this.equalizerEnabled,
       equalizerPreset: equalizerPreset ?? this.equalizerPreset,
       volume: volume ?? this.volume,
+      localeCode: localeCode ?? this.localeCode,
     );
   }
 }
@@ -144,6 +149,11 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   Future<void> setVolume(double v) async {
     state = state.copyWith(volume: v);
     await _sp.setDouble(StorageKeys.playVolume, v);
+  }
+
+  Future<void> setLocaleCode(String code) async {
+    state = state.copyWith(localeCode: code);
+    await _sp.setString(StorageKeys.localeCode, code);
   }
 }
 

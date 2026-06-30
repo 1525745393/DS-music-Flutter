@@ -9,11 +9,13 @@ import 'package:just_audio_background/just_audio_background.dart';
 
 import 'constants/storage_keys.dart';
 import 'model/song.dart';
+import 'player/android_auto_browse_tree.dart';
 import 'player/audio_handler.dart';
 import 'player/playback_service.dart';
 import 'provider/auth_provider.dart';
 import 'provider/core_providers.dart';
 import 'provider/settings_provider.dart';
+import 'repository/library_repository.dart';
 import 'pages/login/login_page.dart';
 import 'pages/main_shell.dart';
 import 'pages/onboarding/onboarding_page.dart';
@@ -164,6 +166,7 @@ class _DSPlayerAppState extends ConsumerState<DSPlayerApp> {
   @override
   Widget build(BuildContext context) {
     final isLoggedIn = ref.watch(isLoggedInProvider);
+    final localeCode = ref.watch(settingsProvider.select((s) => s.localeCode));
     // 启动检查未完成前先显示空白背景，避免闪现
     if (!_onboardingChecked) {
       return CupertinoApp(
@@ -187,7 +190,12 @@ class _DSPlayerAppState extends ConsumerState<DSPlayerApp> {
         Locale('zh', 'CN'),
         Locale('en', 'US'),
       ],
-      locale: const Locale('zh', 'CN'),
+      // 关键：根据 settings.localeCode 切换；'system' 表示 null 跟随系统
+      locale: switch (localeCode) {
+        'zh' => const Locale('zh', 'CN'),
+        'en' => const Locale('en', 'US'),
+        _ => null,
+      },
       home: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         child: _showOnboarding

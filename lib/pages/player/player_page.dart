@@ -5,8 +5,10 @@ import '../../components/ds_text.dart';
 import '../../components/gestures/swipe_to_dismiss.dart';
 import '../../model/lyrics.dart';
 import '../../model/song.dart';
+import '../../constants/app_constants.dart';
 import '../../player/playback_service.dart';
 import '../../player/overlay_lyrics_controller.dart';
+import '../../player/sleep_timer.dart';
 import '../../provider/core_providers.dart';
 import '../../provider/library_provider.dart';
 import '../../provider/lyrics_provider.dart';
@@ -463,11 +465,75 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
               color: _overlayOn ? AppColors.accent : CupertinoColors.white,
             ),
           ),
-          const Icon(CupertinoIcons.speaker_2_fill, size: AppDimens.smallIconSize, color: CupertinoColors.white),
+          // A7 修复：第 5 个图标改为"睡眠定时"快捷入口
+          // 原 speaker_2_fill 是占位，现在替换为月亮图标，点击弹出时长选择
+          GestureDetector(
+            onTap: () => _showSleepSheet(context, ref),
+            child: Icon(
+              CupertinoIcons.moon,
+              size: AppDimens.smallIconSize,
+              color: ref.watch(sleepTimerProvider).inMinutes > 0
+                  ? AppColors.accent
+                  : CupertinoColors.white,
+            ),
+          ),
         ],
       ),
     );
   }
+
+  /// 睡眠定时快捷选择 sheet
+  void _showSleepSheet(BuildContext context, WidgetRef ref) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (_) => Container(
+        height: 280,
+        color: AppColors.darkCard,
+        child: Column(
+          children: [
+            SizedBox(
+              height: 44,
+              child: Row(
+                children: [
+                  CupertinoButton(
+                    onPressed: () {
+                      ref.read(sleepTimerProvider.notifier).cancel();
+                      Navigator.pop(context);
+                    },
+                    child: const DSText('关闭'),
+                  ),
+                  const Spacer(),
+                  CupertinoButton(
+                    onPressed: () {
+                      // onSelectedItemChanged 已经写入 _selectedMinutes
+                      ref.read(sleepTimerProvider.notifier).start(_selectedMinutes);
+                      Navigator.pop(context);
+                    },
+                    child: const DSText('确定'),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: CupertinoPicker(
+                itemExtent: 32,
+                scrollController: FixedExtentScrollController(
+                  initialItem: AppConstants.sleepOptions.indexOf(_selectedMinutes).clamp(0, AppConstants.sleepOptions.length - 1),
+                ),
+                onSelectedItemChanged: (i) => _selectedMinutes = AppConstants.sleepOptions[i],
+                children: [
+                  for (final m in AppConstants.sleepOptions) Center(child: DSText('$m 分钟')),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 睡眠定时初始分钟数（Picker 状态）
+  int _selectedMinutes = AppConstants.sleepOptions[0];
 }
 
 /// 横屏布局中作为左/右侧的占位/对齐辅助

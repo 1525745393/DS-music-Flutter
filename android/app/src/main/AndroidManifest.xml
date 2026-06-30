@@ -73,9 +73,11 @@
             </intent-filter>
         </receiver>
 
-        <!-- audio_service 前台服务 -->
+        <!-- Android Auto / 系统媒体浏览服务
+             替换原 audio_service.AudioService，由 AABrowseService 提供
+             真实媒体库浏览能力（通过 MethodChannel 回查 Dart 侧） -->
         <service
-            android:name="com.ryanheise.audioservice.AudioService"
+            android:name="com.dsplayer.music.AABrowseService"
             android:foregroundServiceType="mediaPlayback"
             android:exported="true"
             tools:ignore="Instantiatable">

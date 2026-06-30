@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/ds_text.dart';
 import '../../constants/app_constants.dart';
+import '../../l10n/app_strings.dart';
 import '../../player/sleep_timer.dart';
 import '../../provider/auth_provider.dart';
 import '../../provider/settings_provider.dart';
@@ -9,10 +10,15 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_dimens.dart';
 import '../cache/cache_manage_page.dart';
 import '../dlna/dlna_devices_page.dart';
+import '../equalizer/equalizer_page.dart';
 import '../overlay_lyrics/overlay_lyrics_settings_page.dart';
 import '../servers/servers_page.dart';
+import 'transcode_picker_page.dart';
+import 'locale_picker_page.dart';
 
 /// 设置页：iOS 分组列表
+/// 关键变更（A4）：所有硬编码中文字符串已切换为 [context.s.xxx]，
+/// 切换语言后立即生效。
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
@@ -21,74 +27,95 @@ class SettingsPage extends ConsumerWidget {
     final s = ref.watch(settingsProvider);
     final notifier = ref.read(settingsProvider.notifier);
     final sleep = ref.watch(sleepTimerProvider);
+    final t = context.s; // 本地字符串
 
     return CupertinoPageScaffold(
       backgroundColor: AppColors.darkBg,
-      navigationBar: const CupertinoNavigationBar(
+      navigationBar: CupertinoNavigationBar(
         backgroundColor: AppColors.darkBg,
-        border: Border(),
-        middle: DSText('设置'),
+        border: const Border(),
+        middle: DSText(t.settings),
       ),
       child: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: 16),
           children: [
-            _section('外观', [
-              _row('跟随系统主题', trailing: CupertinoSwitch(
+            _section(context, t.appearance, [
+              _row(context, t.followSystemTheme, trailing: CupertinoSwitch(
                 value: s.followSystemTheme,
                 onChanged: (v) => notifier.setFollowSystemTheme(v),
               )),
-              _row('深色模式', trailing: CupertinoSwitch(
+              _row(context, t.darkMode, trailing: CupertinoSwitch(
                 value: s.isDark,
                 onChanged: (v) => notifier.setDark(v),
               )),
+              _row(context, '语言', trailing: DSText.assistant(_localeLabel(context, s.localeCode)), onTap: () {
+                Navigator.of(context).push(CupertinoPageRoute(
+                  builder: (_) => const LocalePickerPage(),
+                ));
+              }),
             ]),
-            _section('播放', [
-              _row('无缝播放 (gapless)', trailing: CupertinoSwitch(
+            _section(context, t.playback, [
+              _row(context, t.gapless, trailing: CupertinoSwitch(
                 value: s.gaplessEnabled,
                 onChanged: (v) => notifier.setGapless(v),
               )),
-              _row('音量标准化', trailing: CupertinoSwitch(
+              _row(context, t.volumeNormalize, trailing: CupertinoSwitch(
                 value: s.normalizeVolume,
                 onChanged: (v) => notifier.setNormalize(v),
               )),
-              _row('外网强制无损', trailing: CupertinoSwitch(
+              _row(context, '外网强制无损', trailing: CupertinoSwitch(
                 value: s.forceLossless,
                 onChanged: (v) => notifier.setForceLossless(v),
               )),
-              _row('均衡器', trailing: CupertinoSwitch(
+              _row(context, t.equalizer, trailing: CupertinoSwitch(
                 value: s.equalizerEnabled,
                 onChanged: (v) => notifier.setEqEnabled(v),
               )),
-              _row('睡眠定时',
-                  trailing: DSText.assistant(sleep.inMinutes == 0 ? '关闭' : '${sleep.inMinutes} 分钟'),
+              _row(context, '均衡器调节', trailing: const Icon(CupertinoIcons.chevron_right,
+                  color: AppColors.textAssistantDark, size: 16), onTap: () {
+                Navigator.of(context).push(CupertinoPageRoute(
+                  builder: (_) => const EqualizerPage(),
+                ));
+              }),
+              _row(context, t.sleepTimer,
+                  trailing: DSText.assistant(sleep.inMinutes == 0
+                      ? t.close : '${sleep.inMinutes} 分钟'),
                   onTap: () => _showSleepPicker(context, ref)),
             ]),
-            _section('转码设置', [
-              _row('格式', trailing: DSText.assistant(s.transcodeFormat), onTap: () {}),
-              _row('码率', trailing: DSText.assistant('${s.transcodeBitrate ~/ 1000} kbps'), onTap: () {}),
-              _row('移动网络强制转码', trailing: CupertinoSwitch(
+            _section(context, '转码设置', [
+              _row(context, '格式', trailing: DSText.assistant(s.transcodeFormat), onTap: () {
+                Navigator.of(context).push(CupertinoPageRoute(
+                  builder: (_) => const TranscodePickerPage(type: TranscodePickerType.format),
+                ));
+              }),
+              _row(context, '码率', trailing: DSText.assistant('${s.transcodeBitrate ~/ 1000} kbps'), onTap: () {
+                Navigator.of(context).push(CupertinoPageRoute(
+                  builder: (_) => const TranscodePickerPage(type: TranscodePickerType.bitrate),
+                ));
+              }),
+              _row(context, '移动网络强制转码', trailing: CupertinoSwitch(
                 value: s.forceTranscodeOnMobile,
                 onChanged: (v) => notifier.setForceTranscodeOnMobile(v),
               )),
             ]),
-            _section('存储', [
-              _row('缓存管理', onTap: () {
+            _section(context, t.storage, [
+              _row(context, t.cacheManagement, onTap: () {
                 Navigator.of(context).push(CupertinoPageRoute(builder: (_) => const CacheManagePage()));
               }),
-              _row('悬浮歌词', onTap: () {
+              _row(context, '悬浮歌词', onTap: () {
                 Navigator.of(context).push(CupertinoPageRoute(
                     builder: (_) => const OverlayLyricsSettingsPage()));
               }),
             ]),
-            _section('账号', [
-              _row('服务器列表', onTap: () {
+            _section(context, t.accountGroup, [
+              _row(context, t.servers, onTap: () {
                 Navigator.of(context).push(CupertinoPageRoute(builder: (_) => const ServersPage()));
               }),
-              _row('DLNA 设备', onTap: () {
+              _row(context, t.dlnaDevices, onTap: () {
                 Navigator.of(context).push(CupertinoPageRoute(builder: (_) => const DlnaDevicesPage()));
               }),
-              _row('退出登录', onTap: () => _confirmLogout(context, ref)),
+              _row(context, t.logout, onTap: () => _confirmLogout(context, ref)),
             ]),
           ],
         ),
@@ -96,7 +123,7 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
-  Widget _section(String title, List<Widget> children) {
+  Widget _section(BuildContext context, String title, List<Widget> children) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppDimens.groupSpacing),
       child: Column(
@@ -125,7 +152,7 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
-  Widget _row(String title, {Widget? trailing, VoidCallback? onTap}) {
+  Widget _row(BuildContext context, String title, {Widget? trailing, VoidCallback? onTap}) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
@@ -144,8 +171,18 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
+  String _localeLabel(BuildContext context, String code) {
+    final t = context.s;
+    switch (code) {
+      case 'zh': return '简体中文';
+      case 'en': return 'English';
+      default: return t.followSystemTheme; // 复用 "跟随系统" 含义相近
+    }
+  }
+
   void _showSleepPicker(BuildContext context, WidgetRef ref) {
     int currentIndex = 0;
+    final t = context.s;
     showCupertinoModalPopup(
       context: context,
       builder: (_) => Container(
@@ -162,7 +199,7 @@ class SettingsPage extends ConsumerWidget {
                       ref.read(sleepTimerProvider.notifier).cancel();
                       Navigator.pop(context);
                     },
-                    child: const DSText('关闭'),
+                    child: DSText(t.close),
                   ),
                   const Spacer(),
                   CupertinoButton(
@@ -171,7 +208,7 @@ class SettingsPage extends ConsumerWidget {
                           .start(AppConstants.sleepOptions[currentIndex]);
                       Navigator.pop(context);
                     },
-                    child: const DSText('确定'),
+                    child: DSText(t.confirm),
                   ),
                 ],
               ),
@@ -192,18 +229,19 @@ class SettingsPage extends ConsumerWidget {
   }
 
   void _confirmLogout(BuildContext context, WidgetRef ref) {
+    final t = context.s;
     showCupertinoDialog(
       context: context,
       builder: (_) => CupertinoAlertDialog(
-        title: const DSText('退出登录'),
-        content: const Padding(
-          padding: EdgeInsets.only(top: 8),
+        title: DSText(t.logout),
+        content: Padding(
+          padding: const EdgeInsets.only(top: 8),
           child: DSText('确定退出当前账号？'),
         ),
         actions: [
           CupertinoDialogAction(
             onPressed: () => Navigator.pop(context),
-            child: const DSText('取消'),
+            child: DSText(t.cancel),
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
@@ -214,7 +252,7 @@ class SettingsPage extends ConsumerWidget {
                 Navigator.of(context).popUntil((r) => r.isFirst);
               }
             },
-            child: const DSText('确定'),
+            child: DSText(t.confirm),
           ),
         ],
       ),

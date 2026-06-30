@@ -51,7 +51,8 @@ final quickConnectProvider = Provider<QuickConnect>((ref) => QuickConnect());
 
 final downloadApiProvider = Provider<DownloadApi>((ref) {
   final audio = ref.watch(audioStationApiProvider);
-  final api = DownloadApi(audio);
+  final sp = ref.watch(sharedPreferencesProvider);
+  final api = DownloadApi(audio, sp);
   ref.onDispose(api.dispose);
   return api;
 });

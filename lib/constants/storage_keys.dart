@@ -34,6 +34,9 @@ class StorageKeys {
   // 缓存
   static const String cachedSizeBytes = 'ds_cached_size_bytes';
 
+  // 下载任务持久化
+  static const String downloadTasks = 'ds_download_tasks';
+
   // 均衡器
   static const String equalizerEnabled = 'ds_eq_enabled';
   static const String equalizerPreset = 'ds_eq_preset';
@@ -47,4 +50,7 @@ class StorageKeys {
   static const String overlayFontSize = 'ds_overlay_font_size';
   static const String overlayPosition = 'ds_overlay_position';
   static const String overlayEnabled = 'ds_overlay_enabled';
+
+  // 国际化
+  static const String localeCode = 'ds_locale_code';
 }

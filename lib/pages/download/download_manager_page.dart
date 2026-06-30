@@ -129,6 +129,7 @@ class _DownloadManagerPageState extends ConsumerState<DownloadManagerPage> {
   }
 
   Widget _songItem(Song s, _DownloadProgress? p) {
+    final api = ref.read(downloadApiProvider);
     final selected = _selected.contains(s.id);
     final completed = p?.status == DownloadStatus.completed;
     final downloading = p?.status == DownloadStatus.downloading;
@@ -199,7 +200,21 @@ class _DownloadManagerPageState extends ConsumerState<DownloadManagerPage> {
             if (completed)
               const Icon(CupertinoIcons.checkmark_alt_circle_fill, color: AppColors.success, size: 20)
             else if (downloading)
-              const CupertinoActivityIndicator(radius: 8)
+              GestureDetector(
+                onTap: () => api.pause(s.id),
+                child: const Padding(
+                  padding: EdgeInsets.all(6),
+                  child: Icon(CupertinoIcons.pause_circle_fill, color: AppColors.accent, size: 22),
+                ),
+              )
+            else if (p?.status == DownloadStatus.paused || p?.status == DownloadStatus.failed)
+              GestureDetector(
+                onTap: () => api.resume(s.id),
+                child: const Padding(
+                  padding: EdgeInsets.all(6),
+                  child: Icon(CupertinoIcons.play_circle_fill, color: AppColors.accent, size: 22),
+                ),
+              )
             else
               GestureDetector(
                 onTap: () => _downloadOne(s),
@@ -214,24 +229,23 @@ class _DownloadManagerPageState extends ConsumerState<DownloadManagerPage> {
     );
   }
 
+  /// 注册下载任务，由 DownloadApi 内部调度器决定何时启动
+  /// 关键变更：原实现串行 await start(task)，新实现只 register，
+  /// 由 maxParallel=3 的调度器自动并行执行。
   Future<void> _downloadOne(Song s) async {
     final api = ref.read(downloadApiProvider);
-    final audio = ref.read(audioStationApiProvider);
-    final url = audio.buildDownloadUrl(s);
     final ext = s.container ?? 'mp3';
     final file = await FileUtils.songFile(
       album: s.album ?? 'unknown',
       title: s.title,
       ext: ext,
     );
-    final task = api.register(s, file.path);
-    await api.start(task);
+    api.register(s, file.path);
   }
 
   Future<void> _downloadSelected() async {
-    final selected = widget.songs.where((s) => _selected.contains(s.id)).toList();
-    // 串行下载（避免 NAS 带宽压力），可改为并发池
-    for (final s in selected) {
+    // 并发由 DownloadApi 内部 maxParallel 限制，UI 层只需批量注册
+    for (final s in widget.songs.where((s) => _selected.contains(s.id))) {
       await _downloadOne(s);
     }
   }

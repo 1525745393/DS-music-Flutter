@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/services.dart';
 import '../model/album.dart';
 import '../model/artist.dart';
 import '../model/playlist.dart';
@@ -154,6 +155,58 @@ class AndroidAutoBrowseTree {
         albumArtUrl: p.coverUrl,
         isBrowsable: true,
       );
+}
+
+/// MethodChannel 桥接：将 [AndroidAutoBrowseTree] 暴露给原生
+/// [AABrowseService]，让 Android Auto 能浏览真实媒体库。
+///
+/// 调用：
+/// ```dart
+/// final bridge = AABrowseBridge(tree);
+/// bridge.register();
+/// ```
+/// 反注册：调用 [AABrowseBridge.dispose]
+class AABrowseBridge {
+  static const MethodChannel _channel = MethodChannel('com.dsplayer.music/auto_browse');
+
+  final AndroidAutoBrowseTree tree;
+  AABrowseBridge(this.tree);
+
+  /// 在主 isolate 中注册
+  void register() {
+    _channel.setMethodCallHandler(_handle);
+  }
+
+  /// 注销
+  void dispose() {
+    _channel.setMethodCallHandler(null);
+  }
+
+  Future<dynamic> _handle(MethodCall call) async {
+    switch (call.method) {
+      case 'getChildren':
+        final parentId = (call.arguments as Map?)?['parentId']?.toString() ?? 'root';
+        final items = await tree.getChildren(parentId);
+        return items.map(_serialize).toList();
+      case 'getItem':
+        final mediaId = (call.arguments as Map?)?['mediaId']?.toString() ?? '';
+        final item = await tree.getItem(mediaId);
+        return item == null ? null : _serialize(item);
+      default:
+        throw MissingPluginException('AABrowseBridge 不支持 ${call.method}');
+    }
+  }
+
+  /// 将 [AutoMediaItem] 序列化为原生端约定的 Map 结构
+  Map<String, dynamic> _serialize(AutoMediaItem item) => {
+        'id': item.id,
+        'title': item.title,
+        'browsable': item.isBrowsable,
+        if (item.subtitle != null) 'artist': item.subtitle,
+        if (item.subtitle != null) 'album': item.subtitle,
+        if (item.durationMs != null) 'durationMs': item.durationMs,
+        if (item.albumArtUrl != null) 'artUri': item.albumArtUrl,
+      };
 }
 
 /// 浏览树节点（结构化数据，可由原生 Kotlin 转换为 MediaItem）

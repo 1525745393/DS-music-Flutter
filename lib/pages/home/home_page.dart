@@ -283,7 +283,13 @@ class _HomePageState extends ConsumerState<HomePage> {
               trailing: const Icon(CupertinoIcons.chevron_right,
                   color: AppColors.textAssistantDark, size: 16),
               onTap: () {
-                // 进入子目录
+                // A8 修复：进入子目录
+                Navigator.of(context).push(CupertinoPageRoute(
+                  builder: (_) => FolderBrowsePage(
+                    folderId: (f['id'] ?? '').toString(),
+                    folderName: (f['name'] ?? '未命名').toString(),
+                  ),
+                ));
               },
             );
           },
