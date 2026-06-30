@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../model/song.dart';
+import '../../player/network_type_watcher.dart';
 import '../../player/playback_service.dart';
 import '../../provider/player_provider.dart';
 import '../../provider/core_providers.dart';
@@ -96,11 +97,62 @@ class MiniPlayerBar extends ConsumerWidget {
                     await h.skipToNext();
                   },
                 ),
+                // 网络类型指示（蜂窝时显示"流量"标签提醒用户）
+                const _NetBadge(),
+                const SizedBox(width: 4),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// 网络类型小徽章：WiFi 时不显示，蜂窝时显示"流量"提示
+class _NetBadge extends StatelessWidget {
+  const _NetBadge();
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<NetType>(
+      stream: networkTypeWatcher.stream,
+      initialData: networkTypeWatcher.current,
+      builder: (_, snap) {
+        final type = snap.data ?? NetType.unknown;
+        if (type == NetType.wifi || type == NetType.ethernet || type == NetType.vpn) {
+          return const SizedBox.shrink();
+        }
+        if (type == NetType.none) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4),
+            child: Icon(CupertinoIcons.wifi_slash, size: 16, color: AppColors.textAssistantDark),
+          );
+        }
+        return const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 4),
+          child: _Chip(text: '流量'),
+        );
+      },
+    );
+  }
+}
+
+class _Chip extends StatelessWidget {
+  final String text;
+  const _Chip({required this.text});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: AppColors.accent.withOpacity(0.18),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: DSText.assistant(text, style: const TextStyle(
+        color: AppColors.accent,
+        fontSize: 10,
+        fontWeight: FontWeight.w600,
+      )),
     );
   }
 }

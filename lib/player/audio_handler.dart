@@ -4,6 +4,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import '../model/song.dart';
 import '../utils/logger.dart';
+import 'network_type_watcher.dart';
 
 /// 库数据获取的抽象接口
 /// 设计原因：让 DSPlayerHandler 不直接依赖 ProviderContainer，
@@ -28,9 +29,27 @@ class DSPlayerHandler extends BaseAudioHandler with SeekHandler {
   })  : _repoGetter = repoGetter,
         _settingsGetter = settingsGetter {
     _init();
+    _watchNetwork();
   }
 
   AudioPlayer get player => _player;
+
+  // 当前网络类型（WiFi/有线 → 原始码流；蜂窝/未知 → 转码）
+  NetType _currentNetType = networkTypeWatcher.current;
+  NetType get currentNetType => _currentNetType;
+
+  /// 订阅网络变化：在蜂窝/未知/无网络下应使用转码流
+  /// 设计原因：用户进入 WiFi 区域时希望立即切换回原始码流；
+  /// 离开 WiFi 时降到转码以节省流量。
+  /// 当前限制：仅记录策略变化；实时重建队列在用户主动设置开关或
+  /// 切歌时才会生效，避免在播放途中频繁切换源造成卡顿。
+  void _watchNetwork() {
+    networkTypeWatcher.stream.listen((type) {
+      if (type == _currentNetType) return;
+      _currentNetType = type;
+      AppLogger.i('音频码流策略: ${type.label} → ${type.isHighBandwidth ? "原始" : "转码"}');
+    });
+  }
 
   Future<void> _init() async {
     _player.playbackEventStream.listen(_broadcastState, onError: (Object e, StackTrace st) {
@@ -50,7 +69,14 @@ class DSPlayerHandler extends BaseAudioHandler with SeekHandler {
   }
 
   /// 播放指定队列
-  Future<void> setQueueAndPlay(List<Song> songs, {int startIndex = 0}) async {
+  /// [resumePosition] 从指定位置恢复（用于网络切换重建队列）
+  /// [autoPlay] 是否在加载完成后自动播放
+  Future<void> setQueueAndPlay(
+    List<Song> songs, {
+    int startIndex = 0,
+    Duration resumePosition = Duration.zero,
+    bool autoPlay = true,
+  }) async {
     if (songs.isEmpty) return;
     _currentQueue
       ..clear()
@@ -69,7 +95,12 @@ class DSPlayerHandler extends BaseAudioHandler with SeekHandler {
       initialIndex: startIndex,
       preload: true,
     );
-    await _player.play();
+    if (resumePosition > Duration.zero) {
+      await _player.seek(resumePosition);
+    }
+    if (autoPlay) {
+      await _player.play();
+    }
   }
 
   Future<void> setSingleAndPlay(Song song) async {
@@ -127,17 +158,34 @@ class DSPlayerHandler extends BaseAudioHandler with SeekHandler {
         tag: _mediaItem(song),
       );
     }
-    // WiFi/蜂窝智能选择
-    final isWifi = true; // 实际可在 setQueueAndPlay 前预判
+    // WiFi/有线 → 原始码流（无损）；蜂窝/未知/无网络 → 转码
     final settings = _settingsGetter();
+    final forceTranscode = !_currentNetType.isHighBandwidth || settings.forceTranscodeOnMobile;
     final url = _repoGetter().streamUrl(
       song,
-      forceTranscode: !isWifi,
+      forceTranscode: forceTranscode,
       preferLossless: settings.forceLossless,
     );
     return AudioSource.uri(
       Uri.parse(url),
       tag: _mediaItem(song),
+    );
+  }
+
+  /// 网络切换后重建队列。
+  /// 设计原因：原队列的 URL 已经在 setAudioSource 时锁定，单纯订阅变化无济于事；
+  /// 需重建 ConcatenatingAudioSource 并从当前位置恢复。
+  Future<void> _rebuildForNetwork() async {
+    if (_currentQueue.isEmpty) return;
+    final idx = _player.currentIndex ?? 0;
+    final pos = _player.position;
+    final wasPlaying = _player.playing;
+    AppLogger.i('网络变化：重建队列以切换码流策略');
+    await setQueueAndPlay(
+      List<Song>.from(_currentQueue),
+      startIndex: idx,
+      resumePosition: pos,
+      autoPlay: wasPlaying,
     );
   }
 
@@ -221,9 +269,12 @@ class SettingsPort {
   final bool forceLossless;
   final bool normalizeVolume;
   final bool gaplessEnabled;
+  /// 强制在移动网络下转码（与"高带宽判断"独立；用于用户手动覆盖）
+  final bool forceTranscodeOnMobile;
   const SettingsPort({
     this.forceLossless = false,
     this.normalizeVolume = false,
     this.gaplessEnabled = true,
+    this.forceTranscodeOnMobile = true,
   });
 }

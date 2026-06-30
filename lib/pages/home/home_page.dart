@@ -20,6 +20,7 @@ import '../playlist/playlist_detail_page.dart';
 import '../search/search_page.dart';
 import '../settings/settings_page.dart';
 import '../player/player_page.dart';
+import '../../utils/logger.dart';
 
 /// 首页：专辑墙 + Tab 切换
 class HomePage extends ConsumerStatefulWidget {
@@ -301,39 +302,123 @@ class _HomePageState extends ConsumerState<HomePage> {
         onRetry: () => ref.invalidate(playlistsProvider),
       ),
       data: (playlists) {
-        if (playlists.isEmpty) {
-          return const DSStatePage(type: StateType.empty, message: '暂无歌单');
-        }
         final resp = Responsive(context);
-        return GridView.builder(
-          key: key,
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, AppDimens.miniPlayerHeight + 16),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: resp.albumGridColumns,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            childAspectRatio: 0.85,
-          ),
-          itemCount: playlists.length,
-          itemBuilder: (_, i) {
-            final Playlist p = playlists[i];
-            return AlbumGridItem(
-              album: Album(
-                id: p.id,
-                name: p.name,
-                artist: '${p.songCount} 首',
-                coverUrl: p.coverUrl,
+        return Stack(
+          children: [
+            if (playlists.isEmpty)
+              const DSStatePage(type: StateType.empty, message: '暂无歌单')
+            else
+              GridView.builder(
+                key: key,
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 80),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: resp.albumGridColumns,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  childAspectRatio: 0.85,
+                ),
+                itemCount: playlists.length,
+                itemBuilder: (_, i) {
+                  final Playlist p = playlists[i];
+                  return AlbumGridItem(
+                    album: Album(
+                      id: p.id,
+                      name: p.name,
+                      artist: '${p.songCount} 首',
+                      coverUrl: p.coverUrl,
+                    ),
+                    coverUrl: p.coverUrl,
+                    onTap: () {
+                      Navigator.of(context).push(CupertinoPageRoute(
+                        builder: (_) => PlaylistDetailPage(playlistId: p.id, name: p.name),
+                      ));
+                    },
+                  );
+                },
               ),
-              coverUrl: p.coverUrl,
-              onTap: () {
-                Navigator.of(context).push(CupertinoPageRoute(
-                  builder: (_) => PlaylistDetailPage(playlistId: p.id, name: p.name),
-                ));
-              },
-            );
-          },
+            // 右下角"新建歌单"浮动按钮
+            Positioned(
+              right: 16,
+              bottom: AppDimens.miniPlayerHeight + 16,
+              child: CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: _showCreatePlaylistSheet,
+                child: Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: AppColors.accent,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.accent.withOpacity(0.4),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(CupertinoIcons.add, color: CupertinoColors.white, size: 28),
+                ),
+              ),
+            ),
+          ],
         );
       },
+    );
+  }
+
+  /// 新建歌单弹窗
+  void _showCreatePlaylistSheet() {
+    final ctrl = TextEditingController();
+    showCupertinoModalPopup(
+      context: context,
+      builder: (ctx) => Container(
+        height: 200,
+        color: AppColors.darkCard,
+        child: Column(
+          children: [
+            SizedBox(
+              height: 44,
+              child: Row(
+                children: [
+                  CupertinoButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const DSText('取消'),
+                  ),
+                  const Spacer(),
+                  CupertinoButton(
+                    onPressed: () async {
+                      final name = ctrl.text.trim();
+                      if (name.isEmpty) return;
+                      try {
+                        await ref.read(libraryRepositoryProvider).createPlaylist(name);
+                        ref.invalidate(playlistsProvider);
+                        if (ctx.mounted) Navigator.pop(ctx);
+                      } catch (e) {
+                        AppLogger.e('创建歌单失败: $e');
+                      }
+                    },
+                    child: const DSText('创建', color: AppColors.accent),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: CupertinoTextField(
+                controller: ctrl,
+                placeholder: '歌单名称',
+                style: const TextStyle(color: CupertinoColors.white),
+                decoration: BoxDecoration(
+                  color: AppColors.darkBg,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

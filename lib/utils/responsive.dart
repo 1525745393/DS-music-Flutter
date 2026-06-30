@@ -52,4 +52,26 @@ class Responsive {
 
   /// 平板模式：是否使用左右双栏
   bool get isTablet => deviceClass != DeviceClass.compact;
+
+  /// 是否横屏（width > height）
+  bool get isLandscape {
+    final size = MediaQuery.of(context).size;
+    return size.width > size.height;
+  }
+
+  /// 横屏 + 平板：使用 split 布局
+  bool get isWideLayout => isTablet && isLandscape;
+
+  /// Player 封面尺寸：手机端较大（占满宽度），平板端固定 360
+  double get playerCoverSize {
+    if (isWideLayout) return 360;
+    if (isTablet) return 420;
+    return AppDimens.playerCoverSize;
+  }
+
+  /// 玩家信息最大宽度（横屏时限制在 480，居中显示）
+  double get playerMaxContentWidth {
+    if (isWideLayout) return 480;
+    return double.infinity;
+  }
 }

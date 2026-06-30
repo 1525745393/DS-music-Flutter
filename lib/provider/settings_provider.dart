@@ -10,6 +10,7 @@ class SettingsState {
   final int transcodeBitrate; // bps
   final String transcodeFormat; // mp3/aac/...
   final bool forceLossless;
+  final bool forceTranscodeOnMobile; // 移动网络强制转码
   final bool gaplessEnabled;
   final bool normalizeVolume;
   final bool equalizerEnabled;
@@ -23,6 +24,7 @@ class SettingsState {
     this.transcodeBitrate = 320000,
     this.transcodeFormat = 'mp3',
     this.forceLossless = false,
+    this.forceTranscodeOnMobile = true,
     this.gaplessEnabled = true,
     this.normalizeVolume = false,
     this.equalizerEnabled = false,
@@ -37,6 +39,7 @@ class SettingsState {
     int? transcodeBitrate,
     String? transcodeFormat,
     bool? forceLossless,
+    bool? forceTranscodeOnMobile,
     bool? gaplessEnabled,
     bool? normalizeVolume,
     bool? equalizerEnabled,
@@ -50,6 +53,8 @@ class SettingsState {
       transcodeBitrate: transcodeBitrate ?? this.transcodeBitrate,
       transcodeFormat: transcodeFormat ?? this.transcodeFormat,
       forceLossless: forceLossless ?? this.forceLossless,
+      forceTranscodeOnMobile:
+          forceTranscodeOnMobile ?? this.forceTranscodeOnMobile,
       gaplessEnabled: gaplessEnabled ?? this.gaplessEnabled,
       normalizeVolume: normalizeVolume ?? this.normalizeVolume,
       equalizerEnabled: equalizerEnabled ?? this.equalizerEnabled,
@@ -71,6 +76,8 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       transcodeBitrate: sp.getInt(StorageKeys.transcodeBitrate) ?? 320000,
       transcodeFormat: sp.getString(StorageKeys.transcodeFormat) ?? 'mp3',
       forceLossless: sp.getBool(StorageKeys.forceLossless) ?? false,
+      forceTranscodeOnMobile:
+          sp.getBool(StorageKeys.forceTranscodeOnMobile) ?? true,
       gaplessEnabled: sp.getBool(StorageKeys.gaplessEnabled) ?? true,
       normalizeVolume: sp.getBool(StorageKeys.normalizeVolume) ?? false,
       equalizerEnabled: sp.getBool(StorageKeys.equalizerEnabled) ?? false,
@@ -107,6 +114,11 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   Future<void> setForceLossless(bool v) async {
     state = state.copyWith(forceLossless: v);
     await _sp.setBool(StorageKeys.forceLossless, v);
+  }
+
+  Future<void> setForceTranscodeOnMobile(bool v) async {
+    state = state.copyWith(forceTranscodeOnMobile: v);
+    await _sp.setBool(StorageKeys.forceTranscodeOnMobile, v);
   }
 
   Future<void> setGapless(bool v) async {

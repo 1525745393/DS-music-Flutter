@@ -9,6 +9,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_dimens.dart';
 import '../cache/cache_manage_page.dart';
 import '../dlna/dlna_devices_page.dart';
+import '../overlay_lyrics/overlay_lyrics_settings_page.dart';
 import '../servers/servers_page.dart';
 
 /// 设置页：iOS 分组列表
@@ -66,10 +67,18 @@ class SettingsPage extends ConsumerWidget {
             _section('转码设置', [
               _row('格式', trailing: DSText.assistant(s.transcodeFormat), onTap: () {}),
               _row('码率', trailing: DSText.assistant('${s.transcodeBitrate ~/ 1000} kbps'), onTap: () {}),
+              _row('移动网络强制转码', trailing: CupertinoSwitch(
+                value: s.forceTranscodeOnMobile,
+                onChanged: (v) => notifier.setForceTranscodeOnMobile(v),
+              )),
             ]),
             _section('存储', [
               _row('缓存管理', onTap: () {
                 Navigator.of(context).push(CupertinoPageRoute(builder: (_) => const CacheManagePage()));
+              }),
+              _row('悬浮歌词', onTap: () {
+                Navigator.of(context).push(CupertinoPageRoute(
+                    builder: (_) => const OverlayLyricsSettingsPage()));
               }),
             ]),
             _section('账号', [

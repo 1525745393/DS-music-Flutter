@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 
+import 'constants/storage_keys.dart';
 import 'model/song.dart';
 import 'player/audio_handler.dart';
 import 'player/playback_service.dart';
@@ -15,7 +16,10 @@ import 'provider/core_providers.dart';
 import 'provider/settings_provider.dart';
 import 'pages/login/login_page.dart';
 import 'pages/main_shell.dart';
+import 'pages/onboarding/onboarding_page.dart';
+import 'theme/app_colors.dart';
 import 'theme/app_theme.dart';
+import 'utils/crash_reporter.dart';
 import 'utils/logger.dart';
 import 'utils/permissions.dart';
 
@@ -23,12 +27,19 @@ import 'utils/permissions.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // 0. 崩溃上报与性能监控
+  CrashReporter.instance.init();
+
   // 沉浸式状态栏：透明 + 暗色文字
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Color(0x00000000),
     statusBarIconBrightness: Brightness.light,
   ));
-  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  await SystemChrome.setPreferredOrientations(const [
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+  ]);
 
   // 1. 启动 just_audio_background（锁屏媒体控件 + 通知栏）
   await JustAudioBackground.init(
@@ -65,6 +76,7 @@ Future<void> main() async {
               forceLossless: s.forceLossless,
               normalizeVolume: s.normalizeVolume,
               gaplessEnabled: s.gaplessEnabled,
+              forceTranscodeOnMobile: s.forceTranscodeOnMobile,
             );
           } catch (_) {
             return const SettingsPort();
@@ -111,17 +123,56 @@ class DSPlayerApp extends ConsumerStatefulWidget {
 }
 
 class _DSPlayerAppState extends ConsumerState<DSPlayerApp> {
+  bool _showOnboarding = false;
+  bool _onboardingChecked = false;
+
   @override
   void initState() {
     super.initState();
     PlatformDispatcher.instance.onPlatformBrightnessChanged = () {
       if (mounted) setState(() {});
     };
+    _checkFirstLaunch();
+  }
+
+  /// 检查是否首次启动：仅一次，读取 SharedPreferences
+  Future<void> _checkFirstLaunch() async {
+    try {
+      final sp = await ref.read(sharedPreferencesProvider.future);
+      final launched = sp.getBool(StorageKeys.firstLaunch) ?? true;
+      if (mounted) {
+        setState(() {
+          _showOnboarding = launched;
+          _onboardingChecked = true;
+        });
+      }
+    } catch (e) {
+      AppLogger.w('检查首启失败: $e');
+      if (mounted) {
+        setState(() {
+          _showOnboarding = false;
+          _onboardingChecked = true;
+        });
+      }
+    }
+  }
+
+  void _finishOnboarding() {
+    setState(() => _showOnboarding = false);
   }
 
   @override
   Widget build(BuildContext context) {
     final isLoggedIn = ref.watch(isLoggedInProvider);
+    // 启动检查未完成前先显示空白背景，避免闪现
+    if (!_onboardingChecked) {
+      return CupertinoApp(
+        title: 'DS Player',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.dark,
+        home: const ColoredBox(color: AppColors.darkBg),
+      );
+    }
     return CupertinoApp(
       title: 'DS Player',
       debugShowCheckedModeBanner: false,
@@ -139,9 +190,14 @@ class _DSPlayerAppState extends ConsumerState<DSPlayerApp> {
       locale: const Locale('zh', 'CN'),
       home: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
-        child: isLoggedIn
-            ? const MainShell(key: ValueKey('main'))
-            : const LoginPage(key: ValueKey('login')),
+        child: _showOnboarding
+            ? OnboardingPage(
+                key: const ValueKey('onboard'),
+                onCompleted: _finishOnboarding,
+              )
+            : isLoggedIn
+                ? const MainShell(key: ValueKey('main'))
+                : const LoginPage(key: ValueKey('login')),
       ),
     );
   }

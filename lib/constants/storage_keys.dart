@@ -25,6 +25,7 @@ class StorageKeys {
   static const String transcodeBitrate = 'ds_transcode_bitrate';
   static const String transcodeFormat = 'ds_transcode_format';
   static const String forceLossless = 'ds_force_lossless';
+  static const String forceTranscodeOnMobile = 'ds_force_transcode_mobile';
   static const String followSystemTheme = 'ds_follow_system_theme';
   static const String themeMode = 'ds_theme_mode'; // 0 dark / 1 light
   static const String gaplessEnabled = 'ds_gapless_enabled';
@@ -41,4 +42,9 @@ class StorageKeys {
   // 引导
   static const String firstLaunch = 'ds_first_launch';
   static const String permissionGranted = 'ds_permission_granted';
+
+  // 悬浮歌词
+  static const String overlayFontSize = 'ds_overlay_font_size';
+  static const String overlayPosition = 'ds_overlay_position';
+  static const String overlayEnabled = 'ds_overlay_enabled';
 }

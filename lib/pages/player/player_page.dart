@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/ds_text.dart';
+import '../../components/gestures/swipe_to_dismiss.dart';
 import '../../model/lyrics.dart';
 import '../../model/song.dart';
 import '../../player/playback_service.dart';
@@ -14,6 +15,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_dimens.dart';
 import '../../theme/app_text_styles.dart';
 import '../../utils/datetime_utils.dart';
+import '../../utils/responsive.dart';
 import '../../components/cards/cover_image.dart';
 import '../../components/lyrics/lyrics_view.dart';
 import '../../components/ds_state_page.dart';
@@ -131,53 +133,122 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
             // 背景：封面高斯模糊
             _blurBackground(coverUrl),
             Container(color: AppColors.maskDark),
-            SafeArea(
-              child: Column(
-                children: [
-                  _topBar(context),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: GestureDetector(
-                      onVerticalDragEnd: (d) {
-                        // 上滑展开歌词，下滑收回
-                        if (d.primaryVelocity != null) {
-                          if (d.primaryVelocity! < -200) {
-                            setState(() => _showLyrics = true);
-                          } else if (d.primaryVelocity! > 200) {
-                            setState(() => _showLyrics = false);
-                          }
-                        }
-                      },
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        child: _showLyrics
-                            ? LyricsView(
-                                key: const ValueKey('lyrics'),
-                                lyrics: _lyrics,
-                                position: state.position,
-                                onSeek: (p) async {
-                                  final h = ref.read(audioHandlerProvider);
-                                  await h.seek(p);
-                                },
-                              )
-                            : _albumArt(key: const ValueKey('art'), coverUrl: coverUrl, song: song),
-                      ),
-                    ),
-                  ),
-                  _info(song),
-                  const SizedBox(height: 16),
-                  _progress(state),
-                  const SizedBox(height: 8),
-                  _controls(context),
-                  const SizedBox(height: 12),
-                  _auxControls(),
-                  const SizedBox(height: 16),
-                ],
+            SwipeToDismiss(
+              // 左滑下一首，右滑上一首
+              onSwipeLeft: () async {
+                ref.read(playerStateProvider.notifier).next();
+                await ref.read(audioHandlerProvider).skipToNext();
+              },
+              onSwipeRight: () async {
+                ref.read(playerStateProvider.notifier).prev();
+                await ref.read(audioHandlerProvider).skipToPrevious();
+              },
+              // 下滑超过阈值关闭页面
+              onDismiss: (_) => Navigator.of(context).maybePop(),
+              child: SafeArea(
+                child: Responsive(context).isWideLayout
+                    ? _wideLayout(context, state, song, coverUrl)
+                    : _portraitLayout(context, state, song, coverUrl),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  /// 竖屏/手机：上下排布（封面 + 信息 + 控制）
+  Widget _portraitLayout(BuildContext context, PlayerStateData state, Song song, String? coverUrl) {
+    return Column(
+      children: [
+        _topBar(context),
+        const SizedBox(height: 8),
+        Expanded(
+          child: GestureDetector(
+            onVerticalDragEnd: (d) {
+              if (d.primaryVelocity != null) {
+                if (d.primaryVelocity! < -200) {
+                  setState(() => _showLyrics = true);
+                } else if (d.primaryVelocity! > 200) {
+                  setState(() => _showLyrics = false);
+                }
+              }
+            },
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: _showLyrics
+                  ? LyricsView(
+                      key: const ValueKey('lyrics'),
+                      lyrics: _lyrics,
+                      position: state.position,
+                      onSeek: (p) async {
+                        final h = ref.read(audioHandlerProvider);
+                        await h.seek(p);
+                      },
+                    )
+                  : _albumArt(key: const ValueKey('art'), coverUrl: coverUrl, song: song),
+            ),
+          ),
+        ),
+        _info(song),
+        const SizedBox(height: 16),
+        _progress(state),
+        const SizedBox(height: 8),
+        _controls(context),
+        const SizedBox(height: 12),
+        _auxControls(),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  /// 横屏/平板：左右分栏（左侧封面 + 右侧信息/歌词/控制）
+  Widget _wideLayout(BuildContext context, PlayerStateData state, Song song, String? coverUrl) {
+    return Row(
+      children: [
+        // 左侧：封面 + 标题
+        Expanded(
+          flex: 5,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const _WideSpacer(),
+              _albumArt(key: const ValueKey('art_wide'), coverUrl: coverUrl, song: song),
+              const SizedBox(height: 24),
+              _info(song),
+            ],
+          ),
+        ),
+        // 右侧：进度 + 控制 + 歌词切换
+        Expanded(
+          flex: 4,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _topBar(context),
+              Expanded(
+                child: _showLyrics
+                    ? LyricsView(
+                        key: const ValueKey('lyrics_wide'),
+                        lyrics: _lyrics,
+                        position: state.position,
+                        onSeek: (p) async {
+                          final h = ref.read(audioHandlerProvider);
+                          await h.seek(p);
+                        },
+                      )
+                    : const _WideSpacer(),
+              ),
+              _progress(state),
+              const SizedBox(height: 8),
+              _controls(context),
+              const SizedBox(height: 12),
+              _auxControls(),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -231,16 +302,18 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
   }
 
   Widget _albumArt({required Key key, required String? coverUrl, required Song song}) {
+    final r = Responsive(context);
+    final size = r.isWideLayout ? r.playerCoverSize : AppDimens.playerCoverSize;
     return Center(
       key: key,
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         child: Container(
           key: ValueKey(song.id + '_art'),
-          margin: const EdgeInsets.only(top: AppDimens.playerCoverOffset),
-          width: AppDimens.playerCoverSize,
-          height: AppDimens.playerCoverSize,
-          child: CoverImage(url: coverUrl, size: AppDimens.playerCoverSize, withShadow: true),
+          margin: EdgeInsets.only(top: r.isWideLayout ? 0 : AppDimens.playerCoverOffset),
+          width: size,
+          height: size,
+          child: CoverImage(url: coverUrl, size: size, withShadow: true),
         ),
       ),
     );
@@ -395,4 +468,11 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
       ),
     );
   }
+}
+
+/// 横屏布局中作为左/右侧的占位/对齐辅助
+class _WideSpacer extends StatelessWidget {
+  const _WideSpacer();
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
