@@ -1,5 +1,4 @@
 import 'package:permission_handler/permission_handler.dart';
-import 'package:system_overlay_window/system_overlay_window.dart';
 
 /// 安卓权限工具：分级引导开启关键后台能力
 class AppPermissions {
@@ -16,13 +15,10 @@ class AppPermissions {
   }
 
   /// 请求悬浮窗权限（Android 13+ 行为变更）
+  /// 当前未接入原生浮窗插件，返回 false 以触发 graceful degradation
+  /// 后续接入 flutter_floatwing 时改为真实实现
   static Future<bool> requestOverlay() async {
-    try {
-      if (await SystemOverlayWindow.isPermissionGranted()) return true;
-      return await SystemOverlayWindow.requestPermission();
-    } catch (_) {
-      return false;
-    }
+    return false;
   }
 
   /// 外部存储媒体（Android 13+）

@@ -44,7 +44,8 @@ dependencies:
   # 设备能力与权限
   connectivity_plus: ^5.0.2
   permission_handler: ^11.3.1
-  system_overlay_window: ^2.0.0
+  # 关键：system_overlay_window 在 pub.dev 不存在
+  # 浮窗功能后续可接 flutter_floatwing 或原生实现
 
   # DLNA/UPnP 投屏
   # 关键：upnp2 实际发布版本是 3.0.x（不是 1.0.0），
