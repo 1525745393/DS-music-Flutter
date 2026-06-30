@@ -53,7 +53,6 @@ class EqualizerNotifier extends StateNotifier<EqualizerState> {
     // 默认 10 段频段（Hz），与 just_audio 推荐的 EQ 频段相近
     const defaultBands = <int>[60, 230, 910, 3600, 14000];
     state = state.copyWith(
-      bandFrequencies: List<int>.from(defaultBands),
       bandGains: List<int>.filled(defaultBands.length, 0),
     );
   }

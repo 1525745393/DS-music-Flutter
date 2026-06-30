@@ -50,15 +50,15 @@ class NetworkTypeWatcher {
   Future<void> _init() async {
     try {
       // 首次拉取
-      final results = await _connectivity.checkConnectivity();
-      _current = _mapResult(results);
+      final result = await _connectivity.checkConnectivity();
+      _current = _mapResult(result);
       _controller.add(_current);
     } catch (e) {
       AppLogger.w('NetworkTypeWatcher 初始化失败: $e');
     }
     // 监听变化
-    _connectivity.onConnectivityChanged.listen((results) {
-      final next = _mapResult(results);
+    _connectivity.onConnectivityChanged.listen((result) {
+      final next = _mapResult(result);
       if (next != _current) {
         _current = next;
         AppLogger.i('网络切换为: ${next.label}');
@@ -67,10 +67,8 @@ class NetworkTypeWatcher {
     });
   }
 
-  NetType _mapResult(List<ConnectivityResult> results) {
-    if (results.isEmpty) return NetType.none;
-    final primary = results.first;
-    switch (primary) {
+  NetType _mapResult(ConnectivityResult result) {
+    switch (result) {
       case ConnectivityResult.wifi:
         return NetType.wifi;
       case ConnectivityResult.mobile:

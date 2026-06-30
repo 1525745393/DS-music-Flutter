@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import '../app_dimens.dart';
+import '../theme/app_dimens.dart';
 
 /// 断点（对齐 Material 规范）
 enum DeviceClass { compact, medium, expanded, large }

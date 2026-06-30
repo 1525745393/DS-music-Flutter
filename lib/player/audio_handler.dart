@@ -289,13 +289,24 @@ class DSPlayerHandler extends BaseAudioHandler with SeekHandler {
   }
 
   void _updateMediaItem(Duration? d) {
-    final item = _player.audioSource?.sequenceState?.currentSource?.tag as MediaItem?;
+    // 关键：just_audio 0.9.x 中 sequenceState 在 ConcatenatingAudioSource 上
+    // audioSource 可能是单 AudioSource 或 ConcatenatingAudioSource
+    final src = _player.audioSource;
+    ConcatenatingAudioSource? concat;
+    if (src is ConcatenatingAudioSource) {
+      concat = src;
+    }
+    final item = concat?.sequenceState?.currentSource?.tag as MediaItem?;
     if (item == null) return;
     mediaItem.add(item);
   }
 
   void _broadcastState(PlaybackEvent event) {
     final playing = _player.playing;
+    // 关键：just_audio 0.9.x 中 PlaybackEvent 不再直接暴露 position / speed
+    // 改读 _player 实时状态
+    final position = _player.position;
+    final speed = _player.speed;
     playbackState.add(playbackState.value.copyWith(
       controls: [
         MediaControl.skipToPrevious,
@@ -311,9 +322,9 @@ class DSPlayerHandler extends BaseAudioHandler with SeekHandler {
       androidCompactActionIndices: const [0, 1, 3],
       processingState: _toProcessingState(event.processingState),
       playing: playing,
-      updatePosition: event.position,
+      updatePosition: position,
       bufferedPosition: event.bufferedPosition,
-      speed: event.speed,
+      speed: speed,
       queueIndex: event.currentIndex,
     ));
   }

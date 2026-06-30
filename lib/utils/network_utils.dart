@@ -5,30 +5,31 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 class NetworkUtils {
   NetworkUtils._();
 
-  /// 当前连接类型列表
-  static Future<List<ConnectivityResult>> current() async {
+  /// 当前连接类型
+  /// 关键：connectivity_plus 5.x 返回单值 ConnectivityResult，
+  /// 不再返回 List<ConnectivityResult>
+  static Future<ConnectivityResult> current() async {
     try {
-      final r = await Connectivity().checkConnectivity();
-      return List<ConnectivityResult>.from(r);
+      return await Connectivity().checkConnectivity();
     } catch (_) {
-      return [ConnectivityResult.none];
+      return ConnectivityResult.none;
     }
   }
 
   static Future<bool> isOnline() async {
     final r = await current();
-    return r.any((e) => e != ConnectivityResult.none);
+    return r != ConnectivityResult.none;
   }
 
   /// WiFi 环境下走原始码流，蜂窝环境走转码
   static Future<bool> isWifi() async {
     final r = await current();
-    return r.contains(ConnectivityResult.wifi);
+    return r == ConnectivityResult.wifi;
   }
 
   static Future<bool> isMobile() async {
     final r = await current();
-    return r.contains(ConnectivityResult.mobile);
+    return r == ConnectivityResult.mobile;
   }
 
   static Future<bool> isLanReachable(String host, int port,
