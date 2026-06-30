@@ -104,7 +104,7 @@ class _DlnaDevicesPageState extends ConsumerState<DlnaDevicesPage> {
                           return _browseServerEntry();
                         }
                         final d = devices[i];
-                        final isSelected = selected.uuid == d.uuid;
+                        final isSelected = selected?.uuid == d.uuid;
                         return _deviceItem(d, isSelected, current);
                       },
                     ),

@@ -22,6 +22,7 @@ import '../../utils/responsive.dart';
 import '../../components/cards/cover_image.dart';
 import '../../components/lyrics/lyrics_view.dart';
 import '../../components/ds_state_page.dart';
+import '../../l10n/app_strings.dart';
 import '../queue/queue_page.dart';
 
 /// 播放详情页：全屏沉浸式
@@ -207,7 +208,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
         const SizedBox(height: 8),
         _controls(context),
         const SizedBox(height: 12),
-        _auxControls(),
+        _auxControls(song),
         const SizedBox(height: 16),
       ],
     );
@@ -258,7 +259,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
               const SizedBox(height: 8),
               _controls(context),
               const SizedBox(height: 12),
-              _auxControls(),
+              _auxControls(song),
               const SizedBox(height: 16),
             ],
           ),
@@ -444,7 +445,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
     );
   }
 
-  Widget _auxControls() {
+  Widget _auxControls(Song song) {
     final mode = ref.watch(playerStateProvider.select((s) => s.mode));
     IconData loopIcon = CupertinoIcons.arrow_2_circlepath;
     if (mode == PlayMode.singleLoop) loopIcon = CupertinoIcons.repeat_1;

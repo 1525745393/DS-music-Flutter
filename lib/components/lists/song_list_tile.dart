@@ -7,6 +7,9 @@ import '../cards/cover_image.dart';
 import '../ds_text.dart';
 
 /// 歌曲列表项：行高 48px，包含歌名、艺术家、时长
+/// 可选参数：
+/// - [trailing] 自定义右侧尾随区域（覆盖默认时长 + 更多按钮），常用于评分星星
+/// - [showAlbum] 是否在副标题中展示专辑名（与艺术家并用 `·` 分隔）
 class SongListTile extends StatelessWidget {
   final Song song;
   final String? coverUrl;
@@ -14,6 +17,8 @@ class SongListTile extends StatelessWidget {
   final VoidCallback? onMore;
   final bool highlighted;
   final bool showCover;
+  final bool showAlbum;
+  final Widget? trailing;
 
   const SongListTile({
     super.key,
@@ -23,6 +28,8 @@ class SongListTile extends StatelessWidget {
     this.onMore,
     this.highlighted = false,
     this.showCover = true,
+    this.showAlbum = true,
+    this.trailing,
   });
 
   @override
@@ -59,7 +66,7 @@ class SongListTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    [song.artist, song.album].whereType<String>().join(' · '),
+                    [song.artist, if (showAlbum) song.album].whereType<String>().join(' · '),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.songArtist,
@@ -67,18 +74,22 @@ class SongListTile extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 8),
-            Text(song.durationText, style: AppTextStyles.songArtist),
-            if (onMore != null) ...[
-              const SizedBox(width: 4),
-              GestureDetector(
-                onTap: onMore,
-                child: const Padding(
-                  padding: EdgeInsets.all(4),
-                  child: Icon(CupertinoIcons.ellipsis,
-                      size: 18, color: AppColors.textAssistantDark),
+            // 右侧：自定义 trailing 优先；否则默认显示时长 + 更多按钮
+            if (trailing != null)
+              trailing!
+            else ...[
+              const SizedBox(width: 8),
+              Text(song.durationText, style: AppTextStyles.songArtist),
+              if (onMore != null) ...[
+                const SizedBox(width: 4),
+                GestureDetector(
+                  onTap: onMore,
+                  child: const Padding(
+                    padding: EdgeInsets.all(4),
+                    child: Icon(CupertinoIcons.ellipsis, size: 18, color: AppColors.textAssistantDark),
+                  ),
                 ),
-              ),
+              ],
             ],
           ],
         ),

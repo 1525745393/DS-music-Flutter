@@ -283,7 +283,7 @@ class _PlaylistEditorPageState extends ConsumerState<PlaylistEditorPage> {
                           AppLogger.e('添加失败: $e');
                         }
                       },
-                      child: DSText(t.confirm, color: AppColors.accent),
+                      child: DSText(ctx.s.confirm, color: AppColors.accent),
                     ),
                   ],
                 ),

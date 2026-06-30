@@ -292,14 +292,16 @@ class DSPlayerHandler extends BaseAudioHandler with SeekHandler {
   }
 
   void _updateMediaItem(Duration? d) {
-    // 关键：just_audio 0.9.x 中 sequenceState 在 ConcatenatingAudioSource 上
-    // audioSource 可能是单 AudioSource 或 ConcatenatingAudioSource
-    final src = _player.audioSource;
-    ConcatenatingAudioSource? concat;
-    if (src is ConcatenatingAudioSource) {
-      concat = src;
+    // just_audio 0.9.x：ConcatenatingAudioSource 没有 sequenceState getter。
+    // 当前播放项的 tag 通过 (currentIndex, sequence) 组合定位。
+    final source = _player.audioSource;
+    MediaItem? item;
+    if (source is ConcatenatingAudioSource) {
+      final idx = _player.currentIndex ?? 0;
+      if (idx >= 0 && idx < source.sequence.length) {
+        item = source.sequence[idx].tag as MediaItem?;
+      }
     }
-    final item = concat?.sequenceState?.currentSource?.tag as MediaItem?;
     if (item == null) return;
     mediaItem.add(item);
   }
