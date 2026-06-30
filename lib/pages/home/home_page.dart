@@ -5,6 +5,7 @@ import '../../components/ds_state_page.dart';
 import '../../components/ds_tab_bar.dart';
 import '../../components/ds_text.dart';
 import '../../components/lists/song_list_tile.dart';
+import '../../l10n/app_strings.dart';
 import '../../model/album.dart';
 import '../../model/artist.dart';
 import '../../model/playlist.dart';
@@ -31,18 +32,24 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  static const _tabs = ['专辑', '歌手', '歌曲', '文件夹', '歌单'];
+  /// 标签列表：i18n 需从 context.s 动态构造
+  /// 关键：去掉 static const，改 build 时构造
+  List<String> _buildTabs(BuildContext context) {
+    final t = context.s;
+    return [t.tabAlbums, t.tabArtists, t.songs, t.folders, t.tabPlaylists];
+  }
 
   @override
   Widget build(BuildContext context) {
     final tab = ref.watch(libraryTabProvider);
+    final t = context.s;
     return CupertinoPageScaffold(
       backgroundColor: AppColors.darkBg,
       child: Column(
         children: [
-          _navBar(),
+          _navBar(t),
           DSTabBar(
-            tabs: _tabs,
+            tabs: _buildTabs(context),
             currentIndex: tab.index,
             onTap: (i) =>
                 ref.read(libraryTabProvider.notifier).state = LibraryTab.values[i],
@@ -59,13 +66,13 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  Widget _navBar() {
+  Widget _navBar(AppStrings t) {
     return SizedBox(
       height: AppDimens.navBarHeight,
       child: Row(
         children: [
           const SizedBox(width: 16),
-          const DSText.largeTitle('音乐'),
+          DSText.largeTitle(t.tabMusic),
           const Spacer(),
           GestureDetector(
             onTap: () {
@@ -112,7 +119,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget _albumsView({required Key key}) {
     final async = ref.watch(albumsProvider);
     return async.when(
-      loading: () => const DSStatePage(type: StateType.loading, message: '加载专辑中...'),
+      loading: () => DSStatePage(type: StateType.loading, message: t.loading),
       error: (e, _) => DSStatePage(
         type: StateType.error,
         message: e.toString(),
@@ -152,16 +159,17 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Widget _artistsView({required Key key}) {
+    final t = context.s;
     final async = ref.watch(artistsProvider);
     return async.when(
-      loading: () => const DSStatePage(type: StateType.loading, message: '加载歌手中...'),
+      loading: () => DSStatePage(type: StateType.loading, message: '${t.loading} (${t.tabArtists})'),
       error: (e, _) => DSStatePage(
         type: StateType.error,
         message: e.toString(),
         onRetry: () => ref.invalidate(artistsProvider),
       ),
       data: (artists) {
-        if (artists.isEmpty) return const DSStatePage(type: StateType.empty, message: '暂无歌手');
+        if (artists.isEmpty) return DSStatePage(type: StateType.empty, message: t.empty);
         return ListView.separated(
           key: key,
           padding: const EdgeInsets.only(bottom: AppDimens.miniPlayerHeight + 16),
@@ -228,7 +236,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         onRetry: () => ref.invalidate(songsProvider),
       ),
       data: (songs) {
-        if (songs.isEmpty) return const DSStatePage(type: StateType.empty, message: '暂无歌曲');
+        if (songs.isEmpty) return DSStatePage(type: StateType.empty, message: t.empty);
         return ListView.separated(
           key: key,
           padding: const EdgeInsets.only(bottom: AppDimens.miniPlayerHeight + 16),
@@ -254,16 +262,17 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Widget _foldersView({required Key key}) {
+    final t = context.s;
     final async = ref.watch(foldersProvider);
     return async.when(
-      loading: () => const DSStatePage(type: StateType.loading, message: '加载文件夹中...'),
+      loading: () => DSStatePage(type: StateType.loading, message: '${t.loading} (${t.folders})'),
       error: (e, _) => DSStatePage(
         type: StateType.error,
         message: e.toString(),
         onRetry: () => ref.invalidate(foldersProvider),
       ),
       data: (folders) {
-        if (folders.isEmpty) return const DSStatePage(type: StateType.empty, message: '暂无文件夹');
+        if (folders.isEmpty) return DSStatePage(type: StateType.empty, message: t.empty);
         return ListView.separated(
           key: key,
           padding: const EdgeInsets.only(bottom: AppDimens.miniPlayerHeight + 16),
@@ -299,9 +308,10 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Widget _playlistsView({required Key key}) {
+    final t = context.s;
     final async = ref.watch(playlistsProvider);
     return async.when(
-      loading: () => const DSStatePage(type: StateType.loading, message: '加载歌单中...'),
+      loading: () => DSStatePage(type: StateType.loading, message: '${t.loading} (${t.tabPlaylists})'),
       error: (e, _) => DSStatePage(
         type: StateType.error,
         message: e.toString(),
@@ -312,7 +322,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         return Stack(
           children: [
             if (playlists.isEmpty)
-              const DSStatePage(type: StateType.empty, message: '暂无歌单')
+              DSStatePage(type: StateType.empty, message: t.empty)
             else
               GridView.builder(
                 key: key,
@@ -376,6 +386,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   /// 新建歌单弹窗
   void _showCreatePlaylistSheet() {
     final ctrl = TextEditingController();
+    final t = context.s;
     showCupertinoModalPopup(
       context: context,
       builder: (ctx) => Container(
@@ -389,7 +400,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 children: [
                   CupertinoButton(
                     onPressed: () => Navigator.pop(ctx),
-                    child: const DSText('取消'),
+                    child: DSText(t.cancel),
                   ),
                   const Spacer(),
                   CupertinoButton(
@@ -404,7 +415,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         AppLogger.e('创建歌单失败: $e');
                       }
                     },
-                    child: const DSText('创建', color: AppColors.accent),
+                    child: DSText(t.confirm, color: AppColors.accent),
                   ),
                 ],
               ),
@@ -413,7 +424,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: CupertinoTextField(
                 controller: ctrl,
-                placeholder: '歌单名称',
+                placeholder: t.playlistName,
                 style: const TextStyle(color: CupertinoColors.white),
                 decoration: BoxDecoration(
                   color: AppColors.darkBg,

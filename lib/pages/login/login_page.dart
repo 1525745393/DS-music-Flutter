@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../api/quickconnect.dart';
 import '../../constants/api_constants.dart';
+import '../../l10n/app_strings.dart';
 import '../../model/server_config.dart';
 import '../../provider/auth_provider.dart';
 import '../../provider/core_providers.dart';
@@ -41,10 +42,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   Future<void> _doLogin() async {
+    final t = context.s;
     final account = _accountCtrl.text.trim();
     final passwd = _passwordCtrl.text;
     if (account.isEmpty || passwd.isEmpty) {
-      _showAlert('请填写账号和密码');
+      _showAlert(t.pleaseFillAccount);
       return;
     }
     ServerConfig config;
@@ -62,21 +64,21 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         final open = await qc.open(config.host);
         final sessionId = open['session_id'] as String? ?? '';
         if (sessionId.isEmpty) {
-          _showAlert('QuickConnect 解析失败');
+          _showAlert(t.qcResolveFailed);
           return;
         }
-        _showAlert('请在 NAS 后台允许此设备的访问请求', title: '等待授权');
+        _showAlert(t.qcWaitAuthorize, title: t.tip);
         final poll = await qc.poll(
           qcId: config.host,
           sessionId: sessionId,
         );
         if (poll == null) {
-          _showAlert('QuickConnect 授权超时');
+          _showAlert(t.qcTimeout);
           return;
         }
         final baseUrl = qc.resolveBaseUrl(poll);
         if (baseUrl == null) {
-          _showAlert('未能解析出可用线路');
+          _showAlert(t.qcRouteFailed);
           return;
         }
         // 覆写为解析出的 host/port
@@ -111,8 +113,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   ServerConfig _buildConfig() {
+    final t = context.s;
     final host = _hostCtrl.text.trim();
-    if (host.isEmpty) throw '请填写 ${_mode == ServerMode.quickConnect ? "QuickConnect ID" : "服务器地址"}';
+    if (host.isEmpty) {
+      throw _mode == ServerMode.quickConnect ? t.pleaseFillQcId : t.pleaseFillServer;
+    }
     final port = int.tryParse(_portCtrl.text.trim()) ??
         (_useHttps ? ApiConstants.defaultHttpsPort : ApiConstants.defaultHttpPort);
     return ServerConfig(
@@ -125,11 +130,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
-  void _showAlert(String message, {String title = '提示'}) {
+  void _showAlert(String message, {String? title}) {
+    final t = context.s;
     showCupertinoDialog(
       context: context,
       builder: (_) => CupertinoAlertDialog(
-        title: DSText(title),
+        title: DSText(title ?? t.tip),
         content: Padding(
           padding: const EdgeInsets.only(top: 8),
           child: DSText(message),
@@ -138,7 +144,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           CupertinoDialogAction(
             isDefaultAction: true,
             onPressed: () => Navigator.pop(context),
-            child: const DSText('确定'),
+            child: DSText(t.confirm),
           ),
         ],
       ),
@@ -147,6 +153,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.s;
     final state = ref.watch(authStateProvider);
     final loading = state is AuthLoading;
     return CupertinoPageScaffold(
@@ -159,15 +166,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             children: [
               const SizedBox(height: 48),
               Center(
-                child: Text('DS Player',
+                child: Text(t.appName,
                     style: AppTextStyles.largeTitle.copyWith(
                       color: AppColors.textPrimaryDark,
                       fontSize: 28,
                     )),
               ),
               const SizedBox(height: 8),
-              const Center(
-                child: DSText.assistant('连接你的群晖 AudioStation'),
+              Center(
+                child: DSText.assistant(t.connectToNas),
               ),
               const SizedBox(height: 32),
               _modeSelector(),
@@ -184,7 +191,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               _passwordField(),
               const SizedBox(height: 40),
               DSButton(
-                text: loading ? '登录中...' : '登录',
+                text: loading ? t.loggingIn : t.login,
                 fullWidth: true,
                 loading: loading,
                 onPressed: loading ? null : _doLogin,
@@ -195,9 +202,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   child: DSText.assistant(state.message),
                 ),
               const SizedBox(height: 16),
-              const Center(
+              Center(
                 child: DSText.assistant(
-                  '登录即代表同意《用户协议》与《隐私政策》',
+                  t.agree,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -209,6 +216,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   Widget _modeSelector() {
+    final t = context.s;
     Widget chip(String text, ServerMode mode) {
       final selected = _mode == mode;
       return GestureDetector(
@@ -229,80 +237,98 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        chip('内网', ServerMode.lan),
-        chip('域名', ServerMode.ddns),
-        chip('QuickConnect', ServerMode.quickConnect),
+        chip(t.modeLan, ServerMode.lan),
+        chip(t.modeDdns, ServerMode.ddns),
+        chip(t.quickConnect, ServerMode.quickConnect),
       ],
     );
   }
 
-  Widget _hostField() => _input(
-        label: '服务器',
-        controller: _hostCtrl,
-        hint: _mode == ServerMode.lan ? '192.168.1.100' : 'nas.example.com',
-        keyboardType: TextInputType.url,
-      );
+  Widget _hostField() {
+    final t = context.s;
+    return _input(
+      label: t.server,
+      controller: _hostCtrl,
+      hint: _mode == ServerMode.lan ? '192.168.1.100' : 'nas.example.com',
+      keyboardType: TextInputType.url,
+    );
+  }
 
-  Widget _qcField() => _input(
-        label: 'QuickConnect ID',
-        controller: _hostCtrl,
-        hint: 'ABCDEFG',
-      );
+  Widget _qcField() {
+    final t = context.s;
+    return _input(
+      label: t.quickConnect,
+      controller: _hostCtrl,
+      hint: 'ABCDEFG',
+    );
+  }
 
-  Widget _portField() => _input(
-        label: '端口',
-        controller: _portCtrl,
-        hint: '5000',
-        keyboardType: TextInputType.number,
-      );
+  Widget _portField() {
+    final t = context.s;
+    return _input(
+      label: t.port,
+      controller: _portCtrl,
+      hint: '5000',
+      keyboardType: TextInputType.number,
+    );
+  }
 
-  Widget _accountField() => _input(
-        label: '账号',
-        controller: _accountCtrl,
-        hint: '群晖账号',
-        keyboardType: TextInputType.text,
-      );
+  Widget _accountField() {
+    final t = context.s;
+    return _input(
+      label: t.account,
+      controller: _accountCtrl,
+      hint: t.hintAccount,
+      keyboardType: TextInputType.text,
+    );
+  }
 
-  Widget _passwordField() => Stack(
-        alignment: Alignment.centerRight,
-        children: [
-          _input(
-            label: '密码',
-            controller: _passwordCtrl,
-            hint: '请输入密码',
-            obscure: _obscurePassword,
+  Widget _passwordField() {
+    final t = context.s;
+    return Stack(
+      alignment: Alignment.centerRight,
+      children: [
+        _input(
+          label: t.password,
+          controller: _passwordCtrl,
+          hint: t.hintPassword,
+          obscure: _obscurePassword,
+        ),
+        CupertinoButton(
+          padding: const EdgeInsets.only(right: 12),
+          onPressed: () =>
+              setState(() => _obscurePassword = !_obscurePassword),
+          child: Icon(
+            _obscurePassword
+                ? CupertinoIcons.eye
+                : CupertinoIcons.eye_slash,
+            color: AppColors.textAssistantDark,
+            size: 20,
           ),
-          CupertinoButton(
-            padding: const EdgeInsets.only(right: 12),
-            onPressed: () =>
-                setState(() => _obscurePassword = !_obscurePassword),
-            child: Icon(
-              _obscurePassword
-                  ? CupertinoIcons.eye
-                  : CupertinoIcons.eye_slash,
-              color: AppColors.textAssistantDark,
-              size: 20,
-            ),
-          ),
-        ],
-      );
+        ),
+      ],
+    );
+  }
 
-  Widget _httpsToggle() => Row(
-        children: [
-          const Expanded(child: DSText('使用 HTTPS（自签证书）')),
-          CupertinoSwitch(
-            value: _useHttps,
-            onChanged: (v) {
-              setState(() {
-                _useHttps = v;
-                _portCtrl.text = v
-                    ? ApiConstants.defaultHttpsPort.toString()
-                    : ApiConstants.defaultHttpPort.toString();
-              });
-            },
-          ),
-        ],
-      );
+  Widget _httpsToggle() {
+    final t = context.s;
+    return Row(
+      children: [
+        Expanded(child: DSText(t.useHttps)),
+        CupertinoSwitch(
+          value: _useHttps,
+          onChanged: (v) {
+            setState(() {
+              _useHttps = v;
+              _portCtrl.text = v
+                  ? ApiConstants.defaultHttpsPort.toString()
+                  : ApiConstants.defaultHttpPort.toString();
+            });
+          },
+        ),
+      ],
+    );
+  }
 
   Widget _input({
     required String label,

@@ -140,16 +140,32 @@ class SettingsPage extends ConsumerWidget {
               borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
             ),
             child: Column(
-              children: ListTile.divideTiles(
-                context: context,
-                tiles: children,
-                color: AppColors.darkDivider,
-              ),
+              // 关键：原 ListTile.divideTiles 来自 Material，移到这里改用 IndexedStack
+              // + Divider 的 Cupertino 兼容写法（直接用 Container 0.5px 细线）
+              children: _buildWithDividers(children),
             ),
           ),
         ],
       ),
     );
+  }
+
+  /// 在子项之间插入分割线
+  /// 关键：原实现用 ListTile.divideTiles，移出 Material 依赖
+  List<Widget> _buildWithDividers(List<Widget> children) {
+    if (children.isEmpty) return children;
+    final result = <Widget>[];
+    for (int i = 0; i < children.length; i++) {
+      result.add(children[i]);
+      if (i < children.length - 1) {
+        result.add(Container(
+          margin: const EdgeInsets.only(left: 16),
+          height: 0.5,
+          color: AppColors.darkDivider,
+        ));
+      }
+    }
+    return result;
   }
 
   Widget _row(BuildContext context, String title, {Widget? trailing, VoidCallback? onTap}) {

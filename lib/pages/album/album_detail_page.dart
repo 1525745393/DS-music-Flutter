@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/ds_state_page.dart';
 import '../../components/ds_text.dart';
 import '../../components/lists/song_list_tile.dart';
+import '../../l10n/app_strings.dart';
 import '../../model/song.dart';
 import '../../provider/core_providers.dart';
 import '../../provider/library_provider.dart';
@@ -29,7 +30,7 @@ class AlbumDetailPage extends ConsumerWidget {
       ),
       child: SafeArea(
         child: async.when(
-          loading: () => const DSStatePage(type: StateType.loading, message: '加载中...'),
+          loading: () => DSStatePage(type: StateType.loading, message: context.s.loading),
           error: (e, _) => DSStatePage(type: StateType.error, message: e.toString(), onRetry: () => ref.invalidate(albumDetailProvider(albumId))),
           data: (data) {
             final songs = data.songs;

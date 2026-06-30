@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/ds_state_page.dart';
 import '../../components/ds_text.dart';
 import '../../components/lists/song_list_tile.dart';
+import '../../l10n/app_strings.dart';
 import '../../provider/core_providers.dart';
 import '../../provider/library_provider.dart';
 import '../../provider/player_provider.dart';
@@ -11,6 +12,7 @@ import '../../theme/app_dimens.dart';
 import '../player/player_page.dart';
 
 /// 搜索页
+/// i18n 关键：所有硬编码字符串已切换为 context.s.xxx
 class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({super.key});
 
@@ -20,6 +22,7 @@ class SearchPage extends ConsumerStatefulWidget {
 
 class _SearchPageState extends ConsumerState<SearchPage> {
   final _controller = TextEditingController();
+
   @override
   void dispose() {
     _controller.dispose();
@@ -28,13 +31,14 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.s;
     final async = ref.watch(searchResultProvider);
     return CupertinoPageScaffold(
       backgroundColor: AppColors.darkBg,
-      navigationBar: const CupertinoNavigationBar(
+      navigationBar: CupertinoNavigationBar(
         backgroundColor: AppColors.darkBg,
-        border: Border(),
-        middle: DSText('搜索'),
+        border: const Border(),
+        middle: DSText(t.search),
       ),
       child: SafeArea(
         child: Column(
@@ -43,23 +47,23 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               padding: const EdgeInsets.all(16),
               child: CupertinoSearchTextField(
                 controller: _controller,
-                placeholder: '搜索专辑、艺术家、歌曲',
+                placeholder: '${t.search} ${t.albums.toLowerCase()}/${t.artists.toLowerCase()}/${t.songs}',
                 onChanged: (v) => ref.read(searchKeywordProvider.notifier).state = v,
                 onSubmitted: (v) => ref.read(searchKeywordProvider.notifier).state = v,
               ),
             ),
             Expanded(
               child: async.when(
-                loading: () => const DSStatePage(type: StateType.loading),
+                loading: () => DSStatePage(type: StateType.loading, message: t.loading),
                 error: (e, _) => DSStatePage(type: StateType.error, message: e.toString()),
                 data: (r) {
                   if (r.albums.isEmpty && r.artists.isEmpty && r.songs.isEmpty) {
-                    return const DSStatePage(type: StateType.empty, message: '暂无结果');
+                    return DSStatePage(type: StateType.empty, message: t.empty);
                   }
                   return ListView(
                     padding: const EdgeInsets.only(bottom: AppDimens.miniPlayerHeight + 16),
                     children: [
-                      if (r.songs.isNotEmpty) _section('歌曲', ListView.builder(
+                      if (r.songs.isNotEmpty) _section(t.songs, ListView.builder(
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         itemCount: r.songs.length,
@@ -78,7 +82,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                           );
                         },
                       )),
-                      if (r.albums.isNotEmpty) _section('专辑', ListView.builder(
+                      if (r.albums.isNotEmpty) _section(t.albums, ListView.builder(
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         itemCount: r.albums.length,
@@ -99,7 +103,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                           );
                         },
                       )),
-                      if (r.artists.isNotEmpty) _section('艺术家', ListView.builder(
+                      if (r.artists.isNotEmpty) _section(t.artists, ListView.builder(
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         itemCount: r.artists.length,
@@ -115,7 +119,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                               child: const Icon(CupertinoIcons.person_fill, color: AppColors.textAssistantDark),
                             ),
                             title: DSText(a.name),
-                            subtitle: DSText.assistant('${a.albumCount} 张专辑'),
+                            subtitle: DSText.assistant('${a.albumCount} ${t.albums}'),
                             onTap: () {},
                           );
                         },

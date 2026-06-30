@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/ds_text.dart';
+import '../../l10n/app_strings.dart';
 import '../../player/equalizer_controller.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_dimens.dart';

@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../components/buttons/ds_button.dart';
 import '../../components/ds_text.dart';
 import '../../constants/storage_keys.dart';
+import '../../l10n/app_strings.dart';
 import '../../provider/core_providers.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_dimens.dart';
@@ -21,28 +22,34 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   final _controller = PageController();
   int _index = 0;
 
-  static const _pages = [
-    _OnboardSlide(
-      icon: CupertinoIcons.music_note_2,
-      title: '欢迎使用 DS Player',
-      subtitle: '为 Synology / Plex 打造的移动端音乐客户端',
-    ),
-    _OnboardSlide(
-      icon: CupertinoIcons.wifi,
-      title: '智能网络切换',
-      subtitle: 'WiFi 下播放无损音质\n蜂窝下自动转码节省流量',
-    ),
-    _OnboardSlide(
-      icon: CupertinoIcons.text_quote,
-      title: '悬浮歌词 + 锁屏控制',
-      subtitle: '后台播放时仍可浏览与查看歌词',
-    ),
-    _OnboardSlide(
-      icon: CupertinoIcons.car_detailed,
-      title: '支持 Android Auto',
-      subtitle: '在车载系统中浏览你的私人曲库',
-    ),
-  ];
+  /// i18n 后的引导页数据
+  /// 关键：从 context.s 读取每页 title/subtitle，
+  /// 避免 _pages 静态 const 中混入动态字符串
+  List<_OnboardSlide> _buildPages(BuildContext context) {
+    final t = context.s;
+    return [
+      _OnboardSlide(
+        icon: CupertinoIcons.music_note_2,
+        title: t.onboard1Title,
+        subtitle: t.onboard1Subtitle,
+      ),
+      _OnboardSlide(
+        icon: CupertinoIcons.wifi,
+        title: t.onboard2Title,
+        subtitle: t.onboard2Subtitle,
+      ),
+      _OnboardSlide(
+        icon: CupertinoIcons.text_quote,
+        title: t.onboard3Title,
+        subtitle: t.onboard3Subtitle,
+      ),
+      _OnboardSlide(
+        icon: CupertinoIcons.car_detailed,
+        title: t.onboard4Title,
+        subtitle: t.onboard4Subtitle,
+      ),
+    ];
+  }
 
   @override
   void dispose() {
@@ -58,6 +65,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.s;
+    final pages = _buildPages(context);
     return CupertinoPageScaffold(
       backgroundColor: AppColors.darkBg,
       child: SafeArea(
@@ -71,7 +80,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   const Spacer(),
                   CupertinoButton(
                     onPressed: _complete,
-                    child: DSText.assistant('跳过', color: AppColors.textAssistantDark),
+                    child: DSText.assistant(t.onboardSkip, color: AppColors.textAssistantDark),
                   ),
                 ],
               ),
@@ -81,8 +90,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               child: PageView.builder(
                 controller: _controller,
                 onPageChanged: (i) => setState(() => _index = i),
-                itemCount: _pages.length,
-                itemBuilder: (_, i) => _pages[i],
+                itemCount: pages.length,
+                itemBuilder: (_, i) => pages[i],
               ),
             ),
             // 底部：指示器 + 按钮
@@ -93,7 +102,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   // 指示器
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(_pages.length, (i) {
+                    children: List.generate(pages.length, (i) {
                       final active = i == _index;
                       return AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
@@ -109,9 +118,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   ),
                   const SizedBox(height: 24),
                   DSButton(
-                    text: _index == _pages.length - 1 ? '开始体验' : '下一步',
+                    text: _index == pages.length - 1 ? t.onboardStart : t.onboardNext,
                     onPressed: () {
-                      if (_index == _pages.length - 1) {
+                      if (_index == pages.length - 1) {
                         _complete();
                       } else {
                         _controller.nextPage(

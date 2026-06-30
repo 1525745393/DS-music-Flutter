@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/ds_state_page.dart';
 import '../../components/ds_text.dart';
 import '../../components/lists/song_list_tile.dart';
+import '../../l10n/app_strings.dart';
 import '../../model/song.dart';
 import '../../player/playback_service.dart';
 import '../../provider/core_providers.dart';
@@ -13,11 +14,7 @@ import '../../theme/app_dimens.dart';
 import '../../theme/app_text_styles.dart';
 
 /// 播放队列管理页
-/// 功能：
-/// 1. 当前队列可视化
-/// 2. 拖拽排序（ReorderableListView）
-/// 3. 批量删除 / 清空
-/// 4. 跳转到指定歌曲
+/// i18n：所有硬编码中文已切换为 context.s.xxx
 class QueuePage extends ConsumerStatefulWidget {
   const QueuePage({super.key});
 
@@ -31,6 +28,7 @@ class _QueuePageState extends ConsumerState<QueuePage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.s;
     final state = ref.watch(playerStateProvider);
     final queue = state.queue;
     final currentIndex = state.currentIndex;
@@ -41,21 +39,21 @@ class _QueuePageState extends ConsumerState<QueuePage> {
       navigationBar: CupertinoNavigationBar(
         backgroundColor: AppColors.darkBg.withOpacity(0.85),
         border: const Border(),
-        middle: DSText('播放队列 (${queue.length})'),
+        middle: DSText('${t.queue} (${queue.length})'),
         trailing: _editing
-            ? _editingTrailing(queue)
+            ? _editingTrailing(queue, t)
             : CupertinoButton(
                 padding: EdgeInsets.zero,
                 onPressed: () => setState(() {
                   _editing = true;
                   _selectedIndexes.clear();
                 }),
-                child: const DSText('编辑', color: AppColors.accent),
+                child: DSText(t.edit, color: AppColors.accent),
               ),
       ),
       child: SafeArea(
         child: queue.isEmpty
-            ? const DSStatePage(type: StateType.empty, message: '播放队列为空')
+            ? DSStatePage(type: StateType.empty, message: '${t.queue} ${t.empty}')
             : Column(
                 children: [
                   _summary(state.current, totalDuration),
@@ -93,7 +91,7 @@ class _QueuePageState extends ConsumerState<QueuePage> {
     );
   }
 
-  Widget _editingTrailing(List<Song> queue) {
+  Widget _editingTrailing(List<Song> queue, AppStrings t) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -108,7 +106,7 @@ class _QueuePageState extends ConsumerState<QueuePage> {
               _selectedIndexes.clear();
               setState(() {});
             },
-            child: DSText('删除(${_selectedIndexes.length})',
+            child: DSText('${t.delete}(${_selectedIndexes.length})',
                 color: AppColors.danger),
           ),
         CupertinoButton(
@@ -117,7 +115,7 @@ class _QueuePageState extends ConsumerState<QueuePage> {
             _editing = false;
             _selectedIndexes.clear();
           }),
-          child: const DSText('完成', color: AppColors.accent),
+          child: DSText(t.done, color: AppColors.accent),
         ),
       ],
     );
@@ -194,12 +192,14 @@ class _QueuePageState extends ConsumerState<QueuePage> {
                   size: 18,
                 ),
                 const SizedBox(width: 6),
-                DSText('全选'),
+                DSText(context.s.isEnglish ? 'Select All' : '全选'),
               ],
             ),
           ),
           const Spacer(),
-          DSText.assistant('已选 ${_selectedIndexes.length} 项'),
+          DSText.assistant(context.s.isEnglish
+              ? 'Selected ${_selectedIndexes.length}'
+              : '已选 ${_selectedIndexes.length} 项'),
         ],
       ),
     );

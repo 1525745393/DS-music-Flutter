@@ -108,6 +108,99 @@ class AppStrings {
       ? 'Session expired, please sign in again'
       : '登录已过期，请重新登录';
   String get permissionDenied => isEnglish ? 'Permission denied' : '权限不足';
+  String get tip => isEnglish ? 'Tip' : '提示';
+  String get retryLater => isEnglish ? 'Please try again later' : '请稍后重试';
+
+  // —— 登录页 ——
+  String get connectToNas => isEnglish
+      ? 'Connect to your Synology AudioStation'
+      : '连接你的群晖 AudioStation';
+  String get modeLan => isEnglish ? 'LAN' : '内网';
+  String get modeDdns => isEnglish ? 'Domain' : '域名';
+  String get quickConnect => 'QuickConnect';
+  String get hintAccount => isEnglish ? 'Synology account' : '群晖账号';
+  String get hintPassword => isEnglish ? 'Enter password' : '请输入密码';
+  String get useHttps => isEnglish ? 'Use HTTPS (self-signed)' : '使用 HTTPS（自签证书）';
+  String get pleaseFillAccount => isEnglish
+      ? 'Please enter account and password'
+      : '请填写账号和密码';
+  String get pleaseFillServer => isEnglish ? 'Please enter server address' : '请填写服务器地址';
+  String get pleaseFillQcId => isEnglish ? 'Please enter QuickConnect ID' : '请填写 QuickConnect ID';
+  String get qcResolveFailed => isEnglish
+      ? 'Failed to resolve QuickConnect'
+      : 'QuickConnect 解析失败';
+  String get qcWaitAuthorize => isEnglish
+      ? 'Please approve this device on NAS'
+      : '请在 NAS 后台允许此设备的访问请求';
+  String get qcTimeout => isEnglish
+      ? 'QuickConnect authorization timeout'
+      : 'QuickConnect 授权超时';
+  String get qcRouteFailed => isEnglish
+      ? 'Cannot resolve available route'
+      : '未能解析出可用线路';
+  String get agree => isEnglish
+      ? 'By signing in, you agree to the User Agreement and Privacy Policy'
+      : '登录即代表同意《用户协议》与《隐私政策》';
+
+  // —— 引导页 ——
+  String get onboardSkip => isEnglish ? 'Skip' : '跳过';
+  String get onboardNext => isEnglish ? 'Next' : '下一步';
+  String get onboardStart => isEnglish ? 'Get Started' : '开始体验';
+  String get onboard1Title => isEnglish ? 'Welcome to DS Player' : '欢迎使用 DS Player';
+  String get onboard1Subtitle => isEnglish
+      ? 'A mobile music client for Synology & Plex'
+      : '为 Synology / Plex 打造的移动端音乐客户端';
+  String get onboard2Title => isEnglish ? 'Smart Network Switch' : '智能网络切换';
+  String get onboard2Subtitle => isEnglish
+      ? 'Lossless over WiFi\nAuto-transcode on cellular'
+      : 'WiFi 下播放无损音质\n蜂窝下自动转码节省流量';
+  String get onboard3Title => isEnglish ? 'Floating Lyrics & Lock Screen' : '悬浮歌词 + 锁屏控制';
+  String get onboard3Subtitle => isEnglish
+      ? 'Browse and view lyrics while playing in background'
+      : '后台播放时仍可浏览与查看歌词';
+  String get onboard4Title => isEnglish ? 'Android Auto Support' : '支持 Android Auto';
+  String get onboard4Subtitle => isEnglish
+      ? 'Browse your library in the car'
+      : '在车载系统中浏览你的私人曲库';
+
+  // —— 主导航 ——
+  String get tabMusic => isEnglish ? 'Music' : '音乐';
+  String get tabAlbums => isEnglish ? 'Albums' : '专辑';
+  String get tabArtists => isEnglish ? 'Artists' : '艺术家';
+  String get tabFolders => isEnglish ? 'Folders' : '文件夹';
+  String get tabPlaylists => isEnglish ? 'Playlists' : '歌单';
+
+  // —— 播放相关 ——
+  String get newPlaylist => isEnglish ? 'New Playlist' : '新建歌单';
+  String get playlistName => isEnglish ? 'Playlist name' : '歌单名称';
+  String get addToPlaylist => isEnglish ? 'Add to Playlist' : '添加到歌单';
+  String get playAll => isEnglish ? 'Play All' : '播放全部';
+  String get shufflePlay => isEnglish ? 'Shuffle Play' : '随机播放';
+
+  // —— 服务器与缓存 ——
+  String get addServer => isEnglish ? 'Add Server' : '添加服务器';
+  String get editServer => isEnglish ? 'Edit Server' : '编辑服务器';
+  String get deleteServer => isEnglish ? 'Delete Server' : '删除服务器';
+  String get clearCache => isEnglish ? 'Clear Cache' : '清理缓存';
+  String get cacheSize => isEnglish ? 'Cache Size' : '缓存大小';
+  String get scanCache => isEnglish ? 'Scan Cache' : '扫描缓存';
+
+  // —— DLNA ——
+  String get dlnaCastCurrent => isEnglish ? 'Cast Now Playing' : '投屏当前播放';
+  String get dlnaControl => isEnglish ? 'Remote Control' : '远程控制';
+  String get dlnaVolume => isEnglish ? 'Volume' : '音量';
+
+  // —— 悬浮歌词 ——
+  String get overlayLyrics => isEnglish ? 'Floating Lyrics' : '悬浮歌词';
+  String get overlayFontSize => isEnglish ? 'Font Size' : '字号';
+  String get overlayPosition => isEnglish ? 'Position' : '位置';
+  String get overlayEnabled => isEnglish ? 'Enable' : '启用';
+
+  // —— 通用动作 ——
+  String get deleteConfirm => isEnglish ? 'Delete?' : '确认删除？';
+  String get logoutConfirm => isEnglish ? 'Sign out?' : '确认退出当前账号？';
+  String get yes => isEnglish ? 'Yes' : '是';
+  String get no => isEnglish ? 'No' : '否';
 }
 
 /// BuildContext 扩展：让 [context.s.xxx] 语法糖可用

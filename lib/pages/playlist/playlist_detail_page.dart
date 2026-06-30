@@ -4,6 +4,7 @@ import '../../components/ds_state_page.dart';
 import '../../components/ds_text.dart';
 import '../../components/forms/star_rating.dart';
 import '../../components/lists/song_list_tile.dart';
+import '../../l10n/app_strings.dart';
 import '../../model/song.dart';
 import '../../player/playback_service.dart';
 import '../../provider/core_providers.dart';
@@ -23,6 +24,7 @@ class PlaylistDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = context.s;
     final async = ref.watch(playlistDetailProvider(playlistId));
     return CupertinoPageScaffold(
       backgroundColor: AppColors.darkBg,
@@ -37,7 +39,7 @@ class PlaylistDetailPage extends ConsumerWidget {
               builder: (_) => PlaylistEditorPage(playlistId: playlistId),
             ));
           },
-          child: const DSText('编辑', color: AppColors.accent),
+          child: DSText(t.edit, color: AppColors.accent),
         ),
       ),
       child: SafeArea(
@@ -46,7 +48,7 @@ class PlaylistDetailPage extends ConsumerWidget {
           error: (e, _) => DSStatePage(type: StateType.error, message: e.toString()),
           data: (pl) {
             final songs = pl.songs;
-            if (songs.isEmpty) return const DSStatePage(type: StateType.empty, message: '歌单为空');
+            if (songs.isEmpty) return DSStatePage(type: StateType.empty, message: t.empty);
             return ListView.separated(
               itemCount: songs.length,
               separatorBuilder: (_, __) => Container(
@@ -105,7 +107,7 @@ class PlaylistDetailPage extends ConsumerWidget {
                     children: [
                       CupertinoButton(
                         onPressed: () => Navigator.pop(ctx),
-                        child: const DSText('取消'),
+                        child: DSText(t.cancel),
                       ),
                       const Spacer(),
                       CupertinoButton(

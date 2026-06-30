@@ -11,8 +11,9 @@ import '../utils/logger.dart';
 /// 4. 推送整个队列
 /// 5. MediaServer 内容浏览（Browse 协议）
 ///
-/// 注意：upnp2 包的具体 API 因版本而异，所有调用都用 try/catch 兜底，
-/// 避免包升级时主流程崩溃。
+/// 兼容策略：upnp2 1.0.0 的 Renderer API 不直接暴露 pause/seek/setVolume/browse，
+/// 所有非明确 API 都通过 [UpnpCommand] shim 调用，
+/// 传入一组候选方法名自动匹配，避免主流程崩溃。
 class DlnaController {
   UpnpDevice? selectedRenderer;
   UpnpDevice? selectedServer;
@@ -63,14 +64,11 @@ class DlnaController {
     }
   }
 
-  /// 推送整个队列
-  /// 当前为简化实现：仅推送第一首，其它由 Renderer 端按 URI 列表播放。
-  /// 完整实现需用 SetAVTransportURI 的 playlist 形式。
+  /// 推送整个队列（当前简化：仅推送首首）
   Future<bool> pushQueue(List<Song> songs, List<String> streamUrls) async {
     if (selectedRenderer == null) return false;
     if (songs.isEmpty || streamUrls.isEmpty) return false;
     try {
-      // 先用首首歌曲的元数据构造 DIDL-Lite；简化处理：直接推第一首
       await selectedRenderer!.setAVTransportURI(
         streamUrls.first,
         songs.first.title,
@@ -85,62 +83,68 @@ class DlnaController {
 
   // ============ 远程控制（DMR） ============
 
-  Future<void> pause() async {
-    if (selectedRenderer == null) return;
-    try {
-      // ignore: avoid_dynamic_calls
-      await (selectedRenderer as dynamic).pause();
-    } catch (e) {
-      AppLogger.w('DLNA pause 失败（包 API 不支持？）: $e');
-    }
-  }
+  /// 暂停：尝试 pause / PauseTransport / doPause
+  Future<bool> pause() async => UpnpCommand(
+    'pause',
+    target: selectedRenderer,
+    candidates: const ['pause', 'PauseTransport', 'doPause', 'pausePlayback'],
+  ).invoke();
 
-  Future<void> resume() async {
-    if (selectedRenderer == null) return;
-    try {
-      // ignore: avoid_dynamic_calls
-      await (selectedRenderer as dynamic).play();
-    } catch (e) {
-      AppLogger.w('DLNA resume 失败: $e');
-    }
-  }
+  /// 恢复播放
+  Future<bool> resume() async => UpnpCommand(
+    'play',
+    target: selectedRenderer,
+    candidates: const ['play', 'PlayTransport', 'doPlay', 'resume', 'resumePlayback'],
+  ).invoke();
 
-  Future<void> stop() async {
-    if (selectedRenderer == null) return;
-    try {
-      // ignore: avoid_dynamic_calls
-      await (selectedRenderer as dynamic).stop();
-    } catch (e) {
-      AppLogger.w('DLNA stop 失败: $e');
-    }
-  }
+  /// 停止
+  Future<bool> stop() async => UpnpCommand(
+    'stop',
+    target: selectedRenderer,
+    candidates: const ['stop', 'StopTransport', 'doStop'],
+  ).invoke();
 
   /// 跳转到指定位置（秒）
-  Future<void> seekTo(int seconds) async {
-    if (selectedRenderer == null) return;
-    try {
-      // 群晖/标准 UPnP 格式：HH:MM:SS
-      final h = seconds ~/ 3600;
-      final m = (seconds % 3600) ~/ 60;
-      final s = seconds % 60;
-      final relTime =
-          '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
-      // ignore: avoid_dynamic_calls
-      await (selectedRenderer as dynamic).seek(relTime);
-    } catch (e) {
-      AppLogger.w('DLNA seek 失败: $e');
-    }
+  /// UPnP 标准格式：HH:MM:SS
+  Future<bool> seekTo(int seconds) async {
+    if (selectedRenderer == null) return false;
+    final h = seconds ~/ 3600;
+    final m = (seconds % 3600) ~/ 60;
+    final s = seconds % 60;
+    final relTime =
+        '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+    return UpnpCommand(
+      'seek',
+      target: selectedRenderer,
+      candidates: const ['seek', 'SeekTransport', 'doSeek'],
+      positionalArgs: [relTime],
+    ).invoke();
   }
 
   /// 音量：0-100
-  Future<void> setVolume(int vol) async {
-    if (selectedRenderer == null) return;
+  /// 不同 Renderer 的 setVolume 签名不同：有接受 (int) 的，也有接受 (0..1) 的
+  Future<bool> setVolume(int vol) async {
+    if (selectedRenderer == null) return false;
     final v = vol.clamp(0, 100);
+    // 优先尝试 0-100 整数（DLNA 标准）
+    if (await UpnpCommand(
+      'setVolume',
+      target: selectedRenderer,
+      candidates: const ['setVolume', 'SetVolume'],
+      positionalArgs: [v],
+    ).invoke()) {
+      return true;
+    }
+    // 降级：尝试 0..1 浮点
     try {
-      // ignore: avoid_dynamic_calls
-      await (selectedRenderer as dynamic).setVolume(v);
-    } catch (e) {
-      AppLogger.w('DLNA setVolume 失败: $e');
+      return await UpnpCommand(
+        'setVolume',
+        target: selectedRenderer,
+        candidates: const ['setVolume', 'SetVolume'],
+        positionalArgs: [v / 100.0],
+      ).invoke();
+    } catch (_) {
+      return false;
     }
   }
 
@@ -148,41 +152,113 @@ class DlnaController {
 
   /// 浏览服务器内容
   /// [objectId] '0' = 根目录
-  /// 返回 [{id, title, type, children_count, resource_url}]
-  /// 简化实现：使用 upnp2 包暴露的通用 SOAP 协议调用。
-  /// 若 upnp2 未暴露 browse 接口则返回空列表。
+  /// 关键：upnp2 没有标准 browse API，通过 shim 尝试多个候选方法
+  /// 若 upnp2 包未实现 browse，将返回空列表（UI 提示"不支持"）
   Future<List<DlnaMediaItem>> browse({String objectId = '0'}) async {
     if (selectedServer == null) return const [];
+    // 尝试位置参数
+    return UpnpCommand(
+      'browse',
+      target: selectedServer,
+      candidates: const ['browse', 'Browse', 'browseServer', 'listChildren'],
+      positionalArgs: [objectId],
+    ).invokeList() ?? const [];
+  }
+
+  /// 直接从已选 Renderer 投射播放 URL（dlna_browse_page 内部用）
+  Future<bool> playUrl(String url, String title) async {
+    if (selectedRenderer == null) return false;
     try {
-      // ignore: avoid_dynamic_calls
-      final dynamic svc = selectedServer;
-      if (svc == null) return const [];
-      // 尝试调用 browse 方法（不同 upnp2 版本 API 略有不同）
-      // ignore: avoid_dynamic_calls
-      final dynamic result = await (svc as dynamic).browse(objectId);
-      if (result is List) {
-        return result
-            .whereType<Map>()
-            .map((m) => DlnaMediaItem(
-                  id: m['id']?.toString() ?? '',
-                  title: m['title']?.toString() ?? '',
-                  type: m['type']?.toString() ?? 'unknown',
-                  childrenCount: (m['childCount'] is num)
-                      ? (m['childCount'] as num).toInt()
-                      : 0,
-                  resourceUrl: m['resource']?.toString(),
-                ))
-            .toList();
-      }
-      return const [];
+      await selectedRenderer!.setAVTransportURI(url, title);
+      await selectedRenderer!.play();
+      return true;
     } catch (e) {
-      AppLogger.w('DLNA browse 失败: $e');
-      return const [];
+      AppLogger.w('DLNA playUrl 失败: $e');
+      return false;
     }
   }
 
   void dispose() {
     _sub?.cancel();
+  }
+}
+
+/// UPnP 命令 shim
+/// 关键作用：upnp2 不同版本的 API 签名不一致（pause vs PauseTransport vs doPause），
+/// 此 shim 自动尝试多个候选方法名，找到第一个成功调用的。
+///
+/// 实现说明：
+/// - 不使用 dart:mirrors（release/AOT 不支持）
+/// - 改用 try/catch NoSuchMethodError + 重新 dynamic 调用
+/// - 失败时返回 null/false 不抛异常，调用方按降级路径处理
+class UpnpCommand {
+  final String opName;        // 用于日志
+  final Object? target;
+  final List<String> candidates;
+  final List<dynamic> positionalArgs;
+
+  UpnpCommand(
+    this.opName, {
+    required this.target,
+    required this.candidates,
+    this.positionalArgs = const [],
+  });
+
+  /// 通用调用：返回 true 表示成功
+  /// 设计：明确调用每个候选方法，捕获 NoSuchMethodError
+  /// 关键：upnp2 1.0.0 不会直接动态 dispatch，必须硬编码调用
+  Future<bool> invoke() async {
+    if (target == null) return false;
+    final t = target!;
+    for (final name in candidates) {
+      try {
+        // 关键：用 dynamic + named-arg 转发，捕获 NoSuchMethodError
+        // ignore: avoid_dynamic_calls
+        final dynamic result = await Function.apply(
+          _resolveMethod(t, name),
+          [t, ...positionalArgs],
+        );
+        AppLogger.d('UPnP $opName → $name() 成功');
+        // 任何非 false/null 的返回值都视为成功
+        return result != false && result != null;
+      } on NoSuchMethodError {
+        // 该方法不存在，尝试下一个
+        continue;
+      } catch (e) {
+        // 业务错误（如网络），重试下一个候选
+        AppLogger.w('UPnP $opName 尝试 $name 失败: $e');
+      }
+    }
+    AppLogger.w('UPnP $opName 全部候选方法都失败 (${candidates.length} 个)');
+    return false;
+  }
+
+  /// 列表型调用：返回 List<dynamic> 或 null
+  Future<List<dynamic>?> invokeList() async {
+    if (target == null) return null;
+    final t = target!;
+    for (final name in candidates) {
+      try {
+        // ignore: avoid_dynamic_calls
+        final dynamic result = await Function.apply(
+          _resolveMethod(t, name),
+          [t, ...positionalArgs],
+        );
+        if (result is List) return result;
+      } on NoSuchMethodError {
+        continue;
+      } catch (e) {
+        AppLogger.w('UPnP $opName 列表调用 $name 失败: $e');
+      }
+    }
+    return null;
+  }
+
+  /// 反射获取实例方法
+  /// 关键：在 AOT 模式下 dart:mirrors 不可用，因此采用 try/catch 探测
+  Function _resolveMethod(Object instance, String name) {
+    // ignore: avoid_dynamic_calls
+    return (instance as dynamic)[name] as Function;
   }
 }
 

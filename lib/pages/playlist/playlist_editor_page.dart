@@ -4,6 +4,7 @@ import '../../components/cards/song_list_tile.dart';
 import '../../components/ds_state_page.dart';
 import '../../components/ds_text.dart';
 import '../../components/forms/star_rating.dart';
+import '../../l10n/app_strings.dart';
 import '../../model/song.dart';
 import '../../player/playback_service.dart';
 import '../../provider/core_providers.dart';
@@ -40,6 +41,7 @@ class _PlaylistEditorPageState extends ConsumerState<PlaylistEditorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.s;
     final detail = ref.watch(playlistDetailProvider(widget.playlistId));
     return CupertinoPageScaffold(
       backgroundColor: AppColors.darkBg,
@@ -134,7 +136,7 @@ class _PlaylistEditorPageState extends ConsumerState<PlaylistEditorPage> {
                 const SizedBox(height: 8),
                 Expanded(
                   child: songs.isEmpty
-                      ? const DSStatePage(type: StateType.empty, message: '歌单为空')
+                      ? DSStatePage(type: StateType.empty, message: t.empty)
                       : ListView.separated(
                           itemCount: songs.length,
                           separatorBuilder: (_, __) => Container(
@@ -262,7 +264,7 @@ class _PlaylistEditorPageState extends ConsumerState<PlaylistEditorPage> {
                           AppLogger.e('添加失败: $e');
                         }
                       },
-                      child: const DSText('确定', color: AppColors.accent),
+                      child: DSText(t.confirm, color: AppColors.accent),
                     ),
                   ],
                 ),

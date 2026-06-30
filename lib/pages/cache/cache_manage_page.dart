@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/ds_state_page.dart';
 import '../../components/ds_text.dart';
+import '../../l10n/app_strings.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_dimens.dart';
 import '../../utils/file_utils.dart';

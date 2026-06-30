@@ -120,7 +120,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
     }
     final song = state.current;
     if (song == null) {
-      return const DSStatePage(type: StateType.empty, message: '未选择歌曲');
+      return DSStatePage(type: StateType.empty, message: context.s.empty);
     }
     final repo = ref.read(libraryRepositoryProvider);
     final coverUrl = song.albumId != null ? repo.coverUrl(song.albumId!, size: 'big') : null;
@@ -484,6 +484,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
 
   /// 睡眠定时快捷选择 sheet
   void _showSleepSheet(BuildContext context, WidgetRef ref) {
+    final t = context.s;
     showCupertinoModalPopup(
       context: context,
       builder: (_) => Container(
@@ -500,7 +501,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
                       ref.read(sleepTimerProvider.notifier).cancel();
                       Navigator.pop(context);
                     },
-                    child: const DSText('关闭'),
+                    child: DSText(t.close),
                   ),
                   const Spacer(),
                   CupertinoButton(
@@ -509,7 +510,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
                       ref.read(sleepTimerProvider.notifier).start(_selectedMinutes);
                       Navigator.pop(context);
                     },
-                    child: const DSText('确定'),
+                    child: DSText(t.confirm),
                   ),
                 ],
               ),
