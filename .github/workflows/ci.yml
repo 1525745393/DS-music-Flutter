@@ -18,7 +18,15 @@ jobs:
           channel: stable
           cache: true
       - name: Install dependencies
-        run: flutter pub get
+        # 关键：--verbose 输出完整 pub 解析日志，CI 失败时能从日志看到
+        # 到底是哪个包 / 哪个版本不满足约束
+        run: flutter pub get --verbose 2>&1 | tee pub_get.log
+      - name: Upload pub get log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pub-get-log
+          path: pub_get.log
       - name: Verify formatting
         run: dart format --set-exit-if-changed lib test
       - name: Static analysis

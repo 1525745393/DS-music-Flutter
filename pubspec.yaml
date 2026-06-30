@@ -23,13 +23,15 @@ dependencies:
 
   # 播放核心
   just_audio: ^0.9.36
-  just_audio_background: ^0.0.1-beta.11
+  # 关键：just_audio_background 0.0.1-beta.11 在 CI 偶现解析失败，
+  # 改用 caret 兼容的早期正式版（0.0.1-beta.13）。
+  # 0.0.1-beta.17 需要 Flutter >=3.27，CI 是 3.22 不能用
+  just_audio_background: ^0.0.1-beta.13
   audio_service: ^0.18.12
   audio_session: ^0.1.18
 
   # 状态管理
   flutter_riverpod: ^2.5.1
-  riverpod_annotation: ^2.3.5
 
   # 本地存储与文件
   shared_preferences: ^2.2.3
@@ -38,19 +40,16 @@ dependencies:
 
   # 图片缓存
   cached_network_image: ^3.3.1
-  flutter_cache_manager: ^3.3.1
 
   # 设备能力与权限
   connectivity_plus: ^5.0.2
   permission_handler: ^11.3.1
   system_overlay_window: ^2.0.0
-  device_info_plus: ^10.1.0
-  package_info_plus: ^8.0.0
 
   # DLNA/UPnP 投屏
-  upnp2: ^1.0.0
-  multicast: ^0.3.0+1
-  network_info_plus: ^5.0.3
+  # 关键：upnp2 实际发布版本是 3.0.x（不是 1.0.0），
+  # 写 ^1.0.0 导致 pub 解析失败退出 69
+  upnp2: ^3.0.0
 
   # 均衡器
   flutter_equalizer: ^0.1.2
@@ -61,21 +60,22 @@ dependencies:
   flutter_staggered_grid_view: ^0.7.0
 
   # 工具
-  intl: ^0.19.0
+  # 关键：Flutter 3.22 内置 intl 0.18.x，^0.19.0 在 pub get 时会冲突
+  intl: ^0.18.0
   collection: ^1.18.0
   crypto: ^3.0.3
   uuid: ^4.4.0
-  rxdart: ^0.27.7
   url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.1
-  build_runner: ^2.4.11
-  riverpod_generator: ^2.4.0
-  custom_lint: ^0.6.4
-  riverpod_lint: ^2.3.10
+
+# 关键：dependency_overrides 强制 pin intl 0.18.0，
+# 避免 flutter_localizations 自带 intl 与 ^0.19.0 冲突
+dependency_overrides:
+  intl: 0.18.0
 
 flutter:
   uses-material-design: true
