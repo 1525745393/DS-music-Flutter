@@ -14,7 +14,6 @@ import androidx.media.MediaBrowserServiceCompat
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.dart.DartExecutor
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.view.FlutterMain
 
 /**
  * Android Auto MediaBrowserService 桥接
@@ -56,7 +55,6 @@ class AABrowseService : MediaBrowserServiceCompat() {
 
         // 3. 启动 Flutter 引擎（用于 MethodChannel 调用）
         try {
-            FlutterMain.startInitialization(this)
             val eng = FlutterEngine(this)
             eng.dartExecutor.executeDartEntrypoint(
                 DartExecutor.DartEntrypoint.createDefault()
