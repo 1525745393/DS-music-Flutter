@@ -153,7 +153,19 @@ class DSPlayerHandler extends BaseAudioHandler with SeekHandler {
       album: song.album ?? '未知专辑',
       duration: Duration(seconds: song.duration),
       artUri: artUri != null ? Uri.parse(artUri) : null,
+      // 锁屏歌词：通过 extras 传递 LRC 文本，原生通知/锁屏扩展可读取
+      extras: {
+        'song_id': song.id,
+        'album_id': song.albumId ?? '',
+        'lyrics_lrc': _cachedLyricsLrc,
+      },
     );
+  }
+
+  // 缓存当前队列的 LRC（由 UI 侧注入）
+  String _cachedLyricsLrc = '';
+  void setLyricsLrc(String lrc) {
+    _cachedLyricsLrc = lrc;
   }
 
   void _updateMediaItem(Duration? d) {

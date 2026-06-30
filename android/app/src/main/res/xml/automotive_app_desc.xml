@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android Auto 媒体浏览服务声明
+  描述：声明本应用作为 MediaBrowserService，可被 Android Auto 检索与浏览
+  配合 audio_service/just_audio_background 使用
+-->
+<automotiveApp>
+    <uses name="media" />
+</automotiveApp>

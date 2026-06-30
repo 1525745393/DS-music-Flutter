@@ -13,6 +13,7 @@ import '../../provider/core_providers.dart';
 import '../../provider/library_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_dimens.dart';
+import '../../utils/responsive.dart';
 import '../album/album_detail_page.dart';
 import '../artist/artist_detail_page.dart';
 import '../playlist/playlist_detail_page.dart';
@@ -120,11 +121,12 @@ class _HomePageState extends ConsumerState<HomePage> {
         if (albums.isEmpty) {
           return const DSStatePage(type: StateType.empty, message: '暂无专辑');
         }
+        final resp = Responsive(context);
         return GridView.builder(
           key: key,
           padding: const EdgeInsets.fromLTRB(16, 0, 16, AppDimens.miniPlayerHeight + 16),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: resp.albumGridColumns,
             mainAxisSpacing: 16,
             crossAxisSpacing: 16,
             childAspectRatio: 0.72,
@@ -302,11 +304,12 @@ class _HomePageState extends ConsumerState<HomePage> {
         if (playlists.isEmpty) {
           return const DSStatePage(type: StateType.empty, message: '暂无歌单');
         }
+        final resp = Responsive(context);
         return GridView.builder(
           key: key,
           padding: const EdgeInsets.fromLTRB(16, 0, 16, AppDimens.miniPlayerHeight + 16),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: resp.albumGridColumns,
             mainAxisSpacing: 16,
             crossAxisSpacing: 16,
             childAspectRatio: 0.85,

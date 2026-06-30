@@ -7,6 +7,9 @@ import '../../provider/auth_provider.dart';
 import '../../provider/settings_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_dimens.dart';
+import '../cache/cache_manage_page.dart';
+import '../dlna/dlna_devices_page.dart';
+import '../servers/servers_page.dart';
 
 /// 设置页：iOS 分组列表
 class SettingsPage extends ConsumerWidget {
@@ -64,7 +67,18 @@ class SettingsPage extends ConsumerWidget {
               _row('格式', trailing: DSText.assistant(s.transcodeFormat), onTap: () {}),
               _row('码率', trailing: DSText.assistant('${s.transcodeBitrate ~/ 1000} kbps'), onTap: () {}),
             ]),
+            _section('存储', [
+              _row('缓存管理', onTap: () {
+                Navigator.of(context).push(CupertinoPageRoute(builder: (_) => const CacheManagePage()));
+              }),
+            ]),
             _section('账号', [
+              _row('服务器列表', onTap: () {
+                Navigator.of(context).push(CupertinoPageRoute(builder: (_) => const ServersPage()));
+              }),
+              _row('DLNA 设备', onTap: () {
+                Navigator.of(context).push(CupertinoPageRoute(builder: (_) => const DlnaDevicesPage()));
+              }),
               _row('退出登录', onTap: () => _confirmLogout(context, ref)),
             ]),
           ],

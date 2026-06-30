@@ -5,8 +5,10 @@ import '../../components/ds_text.dart';
 import '../../model/lyrics.dart';
 import '../../model/song.dart';
 import '../../player/playback_service.dart';
+import '../../player/overlay_lyrics_controller.dart';
 import '../../provider/core_providers.dart';
 import '../../provider/library_provider.dart';
+import '../../provider/lyrics_provider.dart';
 import '../../provider/player_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_dimens.dart';
@@ -15,6 +17,7 @@ import '../../utils/datetime_utils.dart';
 import '../../components/cards/cover_image.dart';
 import '../../components/lyrics/lyrics_view.dart';
 import '../../components/ds_state_page.dart';
+import '../queue/queue_page.dart';
 
 /// 播放详情页：全屏沉浸式
 class PlayerPage extends ConsumerStatefulWidget {
@@ -28,7 +31,9 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
   Lyrics _lyrics = const Lyrics();
   bool _showLyrics = false;
   bool _initialized = false;
+  bool _overlayOn = false;
 
+  // —— 悬浮歌词：定时把当前位置推送到原生层 ——
   @override
   void initState() {
     super.initState();
@@ -51,15 +56,64 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
     }
     ref.read(playerStateProvider.notifier).setPlaying(true);
 
-    // 2. 拉取歌词
-    final repo = ref.read(libraryRepositoryProvider);
-    final lyrics = await repo.lyricsOf(song);
-    if (mounted) setState(() => _lyrics = lyrics);
+    // 2. 通过歌词 Provider 拉取（同时驱动锁屏 + 悬浮窗）
+    final lyricsNotifier = ref.read(lyricsProvider.notifier);
+    await lyricsNotifier.load(song);
+    if (mounted) {
+      final s = ref.read(lyricsProvider);
+      setState(() => _lyrics = s.lyrics);
+      // 同步 LRC 给 audio_handler → 锁屏显示
+      ref.read(audioHandlerProvider).setLyricsLrc(_serializeLrc(s.lyrics));
+    }
+  }
+
+  /// 切换悬浮歌词
+  Future<void> _toggleOverlayLyrics(Song song) async {
+    final s = ref.read(lyricsProvider);
+    if (_overlayOn) {
+      await OverlayLyricsController.instance.hide();
+      setState(() => _overlayOn = false);
+    } else {
+      final ok = await OverlayLyricsController.instance.show(song, s.lyrics);
+      setState(() => _overlayOn = ok);
+      if (ok) {
+        // 首次开启时推一次位置
+        await OverlayLyricsController.instance
+            .updatePosition(ref.read(playerStateProvider).position);
+      }
+    }
+  }
+
+  /// LRC 序列化：用于锁屏显示
+  String _serializeLrc(Lyrics lyrics) {
+    final buf = StringBuffer();
+    for (final l in lyrics.lines) {
+      final m = l.time.inMinutes.remainder(60).toString().padLeft(2, '0');
+      final sec = l.time.inSeconds.remainder(60).toString().padLeft(2, '0');
+      final ms = (l.time.inMilliseconds.remainder(1000) ~/ 10).toString().padLeft(2, '0');
+      buf.writeln('[$m:$sec.$ms]${l.text}');
+    }
+    return buf.toString();
+  }
+
+  @override
+  void dispose() {
+    if (_overlayOn) {
+      OverlayLyricsController.instance.hide();
+    }
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(playerStateProvider);
+    // 驱动悬浮歌词滚动
+    if (_overlayOn) {
+      // 使用 microtask 避免在 build 阶段触发外部副作用
+      Future.microtask(() {
+        OverlayLyricsController.instance.updatePosition(state.position);
+      });
+    }
     final song = state.current;
     if (song == null) {
       return const DSStatePage(type: StateType.empty, message: '未选择歌曲');
@@ -320,7 +374,22 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
                 size: AppDimens.smallIconSize,
                 color: mode == PlayMode.shuffle ? AppColors.accent : CupertinoColors.white),
           ),
-          const Icon(CupertinoIcons.list_bullet, size: AppDimens.smallIconSize, color: CupertinoColors.white),
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(CupertinoPageRoute(
+                builder: (_) => const QueuePage(),
+              ));
+            },
+            child: const Icon(CupertinoIcons.list_bullet, size: AppDimens.smallIconSize, color: CupertinoColors.white),
+          ),
+          GestureDetector(
+            onTap: () => _toggleOverlayLyrics(song),
+            child: Icon(
+              _overlayOn ? CupertinoIcons.text_bubble_fill : CupertinoIcons.text_bubble,
+              size: AppDimens.smallIconSize,
+              color: _overlayOn ? AppColors.accent : CupertinoColors.white,
+            ),
+          ),
           const Icon(CupertinoIcons.speaker_2_fill, size: AppDimens.smallIconSize, color: CupertinoColors.white),
         ],
       ),
