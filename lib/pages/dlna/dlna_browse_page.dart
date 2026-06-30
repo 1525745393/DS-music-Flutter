@@ -96,7 +96,8 @@ class _DlnaBrowsePageState extends ConsumerState<DlnaBrowsePage> {
                   onPressed: () async {
                     Navigator.pop(context);
                     if (item.resourceUrl != null) {
-                      await widget.controller.playUrl(item.resourceUrl!, item.title);
+                      await widget.controller
+                          .playUrl(item.resourceUrl!, item.title);
                     }
                   },
                   child: const DSText('投屏'),
@@ -111,8 +112,11 @@ class _DlnaBrowsePageState extends ConsumerState<DlnaBrowsePage> {
         child: Row(
           children: [
             Icon(
-              isContainer ? CupertinoIcons.folder_fill : CupertinoIcons.music_note,
-              color: isContainer ? AppColors.accent : AppColors.textAssistantDark,
+              isContainer
+                  ? CupertinoIcons.folder_fill
+                  : CupertinoIcons.music_note,
+              color:
+                  isContainer ? AppColors.accent : AppColors.textAssistantDark,
               size: 22,
             ),
             const SizedBox(width: 12),

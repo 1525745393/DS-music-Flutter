@@ -73,7 +73,8 @@ class DlnaController {
   /// 推送单首歌曲
   Future<bool> push(Song song, String streamUrl) async {
     if (selectedRenderer == null) return false;
-    AppLogger.i('DLNA push (桩): ${song.title} → ${selectedRenderer!.friendlyName}');
+    AppLogger.i(
+        'DLNA push (桩): ${song.title} → ${selectedRenderer!.friendlyName}');
     return true;
   }
 
