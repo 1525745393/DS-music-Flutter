@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Dismissible, DismissDirection;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../components/cards/song_list_tile.dart';
+import '../../components/lists/song_list_tile.dart';
 import '../../components/ds_state_page.dart';
 import '../../components/ds_text.dart';
 import '../../components/forms/star_rating.dart';
 import '../../l10n/app_strings.dart';
+import '../../model/playlist.dart';
 import '../../model/song.dart';
 import '../../player/playback_service.dart';
 import '../../provider/core_providers.dart';
@@ -230,7 +232,7 @@ class _PlaylistEditorPageState extends ConsumerState<PlaylistEditorPage> {
     }
   }
 
-  Future<void> _removeSong(pl, Song s) async {
+  Future<void> _removeSong(Playlist pl, Song s) async {
     try {
       final repo = ref.read(libraryRepositoryProvider);
       await repo.updatePlaylist(id: pl.id, removeSongIds: [s.id]);
@@ -241,7 +243,7 @@ class _PlaylistEditorPageState extends ConsumerState<PlaylistEditorPage> {
     }
   }
 
-  Future<void> _addSongs(pl) async {
+  Future<void> _addSongs(Playlist pl) async {
     // 简化实现：弹一个底部 sheet 让用户选择要添加的歌曲 id
     final songs = await ref.read(libraryRepositoryProvider).songs();
     if (!mounted) return;

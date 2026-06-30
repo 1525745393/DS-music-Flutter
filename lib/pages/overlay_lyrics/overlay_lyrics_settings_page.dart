@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show ListTile;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/buttons/ds_button.dart';
 import '../../components/ds_text.dart';
@@ -148,7 +149,7 @@ class _OverlayLyricsSettingsPageState
                 context: context,
                 tiles: children,
                 color: AppColors.darkDivider,
-              ),
+              ).toList(),
             ),
           ),
         ],

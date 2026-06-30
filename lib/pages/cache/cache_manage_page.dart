@@ -195,7 +195,7 @@ class _CacheManagePageState extends ConsumerState<CacheManagePage> {
                 context: context,
                 tiles: children,
                 color: AppColors.darkDivider,
-              ),
+              ).toList(),
             ),
           ),
         ],

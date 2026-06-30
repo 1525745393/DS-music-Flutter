@@ -100,6 +100,7 @@ class PlaylistDetailPage extends ConsumerWidget {
 
   /// 弹出评分底部弹窗
   void _showRatingSheet(BuildContext context, WidgetRef ref, Song s) {
+    final t = AppStrings.of(context);
     int current = s.rating;
     showCupertinoModalPopup(
       context: context,

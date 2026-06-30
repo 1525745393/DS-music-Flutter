@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show IconButton;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/ds_text.dart';
 import '../../components/gestures/swipe_to_dismiss.dart';
@@ -342,10 +343,11 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
   Widget _info(Song song) {
     return Column(
       children: [
-        DSText.playerSong(song.title),
+        DSText(song.title, style: AppTextStyles.playerSong),
         const SizedBox(height: 6),
-        DSText.playerArtist(
+        DSText(
           song.artist ?? '未知艺术家',
+          style: AppTextStyles.playerArtist,
           color: AppColors.textAssistantDark,
         ),
       ],
