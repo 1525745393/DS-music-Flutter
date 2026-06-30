@@ -84,13 +84,17 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
-  fonts:
-    - family: SF Pro
-      fonts:
-        - asset: assets/fonts/SFPro-Regular.ttf
-        - asset: assets/fonts/SFPro-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/SFPro-Semibold.ttf
-          weight: 600
-        - asset: assets/fonts/SFPro-Bold.ttf
-          weight: 700
+  # 关键：仓库 assets/fonts/ 仅含 README.md 占位，未提供 SF Pro 字体源文件
+  # 显式声明 SF Pro 字体会在 flutter build apk 时报
+  #   "unable to locate asset entry in pubspec.yaml"
+  # 等拿到正式授权字体后再恢复 fonts: 段。
+  # fonts:
+  #   - family: SF Pro
+  #     fonts:
+  #       - asset: assets/fonts/SFPro-Regular.ttf
+  #       - asset: assets/fonts/SFPro-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/SFPro-Semibold.ttf
+  #         weight: 600
+  #       - asset: assets/fonts/SFPro-Bold.ttf
+  #         weight: 700
