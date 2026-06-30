@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show ListTile;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/buttons/ds_button.dart';
 import '../../components/ds_text.dart';
@@ -145,11 +144,7 @@ class _OverlayLyricsSettingsPageState
               borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
             ),
             child: Column(
-              children: ListTile.divideTiles(
-                context: context,
-                tiles: children,
-                color: AppColors.darkDivider,
-              ).toList(),
+              children: _buildWithDividers(children),
             ),
           ),
         ],
@@ -175,5 +170,21 @@ class _OverlayLyricsSettingsPageState
         ),
       ),
     );
+  }
+
+  List<Widget> _buildWithDividers(List<Widget> children) {
+    if (children.isEmpty) return children;
+    final result = <Widget>[];
+    for (int i = 0; i < children.length; i++) {
+      result.add(children[i]);
+      if (i < children.length - 1) {
+        result.add(Container(
+          margin: const EdgeInsets.only(left: 16),
+          height: 0.5,
+          color: AppColors.darkDivider,
+        ));
+      }
+    }
+    return result;
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show ListTile;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/ds_state_page.dart';
 import '../../components/ds_text.dart';
@@ -110,7 +109,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                               itemCount: r.albums.length,
                               itemBuilder: (_, i) {
                                 final a = r.albums[i];
-                                return ListTile(
+                                return _searchTile(
                                   leading: Container(
                                     width: 48,
                                     height: 48,
@@ -122,9 +121,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                         CupertinoIcons.music_albums,
                                         color: AppColors.textAssistantDark),
                                   ),
-                                  title: DSText(a.name),
-                                  subtitle: DSText.assistant(a.artist ?? ''),
-                                  onTap: () {},
+                                  title: a.name,
+                                  subtitle: a.artist ?? '',
                                 );
                               },
                             )),
@@ -137,7 +135,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                               itemCount: r.artists.length,
                               itemBuilder: (_, i) {
                                 final a = r.artists[i];
-                                return ListTile(
+                                return _searchTile(
                                   leading: Container(
                                     width: 48,
                                     height: 48,
@@ -149,10 +147,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                         CupertinoIcons.person_fill,
                                         color: AppColors.textAssistantDark),
                                   ),
-                                  title: DSText(a.name),
-                                  subtitle: DSText.assistant(
-                                      '${a.albumCount} ${t.albums}'),
-                                  onTap: () {},
+                                  title: a.name,
+                                  subtitle: '${a.albumCount} ${t.albums}',
                                 );
                               },
                             )),
@@ -177,6 +173,39 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         ),
         child,
       ],
+    );
+  }
+
+  Widget _searchTile({
+    required Widget leading,
+    required String title,
+    required String subtitle,
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        height: 60,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            leading,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DSText(title),
+                  const SizedBox(height: 2),
+                  DSText.assistant(subtitle),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

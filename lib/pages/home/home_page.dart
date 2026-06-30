@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show ListTile;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/cards/album_grid_item.dart';
 import '../../components/ds_state_page.dart';
@@ -321,15 +320,10 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
           itemBuilder: (_, i) {
             final f = folders[i];
-            return ListTile(
-              leading: const Icon(CupertinoIcons.folder,
-                  color: AppColors.accent, size: 28),
-              title: DSText(f['name']?.toString() ?? '未命名'),
-              subtitle: DSText.assistant('${f['items'] ?? 0} 项'),
-              trailing: const Icon(CupertinoIcons.chevron_right,
-                  color: AppColors.textAssistantDark, size: 16),
+            return _folderTile(
+              name: f['name']?.toString() ?? '未命名',
+              count: f['items'] ?? 0,
               onTap: () {
-                // A8 修复：进入子目录
                 Navigator.of(context).push(CupertinoPageRoute(
                   builder: (_) => FolderBrowsePage(
                     folderId: (f['id'] ?? '').toString(),
@@ -341,6 +335,41 @@ class _HomePageState extends ConsumerState<HomePage> {
           },
         );
       },
+    );
+  }
+
+  Widget _folderTile({
+    required String name,
+    required dynamic count,
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        height: 64,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            const Icon(CupertinoIcons.folder,
+                color: AppColors.accent, size: 28),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DSText(name),
+                  const SizedBox(height: 2),
+                  DSText.assistant('$count 项'),
+                ],
+              ),
+            ),
+            const Icon(CupertinoIcons.chevron_right,
+                color: AppColors.textAssistantDark, size: 16),
+          ],
+        ),
+      ),
     );
   }
 
