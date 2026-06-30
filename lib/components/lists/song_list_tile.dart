@@ -66,7 +66,9 @@ class SongListTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    [song.artist, if (showAlbum) song.album].whereType<String>().join(' · '),
+                    [song.artist, if (showAlbum) song.album]
+                        .whereType<String>()
+                        .join(' · '),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.songArtist,
@@ -86,7 +88,8 @@ class SongListTile extends StatelessWidget {
                   onTap: onMore,
                   child: const Padding(
                     padding: EdgeInsets.all(4),
-                    child: Icon(CupertinoIcons.ellipsis, size: 18, color: AppColors.textAssistantDark),
+                    child: Icon(CupertinoIcons.ellipsis,
+                        size: 18, color: AppColors.textAssistantDark),
                   ),
                 ),
               ],
