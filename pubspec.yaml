@@ -1,21 +1,100 @@
 name: ds_music_flutter
-description: A cross-platform music app built with Flutter.
+description: DS Player - Synology AudioStation Flutter Client，复刻iOS端DS Player体验。
 publish_to: 'none'
-
-version: 0.1.0+1
+version: 1.1.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.4.0 <4.0.0'
+  flutter: ">=3.22.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.6
+  flutter_localizations:
+    sdk: flutter
+
+  # Cupertino 图标
+  cupertino_icons: ^1.0.8
+
+  # 网络层
+  dio: ^5.4.3+1
+  pretty_dio_logger: ^1.4.0
+  http: ^1.2.1
+
+  # 播放核心
+  just_audio: ^0.9.36
+  # 关键：just_audio_background 0.0.1-beta.11 在 CI 偶现解析失败，
+  # 改用 caret 兼容的早期正式版（0.0.1-beta.13）。
+  # 0.0.1-beta.17 需要 Flutter >=3.27，CI 是 3.22 不能用
+  just_audio_background: ^0.0.1-beta.13
+  audio_service: ^0.18.12
+  audio_session: ^0.1.18
+
+  # 状态管理
+  flutter_riverpod: ^2.5.1
+
+  # 本地存储与文件
+  shared_preferences: ^2.2.3
+  path_provider: ^2.1.3
+  path: ^1.9.0
+
+  # 图片缓存
+  cached_network_image: ^3.3.1
+
+  # 设备能力与权限
+  connectivity_plus: ^5.0.2
+  permission_handler: ^11.3.1
+  # 关键：system_overlay_window 在 pub.dev 不存在
+  # 浮窗功能后续可接 flutter_floatwing 或原生实现
+
+  # DLNA/UPnP 投屏
+  # 关键：upnp2 实际发布版本是 3.0.x（不是 1.0.0），
+  # 写 ^1.0.0 导致 pub 解析失败退出 69
+  upnp2: ^3.0.0
+
+  # 均衡器：原生插件走 graceful degradation
+  # 不依赖任何 native 插件，UI 仅维护状态
+  # 后续可接 audio_session 提供的 native equalizer capabilities
+
+  # UI 辅助
+  shimmer: ^3.0.0
+  animations: ^2.0.10
+  flutter_staggered_grid_view: ^0.7.0
+
+  # 工具
+  # 关键：Flutter 3.22 内置 intl 0.18.x，^0.19.0 在 pub get 时会冲突
+  intl: ^0.18.0
+  collection: ^1.18.0
+  crypto: ^3.0.3
+  uuid: ^4.4.0
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.1
 
+# 关键：dependency_overrides 强制 pin intl 0.18.0，
+# 避免 flutter_localizations 自带 intl 与 ^0.19.0 冲突
+dependency_overrides:
+  intl: 0.18.0
+
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/
+  # 关键：仓库 assets/fonts/ 仅含 README.md 占位，未提供 SF Pro 字体源文件
+  # 显式声明 SF Pro 字体会在 flutter build apk 时报
+  #   "unable to locate asset entry in pubspec.yaml"
+  # 等拿到正式授权字体后再恢复 fonts: 段。
+  # fonts:
+  #   - family: SF Pro
+  #     fonts:
+  #       - asset: assets/fonts/SFPro-Regular.ttf
+  #       - asset: assets/fonts/SFPro-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/SFPro-Semibold.ttf
+  #         weight: 600
+  #       - asset: assets/fonts/SFPro-Bold.ttf
+  #         weight: 700

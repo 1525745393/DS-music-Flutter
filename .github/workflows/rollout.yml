@@ -1,0 +1,37 @@
+name: Staged Rollout (5% → 25% → 50% → 100%)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'release/x.y.z 分支名'
+        required: true
+      current_pct:
+        description: '当前灰度比例'
+        required: true
+        default: '5'
+
+jobs:
+  rollout:
+    name: Gradual Rollout
+    runs-on: ubuntu-latest
+    steps:
+      - name: 计算下一阶段比例
+        id: next
+        run: |
+          case "${{ github.event.inputs.current_pct }}" in
+            "5") next="25" ;;
+            "25") next="50" ;;
+            "50") next="100" ;;
+            "100") next="100" ;;
+            *) next="5" ;;
+          esac
+          echo "next=${next}" >> $GITHUB_OUTPUT
+      - name: 触发下游分发
+        run: |
+          echo "发布比例 ${{ github.event.inputs.current_pct }}% → ${{ steps.next.outputs.next }}%"
+          echo "（实际灰度配置由蒲公英/firebase app distribution 等外部服务完成）"
+          # 1. 调用蒲公英 API 上传 + 设置比例
+          # 2. 或者更新 Firebase App Distribution rollout
+          # 3. 等待 24h 监控指标
+          # 4. 自动触发下一阶段或回滚
