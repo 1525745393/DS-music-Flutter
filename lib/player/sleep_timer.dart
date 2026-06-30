@@ -11,7 +11,7 @@ class SleepTimer {
 
   SleepTimer({required this.minutes, required this.onTimeout});
 
-  void start(StateNotifierProviderRef<SleepTimerNotifier, Duration> ref) {
+  void start(Ref ref) {
     _timer?.cancel();
     _remaining = Duration(minutes: minutes);
     _timer = Timer.periodic(const Duration(seconds: 1), (t) {

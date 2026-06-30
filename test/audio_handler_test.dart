@@ -12,6 +12,10 @@ class _StubSettings implements SettingsPort {
   bool get forceLossless => false;
   @override
   bool get forceTranscodeOnMobile => true;
+  @override
+  bool get normalizeVolume => false;
+  @override
+  bool get gaplessEnabled => true;
 }
 
 /// LibraryAccess 测试桩

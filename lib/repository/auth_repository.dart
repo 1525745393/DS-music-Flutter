@@ -58,7 +58,7 @@ class AuthRepository {
   }
 
   // —— SID ——
-  Future<String?> getSid() => _sp.getString(StorageKeys.sid);
+  Future<String?> getSid() async => _sp.getString(StorageKeys.sid);
   Future<void> setSid(String sid, {Duration? ttl}) async {
     await _sp.setString(StorageKeys.sid, sid);
     if (ttl != null) {
@@ -80,7 +80,7 @@ class AuthRepository {
     await _sp.remove(StorageKeys.sidExpire);
   }
 
-  Future<String?> getLastAccount() => _sp.getString(StorageKeys.account);
+  Future<String?> getLastAccount() async => _sp.getString(StorageKeys.account);
   Future<void> setLastAccount(String account) =>
       _sp.setString(StorageKeys.account, account);
 }

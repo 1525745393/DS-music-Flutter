@@ -95,15 +95,8 @@ class _DlnaBrowsePageState extends ConsumerState<DlnaBrowsePage> {
                   isDefaultAction: true,
                   onPressed: () async {
                     Navigator.pop(context);
-                    try {
-                      // ignore: avoid_dynamic_calls
-                      await (widget.controller.selectedRenderer as dynamic)
-                          .setAVTransportURI(item.resourceUrl!, item.title);
-                      // ignore: avoid_dynamic_calls
-                      await (widget.controller.selectedRenderer as dynamic)
-                          .play();
-                    } catch (e) {
-                      // 静默失败
+                    if (item.resourceUrl != null) {
+                      await widget.controller.playUrl(item.resourceUrl!, item.title);
                     }
                   },
                   child: const DSText('投屏'),
@@ -118,11 +111,8 @@ class _DlnaBrowsePageState extends ConsumerState<DlnaBrowsePage> {
         child: Row(
           children: [
             Icon(
-              isContainer
-                  ? CupertinoIcons.folder_fill
-                  : CupertinoIcons.music_note,
-              color:
-                  isContainer ? AppColors.accent : AppColors.textAssistantDark,
+              isContainer ? CupertinoIcons.folder_fill : CupertinoIcons.music_note,
+              color: isContainer ? AppColors.accent : AppColors.textAssistantDark,
               size: 22,
             ),
             const SizedBox(width: 12),

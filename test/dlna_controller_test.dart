@@ -1,84 +1,43 @@
 import 'package:ds_music_flutter/player/dlna_controller.dart';
 import 'package:ds_music_flutter/model/song.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:upnp2/upnp2.dart';
 
-/// UpnpCommand 的 candidate 候选策略
-/// 关键点：upnp2 1.0.0 的 DMR API 不固定，本测试验证
-/// 1. 选中目标为 null 时不调用且不抛
-/// 2. 多个候选全部失败时返回 false
-class _FakeRenderer extends UpnpDevice {
-  _FakeRenderer({this.shouldFail = true}) : super.empty();
-  final bool shouldFail;
-
-  @override
-  String get uuid => 'fake-uuid';
-  @override
-  String get deviceType => 'urn:schemas-upnp-org:device:MediaRenderer:1';
-  @override
-  String? get friendlyName => 'Fake';
-  @override
-  String? get host => '192.168.1.10';
-  @override
-  int? get port => 8080;
-
-  @override
-  Future<void> setAVTransportURI(String uri, String title) async {
-    if (shouldFail) throw StateError('setAVTransportURI failed');
-  }
-
-  @override
-  Future<void> play() async {
-    if (shouldFail) throw StateError('play failed');
-  }
-}
-
+/// DlnaController 桩实现行为测试
+/// 关键点：v1.1.0 DLNA 改为桩实现，仅验证：
+/// 1. 设备列表初始为空
+/// 2. 未选设备时 push/pushQueue 返回 false
+/// 3. DlnaMediaItem 字段与判定正确
 void main() {
-  group('UpnpCommand', () {
-    test('target=null 时返回 false 不抛', () async {
-      final cmd = UpnpCommand(
-        'test',
-        target: null,
-        candidates: const ['pause'],
-      );
-      expect(await cmd.invoke(), false);
-    });
-
-    test('目标方法不存在时返回 false（NoSuchMethod 兜底）', () async {
-      final r = _FakeRenderer(shouldFail: true);
-      final cmd = UpnpCommand(
-        'pause',
-        target: r,
-        candidates: const ['nonExistentMethod1', 'nonExistentMethod2'],
-      );
-      expect(await cmd.invoke(), false);
-    });
-
-    test('invokeList null target 返回 null', () async {
-      final cmd = UpnpCommand(
-        'browse',
-        target: null,
-        candidates: const ['browse'],
-      );
-      expect(await cmd.invokeList(), isNull);
-    });
-  });
-
-  group('DlnaController 设备发现', () {
-    test('空 devices 时返回空列表', () {
+  group('DlnaController 设备管理', () {
+    test('初始 devices/servers 为空', () {
       final c = DlnaController();
       expect(c.devices, isEmpty);
       expect(c.servers, isEmpty);
+      c.dispose();
+    });
+
+    test('startDiscovery 后填充示例设备', () async {
+      final c = DlnaController();
+      await c.startDiscovery();
+      expect(c.devices, isNotEmpty);
       c.dispose();
     });
   });
 
   group('DlnaMediaItem', () {
     test('isContainer 判定', () {
-      final c = const DlnaMediaItem(
-          id: '1', title: 'A', type: 'container', childrenCount: 5);
-      final a = const DlnaMediaItem(
-          id: '2', title: 'B', type: 'audio', childrenCount: 0);
+      const c = DlnaMediaItem(
+        id: '1',
+        title: 'A',
+        type: 'container',
+        childrenCount: 5,
+      );
+      const a = DlnaMediaItem(
+        id: '2',
+        title: 'B',
+        type: 'audio',
+        childrenCount: 0,
+      );
       expect(c.isContainer, true);
       expect(a.isContainer, false);
     });
@@ -88,14 +47,37 @@ void main() {
     test('未选设备时 push 返回 false', () async {
       final c = DlnaController();
       final ok = await c.push(
-          Song.fromJson({'id': '1', 'title': 'S'}), 'https://stub/1');
+        Song.fromJson({'id': '1', 'title': 'S'}),
+        'https://stub/1',
+      );
       expect(ok, false);
       c.dispose();
     });
 
     test('pushQueue 空列表返回 false', () async {
       final c = DlnaController();
-      expect(await c.pushQueue([], const []), false);
+      expect(await c.pushQueue(const [], const []), false);
+      c.dispose();
+    });
+  });
+
+  group('远程控制 (DMR)', () {
+    test('未选设备时 pause/resume/stop/seekTo/setVolume 返回 false', () async {
+      final c = DlnaController();
+      expect(await c.pause(), false);
+      expect(await c.resume(), false);
+      expect(await c.stop(), false);
+      expect(await c.seekTo(30), false);
+      expect(await c.setVolume(50), false);
+      c.dispose();
+    });
+  });
+
+  group('Browse', () {
+    test('browse 未选设备返回空列表', () async {
+      final c = DlnaController();
+      final items = await c.browse();
+      expect(items, isEmpty);
       c.dispose();
     });
   });
