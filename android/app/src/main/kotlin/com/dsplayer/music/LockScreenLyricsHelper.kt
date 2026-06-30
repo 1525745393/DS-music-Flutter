@@ -3,8 +3,6 @@ package com.dsplayer.music
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
-import androidx.media3.session.MediaSession
-import androidx.media3.session.MediaStyleNotificationHelper
 import com.ryanheise.audioservice.AudioServicePlugin
 
 /**
