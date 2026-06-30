@@ -31,11 +31,22 @@ jobs:
           name: pub-get-log
           path: pub_get.log
       - name: Auto-fix formatting
-        # 关键：沙箱无 dart SDK，CI 上自动跑 dart format 修复格式问题
-        # 并把改动 commit 回当前分支（用 GitHub Actions 内置的 GITHUB_TOKEN）
+        # 关键：先逐文件尝试 dart format，定位有语法错误的文件，
+        # 避免整个 step 因单个文件出错直接 exit 65 中断
+        # 捕获到错误的文件后单独跳过
         run: |
           git config user.name "ds-player-bot"
           git config user.email "bot@dsplayer.local"
+          echo "=== 检查 dart 语法错误 ==="
+          # 用 dart analyze 快速找出语法错的文件
+          BAD_FILES=$(dart analyze lib test 2>&1 | grep -E "error -" | grep -oE "lib/[^ ]+\.dart|test/[^ ]+\.dart" | sort -u)
+          echo "语法错误文件: $BAD_FILES"
+          if [ -n "$BAD_FILES" ]; then
+            echo "::error::以下文件存在语法错误，需要修复：$BAD_FILES"
+            dart analyze lib test 2>&1 | head -50
+            exit 1
+          fi
+          echo "=== 全部文件语法 OK，开始 dart format ==="
           dart format lib test
           if ! git diff --quiet; then
             git add -A
