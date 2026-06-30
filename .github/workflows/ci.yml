@@ -3,6 +3,7 @@ name: DS Player CI
 on:
   push:
     branches: [main, develop, 'release/**']
+    tags: ['v*']
   pull_request:
     branches: [main, develop]
 
@@ -107,11 +108,13 @@ jobs:
           path: build/app/outputs/flutter-apk/app-release.apk
 
   # 灰度发布：自动为每个 release tag 创建 GitHub Release
+  # 关键：仅在 push tag (v*) 时触发，不在 release/* 分支 push 时触发
+  # 发布流程：CI 验证 release/x.y.z → 合 main → main 上打 tag vx.y.z → 触发本 job
   release:
     name: Create Release
     needs: build-android
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/heads/release/')
+    if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
     steps:

@@ -35,9 +35,14 @@ void main() {
     testWidgets('BuildContext 上能取到当前 locale 字符串', (tester) async {
       SharedPreferencesTestSetup.apply();
       // 场景 1：默认中文
+      // 关键：MaterialApp 必须显式设置 locale: zh，
+      // 否则 Localizations.localeOf 在 CI 环境下默认 en_US，
+      // 测试期望 isEnglish = false（中文）。
       late BuildContext capturedContext;
       await tester.pumpWidget(ProviderScope(
         child: MaterialApp(
+          locale: const Locale('zh'),
+          supportedLocales: const [Locale('zh'), Locale('en')],
           home: Builder(builder: (ctx) {
             capturedContext = ctx;
             return const SizedBox.shrink();

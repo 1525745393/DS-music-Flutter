@@ -1,20 +1,38 @@
 import 'package:ds_music_flutter/api/download_api.dart';
 import 'package:ds_music_flutter/api/audio_station_api.dart';
+import 'package:ds_music_flutter/api/api_info.dart';
+import 'package:ds_music_flutter/api/dio_client.dart';
 import 'package:ds_music_flutter/model/song.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// AudioStationApi 抽象类测试桩
 /// 关键：避免引入 mocking 库，继承实现一遍
 class _StubAudio extends AudioStationApi {
-  _StubAudio() : super();
+  _StubAudio()
+      : super(
+          // 测试桩不发起真实请求，Dio 用默认配置即可
+          Dio(),
+          ApiInfo(Dio()),
+          DioClient(baseUrl: 'http://stub.local'),
+        );
 
   @override
-  String buildStreamUrl(Song song) => 'https://stub/${song.id}';
+  String buildStreamUrl(
+    Song song, {
+    bool forceTranscode = false,
+    int? bitrate,
+    String? format,
+    bool preferLossless = false,
+  }) =>
+      'https://stub/${song.id}';
+
   @override
   String buildDownloadUrl(Song song) => 'https://stub/${song.id}';
+
   @override
-  String coverUrl(String albumId, {int size = 300}) =>
+  String buildCoverUrl(String albumId, {String size = 'mid'}) =>
       'https://stub/cover/$albumId';
 }
 

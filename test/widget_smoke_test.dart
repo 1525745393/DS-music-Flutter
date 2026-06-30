@@ -3,7 +3,7 @@ import 'package:ds_music_flutter/pages/onboarding/onboarding_page.dart';
 import 'package:ds_music_flutter/pages/settings/settings_page.dart';
 import 'package:ds_music_flutter/pages/settings/transcode_picker_page.dart';
 import 'package:ds_music_flutter/pages/settings/locale_picker_page.dart';
-import 'package:ds_music_flutter/theme/app_colors.dart';
+import 'package:ds_music_flutter/provider/core_providers.dart';
 import 'package:ds_music_flutter/theme/app_theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,8 +23,15 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
+  /// 共享 pump 工具：
+  /// 必须 override sharedPreferencesProvider，否则 settingsProvider 内部
+  /// 会抛 UnimplementedError('必须在 main() 中 override')，整个 widget tree build 失败。
   Future<void> _pumpWithDefaults(WidgetTester tester, Widget child) async {
+    final sp = await SharedPreferences.getInstance();
     await tester.pumpWidget(ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(sp),
+      ],
       child: CupertinoApp(
         theme: AppTheme.dark,
         home: child,

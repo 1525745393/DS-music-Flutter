@@ -1,4 +1,5 @@
 import 'package:ds_music_flutter/provider/settings_provider.dart';
+import 'package:ds_music_flutter/provider/core_providers.dart';
 import 'package:ds_music_flutter/constants/storage_keys.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
