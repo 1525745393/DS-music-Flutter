@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/1525745393/DS-music-Flutter/compare/v1.1.1...v1.1.2) (2026-07-01)
+
+
+### Bug Fixes
+
+* 添加 Google Play Core 缺失类的 ProGuard 规则 ([a1e92d6](https://github.com/1525745393/DS-music-Flutter/commit/a1e92d6c3dc9f272713f73a87be83a76e473a249))
+
 ## [1.1.1](https://github.com/1525745393/DS-music-Flutter/compare/v1.1.0...v1.1.1) (2026-07-01)
 
 
