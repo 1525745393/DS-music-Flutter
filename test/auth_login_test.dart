@@ -66,8 +66,7 @@ void main() {
         'method': 'list',
       });
 
-      expect(capturedSid, 'test-sid-123',
-          reason: '_sid 必须带下划线且值为当前 SID');
+      expect(capturedSid, 'test-sid-123', reason: '_sid 必须带下划线且值为当前 SID');
       client.close();
     });
 
@@ -92,8 +91,7 @@ void main() {
         'passwd': 'pass',
       });
 
-      expect(capturedSid, isNull,
-          reason: '登录请求不应携带 _sid，避免干扰鉴权');
+      expect(capturedSid, isNull, reason: '登录请求不应携带 _sid，避免干扰鉴权');
       client.close();
     });
   });
@@ -166,7 +164,10 @@ void main() {
             'data': {'sid': 'login-sid-999'},
           });
         }
-        return _jsonResponse({'success': false, 'error': {'code': 100}});
+        return _jsonResponse({
+          'success': false,
+          'error': {'code': 100}
+        });
       });
       client.dio.httpClientAdapter = mock;
 
@@ -242,8 +243,7 @@ void main() {
       final sid = await apiAuth.login(account: 'admin', passwd: 'password');
 
       expect(sid, 'sid-after-login');
-      expect(client.sid, 'sid-after-login',
-          reason: '登录后 SID 必须写入 DioClient');
+      expect(client.sid, 'sid-after-login', reason: '登录后 SID 必须写入 DioClient');
       client.close();
     });
 
@@ -271,8 +271,7 @@ void main() {
         await apiAuth.login(account: 'admin', passwd: 'wrong');
         fail('密码错误应抛出异常');
       } catch (e) {
-        expect(e, isA<Exception>(),
-            reason: '密码错误 (code=403) 应抛出 Exception');
+        expect(e, isA<Exception>(), reason: '密码错误 (code=403) 应抛出 Exception');
       }
       client.close();
     });

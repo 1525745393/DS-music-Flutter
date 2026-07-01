@@ -343,7 +343,8 @@ class AudioStationApi {
       ...extra,
     };
     try {
-      final resp = await _dio.get(ApiConstants.entryPath, queryParameters: query);
+      final resp =
+          await _dio.get(ApiConstants.entryPath, queryParameters: query);
       final data = resp.data as Map<String, dynamic>;
       if (data['success'] != true) {
         final err = data['error'];

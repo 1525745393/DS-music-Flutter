@@ -57,8 +57,7 @@ class DioClient {
         if (_sid != null) {
           final api = options.queryParameters['api']?.toString();
           final method = options.queryParameters['method']?.toString();
-          final isLogin =
-              api == 'SYNO.API.Auth' && method == 'login';
+          final isLogin = api == 'SYNO.API.Auth' && method == 'login';
           if (!isLogin) {
             options.queryParameters['_sid'] = _sid;
           }
