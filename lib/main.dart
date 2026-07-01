@@ -45,17 +45,27 @@ Future<void> main() async {
   ]);
 
   // 1. 启动 just_audio_background（锁屏媒体控件 + 通知栏）
-  await JustAudioBackground.init(
-    androidNotificationChannelId: 'com.dsplayer.audio',
-    androidNotificationChannelName: 'DS Player 播放',
-    androidNotificationOngoing: true,
-  );
+  // 容错：音频插件初始化失败不应阻塞 UI 启动，避免黑屏
+  try {
+    await JustAudioBackground.init(
+      androidNotificationChannelId: 'com.dsplayer.audio',
+      androidNotificationChannelName: 'DS Player 播放',
+      androidNotificationOngoing: true,
+    );
+  } catch (e) {
+    AppLogger.w('JustAudioBackground 初始化失败：$e');
+  }
 
   // 1.1 配置音频会话：处理来电/导航播报等音频焦点
   // 设计原因：iOS/Android 在来电、CarPlay、导航播报时会中断当前 App 音频，
   // 必须显式配置 AVAudioSession/Android AudioFocus 才能拿到 interruption 事件
-  final audioSession = await AudioSession.instance;
-  await audioSession.configure(const AudioSessionConfiguration.music());
+  AudioSession? audioSession;
+  try {
+    audioSession = await AudioSession.instance;
+    await audioSession.configure(const AudioSessionConfiguration.music());
+  } catch (e) {
+    AppLogger.w('AudioSession 配置失败：$e');
+  }
 
   // 2. 加载持久化
   final sp = await SharedPreferences.getInstance();
@@ -68,38 +78,44 @@ Future<void> main() async {
   // 4. 启动后台播放服务
   // 设计原因：handler 仅在调用 setQueueAndPlay 时才真正访问 repo
   // 因此允许在 ProviderContainer 还未注入 LibraryRepository 时创建
-  final handler = await AudioService.init<DSPlayerHandler>(
-    builder: () {
-      return DSPlayerHandler(
-        repoGetter: () {
-          try {
-            return container.read(libraryRepositoryProvider) as dynamic;
-          } catch (_) {
-            return _NullAccess();
-          }
-        },
-        settingsGetter: () {
-          try {
-            final s = container.read(settingsProvider);
-            return SettingsPort(
-              forceLossless: s.forceLossless,
-              normalizeVolume: s.normalizeVolume,
-              gaplessEnabled: s.gaplessEnabled,
-              forceTranscodeOnMobile: s.forceTranscodeOnMobile,
-            );
-          } catch (_) {
-            return const SettingsPort();
-          }
-        },
-      );
-    },
-    config: const AudioServiceConfig(
-      androidNotificationChannelId: 'com.dsplayer.audio',
-      androidNotificationChannelName: 'DS Player 播放',
-      androidNotificationOngoing: true,
-      androidStopForegroundOnPause: true,
-    ),
-  );
+  // 容错：AudioService 初始化失败不阻塞 UI
+  DSPlayerHandler? handler;
+  try {
+    handler = await AudioService.init<DSPlayerHandler>(
+      builder: () {
+        return DSPlayerHandler(
+          repoGetter: () {
+            try {
+              return container.read(libraryRepositoryProvider) as dynamic;
+            } catch (_) {
+              return _NullAccess();
+            }
+          },
+          settingsGetter: () {
+            try {
+              final s = container.read(settingsProvider);
+              return SettingsPort(
+                forceLossless: s.forceLossless,
+                normalizeVolume: s.normalizeVolume,
+                gaplessEnabled: s.gaplessEnabled,
+                forceTranscodeOnMobile: s.forceTranscodeOnMobile,
+              );
+            } catch (_) {
+              return const SettingsPort();
+            }
+          },
+        );
+      },
+      config: const AudioServiceConfig(
+        androidNotificationChannelId: 'com.dsplayer.audio',
+        androidNotificationChannelName: 'DS Player 播放',
+        androidNotificationOngoing: true,
+        androidStopForegroundOnPause: true,
+      ),
+    );
+  } catch (e) {
+    AppLogger.w('AudioService 初始化失败：$e');
+  }
 
   // 5. 首次启动请求关键权限
   try {
@@ -111,24 +127,28 @@ Future<void> main() async {
   // 5.1 订阅音频焦点事件：来电/导航/CarPlay 触发时自动暂停
   // 设计原因：手机/车机场景下其他 App 抢占音频焦点是常态，
   // 应在硬件层面降级处理而不是依赖 UI 层监听
-  audioSession.becomingNoisyEventStream.listen((_) {
-    AppLogger.i('音频焦点丢失（耳机拔出 / 其他 App 抢占），自动暂停');
-    handler.pause();
-  });
-  audioSession.interruptionEventStream.listen((event) {
-    if (event.begin) {
-      AppLogger.i('音频被打断：${event.type}');
-      handler.pause();
-    } else {
-      // 中断结束：iOS/Android 由系统决定是否自动恢复，
-      // 出于用户体验考虑不主动 resume，让用户手动点击
-      AppLogger.i('音频中断结束');
-    }
-  });
+  if (audioSession != null && handler != null) {
+    audioSession.becomingNoisyEventStream.listen((_) {
+      AppLogger.i('音频焦点丢失（耳机拔出 / 其他 App 抢占），自动暂停');
+      handler?.pause();
+    });
+    audioSession.interruptionEventStream.listen((event) {
+      if (event.begin) {
+        AppLogger.i('音频被打断：${event.type}');
+        handler?.pause();
+      } else {
+        // 中断结束：iOS/Android 由系统决定是否自动恢复，
+        // 出于用户体验考虑不主动 resume，让用户手动点击
+        AppLogger.i('音频中断结束');
+      }
+    });
+  }
 
   runApp(ProviderScope(
     parent: container,
-    overrides: [audioHandlerProvider.overrideWithValue(handler)],
+    overrides: handler != null
+        ? [audioHandlerProvider.overrideWithValue(handler)]
+        : [],
     child: const DSPlayerApp(),
   ));
 }
