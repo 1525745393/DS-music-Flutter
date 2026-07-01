@@ -1,107 +1,121 @@
 # Checklist - DS Player 全量需求自查
 
-## NAS 连接与认证
+## 一、固定技术栈
 
-- [x] 三种登录模式：内网直连（IP+端口）、DDNS 域名、QuickConnect 中继
-  - **验证结果**：[login_page.dart](file:///workspace/lib/pages/login/login_page.dart) 已实现
-- [x] 动态接口发现：SYNO.API.Info 拉取所有接口路径与最大版本
-  - **验证结果**：[api_info.dart](file:///workspace/lib/api/api_info.dart) 已实现
-- [x] 自签证书兼容：HTTPS NAS 自动信任
-  - **验证结果**：[dio_client.dart](file:///workspace/lib/api/dio_client.dart) badCertificateCallback 已实现
-- [x] SID 持久化 + 静默重登：过期自动续期
-  - **验证结果**：[auth_repository.dart](file:///workspace/lib/repository/auth_repository.dart) 已实现
+- [x] Flutter 3.22+ / Dart 3.4+ / 空安全
+- [x] dio ^5.4.0 + pretty_dio_logger
+- [x] just_audio ^0.9.36 + audio_service ^0.18.12 + audio_session
+- [x] flutter_riverpod ^2.5.1
+- [x] shared_preferences ^2.2.2 + path_provider
+- [x] cached_network_image ^3.3.1
+- [ ] flutter_marquee 滚动歌词（**缺失，需添加**）
+- [x] connectivity_plus ^5.0.2
+- [x] permission_handler ^11.3.1
+- [ ] system_overlay_window ^2.0.0（**pub.dev 不存在，需原生替代方案**）
+- [x] upnp2（⚠ 版本 ^3.0.0，需验证 API 兼容性）
+- [x] flutter_equalizer ^0.1.2
 
-## 播放核心
+## 二、NAS 连接与鉴权
 
-- [ ] 无缝 gapless：ConcatenatingAudioSource 拼接
-  - **验证结果**：待验证，需检查 [audio_handler.dart](file:///workspace/lib/player/audio_handler.dart)
-- [ ] WiFi/蜂窝智能切换：WiFi 原始码流，蜂窝转码 320k MP3
-  - **验证结果**：待验证，[network_type_watcher.dart](file:///workspace/lib/player/network_type_watcher.dart) 存在
-- [ ] 本地优先播放：已下载歌曲直接播放本地
-  - **验证结果**：待验证，需检查 downloadApi 集成
-- [x] 后台播放 + 锁屏控件：audio_service + just_audio_background
-  - **验证结果**：[main.dart](file:///workspace/lib/main.dart#L47-L57) 已实现
-- [x] DSD/FLAC/APE 全格式软解
-  - **验证结果**：just_audio 默认软解支持
+- [x] 内网直连（IP+端口，默认5000/5001，手动HTTPS开关）
+- [x] DDNS 域名 + 端口，HTTPS 默认开启
+- [x] QuickConnect 中继（仅 QC ID，禁止强制加端口）
+- [x] 自动保存多服务器配置
+- [x] SYNO.API.Info 动态获取接口路径与版本
+- [x] SYNO.API.Auth 登录获取 SID
+- [x] 自动处理 HTTPS 自签名证书
+- [x] SID 持久化 + 静默重登
+- [ ] 异常兜底（连接超时/账号密码错误/权限不足提示与重试）
 
-## UI/主题（iOS 扁平化）
+## 三、AudioStation 接口全封装
 
-- [x] 严格遵循 iOS 设计语言，禁止 Material Design
-  - **验证结果**：[main.dart](file:///workspace/lib/main.dart#L219-L226) 使用 CupertinoApp
-- [x] 主背景 #121212
-  - **验证结果**：[app_colors.dart](file:///workspace/lib/theme/app_colors.dart#L9) 已定义
-- [x] 强调色 #007AFF
-  - **验证结果**：[app_colors.dart](file:///workspace/lib/theme/app_colors.dart#L21) 已定义
-- [x] 沉浸式状态栏
-  - **验证结果**：[main.dart](file:///workspace/lib/main.dart#L36-L40) 透明状态栏
-- [x] 毛玻璃 10%
-  - **验证结果**：[app_colors.dart](file:///workspace/lib/theme/app_colors.dart#L42) glassDark 已定义
-- [x] 圆角 16/10/4
-  - **验证结果**：[app_dimens.dart](file:///workspace/lib/theme/app_dimens.dart) 已定义
-- [ ] 弹性阻尼滚动
-  - **验证结果**：待验证，需检查 BouncingScrollPhysics
-- [ ] 点击透明度反馈
-  - **验证结果**：待验证，需检查组件点击状态
+- [x] 专辑、歌手、单曲、文件夹、歌单5类分类拉取
+- [x] 分页、搜索、排序
+- [x] cover.cgi 加载多尺寸专辑封面
+- [x] SYNO.AudioStation.Lyrics 读取内嵌歌词
+- [ ] 在线歌词补全（后续可扩展）
+- [x] stream.cgi 双模式（WiFi 原始/蜂窝转码）
+- [x] 转码参数 format=mp3 / bitrate=320k / samplerate=44100
+- [x] 设置页可自定义转码参数
+- [ ] 提前缓冲下一首歌曲前30秒（**未实现**）
+- [ ] 智能调节缓冲阈值（**未实现**）
+- [x] download.cgi 批量下载
+- [x] 断点续传
+- [x] 进度显示
+- [ ] 缓存路径自定义（**未实现**）
+- [x] 歌单增删改查双向同步
+- [x] 歌曲星级评分
+- [ ] 播放记录回传 AudioStation（**待验证**）
 
-## 音乐库浏览
+## 四、播放核心功能
 
-- [x] 专辑列表浏览（封面、标题、艺术家）
-  - **验证结果**：[album_detail_page.dart](file:///workspace/lib/pages/album/album_detail_page.dart) 已实现
-- [x] 艺术家列表浏览
-  - **验证结果**：[artist_detail_page.dart](file:///workspace/lib/pages/artist/artist_detail_page.dart) 已实现
-- [x] 歌曲列表浏览
-  - **验证结果**：[home_page.dart](file:///workspace/lib/pages/home/home_page.dart#L258-L295) songsProvider 已实现
-- [x] 播放列表管理（创建、编辑、删除）
-  - **验证结果**：[playlist_editor_page.dart](file:///workspace/lib/pages/playlist/playlist_editor_page.dart) 已实现
-- [x] 文件夹浏览（按目录结构）
-  - **验证结果**：[folder_browse_page.dart](file:///workspace/lib/pages/folder/folder_browse_page.dart) 已实现
-- [x] 搜索功能
-  - **验证结果**：[search_page.dart](file:///workspace/lib/pages/search/search_page.dart) 已实现
-
-## 播放器页面与歌词
-
-- [x] 全屏播放器页面（封面、进度、控制按钮）
-  - **验证结果**：[player_page.dart](file:///workspace/lib/pages/player/player_page.dart) 已实现
-- [x] Mini 播放器条（底部固定）
-  - **验证结果**：[mini_player_bar.dart](file:///workspace/lib/components/player_bar/mini_player_bar.dart) 已实现
-- [x] 歌词显示与同步滚动
-  - **验证结果**：[lyrics_view.dart](file:///workspace/lib/components/lyrics/lyrics_view.dart) 已实现
+- [ ] 无缝 gapless 播放（**待验证**）
+- [ ] 音量标准化（**未实现**）
+- [ ] 播放速度调节 0.5x-2x（**未实现**）
+- [x] 锁屏完整媒体控件
+- [ ] 锁屏歌词显示（**未实现**）
+- [ ] 状态栏悬浮歌词可拖动可调节大小（**未实现**）
+- [x] 定时睡眠（10/30/60/120分钟）
 - [x] 播放队列管理
-  - **验证结果**：[queue_page.dart](file:///workspace/lib/pages/queue/queue_page.dart) 已实现
-- [x] 歌词解析（LRC 格式）
-  - **验证结果**：[lyrics.dart](file:///workspace/lib/model/lyrics.dart) 已实现
+- [x] 随机/单曲/列表循环
+- [ ] Android Auto 完整适配（后续可扩展）
+- [ ] DLNA 投屏（**待验证**）
+- [ ] 蓝牙音频无损输出（**未实现**）
+- [x] 音频焦点处理（来电/导航自动暂停）
+- [ ] 本地优先播放（**待验证**）
+- [ ] WiFi/蜂窝智能切换（**待验证**）
 
-## 下载与缓存
+## 五、UI 像素级复刻规范
 
-- [x] 文件下载（歌曲下载到本地）
-  - **验证结果**：[download_api.dart](file:///workspace/lib/api/download_api.dart) DownloadTask 已实现
-- [x] 下载管理（进度、暂停、取消）
-  - **验证结果**：[download_manager_page.dart](file:///workspace/lib/pages/download/download_manager_page.dart) 已实现
-- [x] 本地缓存管理（清理、统计）
-  - **验证结果**：[cache_manage_page.dart](file:///workspace/lib/pages/cache/cache_manage_page.dart) 已实现
-- [ ] 本地优先播放
-  - **验证结果**：待验证，需检查播放源选择逻辑
+### 全局设计系统
+- [x] 主背景 #121212
+- [x] 卡片背景 #1E1E1E
+- [x] 毛玻璃白色10%+模糊度10（⚠ 模糊度待验证）
+- [x] 强调色 #007AFF
+- [x] 文字层级（一级/二级/辅助/禁用）
+- [x] 分割线 #2C2C2C 1px
+- [x] 圆角 16/10/4
+- [x] 边距 16px/12px/10px
+- [ ] 字体 SF Pro 优先（**字体文件缺失**）
+- [x] 沉浸式状态栏
+- [ ] 点击反馈透明度70%（**未实现**）
+- [ ] 封面阴影黑色20%模糊8px Y偏移2px（**待验证**）
 
-## Android 权限
+### 核心页面布局
+- [ ] 登录页布局对齐（标题距顶48px/表单48px/按钮100%宽48px高/底部居中提示）
+- [ ] 首页专辑墙对齐（44px导航栏/40pxTab+下划线/2列网格/64px底部空白）
+- [ ] 播放详情页对齐（高斯模糊+70%遮罩/封面居中距顶80px/进度条3px/控制区三等分/歌词面板）
+- [ ] 迷你播放栏对齐（56px高/毛玻璃/左封面中歌名右控制）
+- [ ] 设置页对齐（iOS分组列表/项高48px）
 
-- [x] INTERNET（API 请求）
-- [x] FOREGROUND_SERVICE（后台播放）
-- [x] POST_NOTIFICATIONS（锁屏通知，Android 13+）
-- [x] READ_MEDIA_AUDIO（读取本地音乐，Android 13+）
-- [x] WAKE_LOCK（息屏播放）
-- [x] REQUEST_IGNORE_BATTERY_OPTIMIZATIONS（防止系统查杀）
-- [x] SYSTEM_ALERT_WINDOW（悬浮歌词）
-- [x] CHANGE_WIFI_MULTICAST_STATE（DLNA 发现）
+### 交互动效
+- [ ] 普通页右向左滑入300ms
+- [ ] 播放页底部滑入+缩放350ms弹性曲线（**未实现**）
+- [ ] 拖拽关闭跟随手势（**未实现**）
+- [ ] iOS 弹性阻尼滚动（**未实现**）
+- [ ] 按钮点击透明度70%（**未实现**）
+- [ ] 进度条拖拽实时更新（**待验证**）
+- [ ] 左右滑动切歌+封面跟随手势（**未实现**）
+- [ ] 切歌淡入淡出300ms（**未实现**）
 
-## 特殊功能
+### Flutter 实现
+- [x] 优先 Cupertino 组件
+- [x] 通用组件封装（DSCard/DSText/DSButton/DSTabBar）
+- [x] UI 层与业务逻辑分离
+- [ ] 毛玻璃统一 BackdropFilter（**待验证**）
 
-- [ ] DLNA 投屏（设备发现、播放控制）
-  - **验证结果**：文件存在，功能待验证
-- [ ] 悬浮歌词（Android 原生服务）
-  - **验证结果**：文件存在，原生服务待验证
-- [ ] Android Auto 适配
-  - **验证结果**：README 标记为「后续可扩展」
-- [x] 睡眠定时器
-  - **验证结果**：[sleep_timer.dart](file:///workspace/lib/player/sleep_timer.dart) 已实现
-- [x] 均衡器（纯状态维护）
-  - **验证结果**：[equalizer_page.dart](file:///workspace/lib/pages/equalizer/equalizer_page.dart) 已实现
+## 六、安卓专属适配
+
+- [x] 首次启动引导权限
+- [x] Android 10-15 存储权限适配
+- [x] 悬浮窗权限
+- [ ] 后台音频保活逻辑（**待验证**）
+- [x] 缓存清理、空间占用统计
+
+## 七、输出要求
+
+- [x] pubspec.yaml 完整依赖（仅缺 flutter_marquee）
+- [x] 项目目录结构对齐
+- [x] 核心模块详细注释
+- [x] 优先输出：登录页/首页/播放页/播放栏/播放核心
+- [x] 运行说明与编译问题排查
