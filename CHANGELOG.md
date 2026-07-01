@@ -1,3 +1,16 @@
+# [1.4.0](https://github.com/1525745393/DS-music-Flutter/compare/v1.3.0...v1.4.0) (2026-07-01)
+
+
+### Bug Fixes
+
+* SettingsPort 构造补传 playSpeed 参数 ([f31fa10](https://github.com/1525745393/DS-music-Flutter/commit/f31fa1066bc3f1745596a8fd10745f0a768dfde7))
+* 替换不存在的 flutter_marquee 包，初始化时应用播放速度 ([73363e2](https://github.com/1525745393/DS-music-Flutter/commit/73363e2f4276c4d04f086b77f6332877f2928160))
+
+
+### Features
+
+* P0核心缺失修复 ([e11c226](https://github.com/1525745393/DS-music-Flutter/commit/e11c2267566c40cef1d94c6a9ccf9d5a345c6ffb))
+
 # [1.3.0](https://github.com/1525745393/DS-music-Flutter/compare/v1.2.0...v1.3.0) (2026-07-01)
 
 
