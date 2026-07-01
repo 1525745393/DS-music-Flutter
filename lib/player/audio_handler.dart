@@ -74,6 +74,12 @@ class DSPlayerHandler extends BaseAudioHandler with SeekHandler {
     try {
       await _player.setSkipSilenceEnabled(_settingsGetter().normalizeVolume);
     } catch (_) {}
+
+    // 应用用户保存的播放速度
+    try {
+      final savedSpeed = _settingsGetter().playSpeed;
+      if (savedSpeed != 1.0) await _player.setSpeed(savedSpeed);
+    } catch (_) {}
   }
 
   /// 播放指定队列
