@@ -66,10 +66,11 @@ android {
             def releaseStoreFile = file("release.keystore")
             def debugStoreFile = file("debug.keystore")
             if (releaseStoreFile.exists()) {
-                // 从 local.properties 读取签名密码，不在代码里硬编码
-                def releaseStorePassword = localProperties.getProperty("release.storePassword", "")
-                def releaseKeyAlias = localProperties.getProperty("release.keyAlias", "")
-                def releaseKeyPassword = localProperties.getProperty("release.keyPassword", "")
+                // CI 环境：优先从环境变量读取签名密码（GitHub Secrets）
+                // 本地开发：从 local.properties 读取
+                def releaseStorePassword = System.getenv("STORE_PASSWORD") ?: localProperties.getProperty("release.storePassword", "")
+                def releaseKeyAlias = System.getenv("KEY_ALIAS") ?: localProperties.getProperty("release.keyAlias", "dsplayer")
+                def releaseKeyPassword = System.getenv("KEY_PASSWORD") ?: localProperties.getProperty("release.keyPassword", "")
                 storeFile releaseStoreFile
                 storePassword releaseStorePassword
                 keyAlias releaseKeyAlias

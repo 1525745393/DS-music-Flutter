@@ -45,6 +45,10 @@ jobs:
         with:
           node-version: 'lts/*'
 
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
+
       - name: Install semantic-release
         run: |
           npm install -g \
@@ -56,4 +60,7 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_ALIAS: dsplayer
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: npx semantic-release
