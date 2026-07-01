@@ -41,3 +41,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Android signing keys (不应提交到仓库，通过 GitHub Secrets 传递)
+# debug.keystore 已提交作为 CI 备用签名，仅排除 release.keystore
+/android/app/release.keystore
+*.jks
