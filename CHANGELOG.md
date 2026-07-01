@@ -1,3 +1,11 @@
+# [1.3.0](https://github.com/1525745393/DS-music-Flutter/compare/v1.2.0...v1.3.0) (2026-07-01)
+
+
+### Features
+
+* Flutter DS Player 复刻 ([2b2eef8](https://github.com/1525745393/DS-music-Flutter/commit/2b2eef8742694b4ca0960bf229d1f187b17f44e6))
+* Flutter DS Player 复刻 ([721a4e5](https://github.com/1525745393/DS-music-Flutter/commit/721a4e585979afd988080ba4d1c76ed710579ed0))
+
 # [1.2.0](https://github.com/1525745393/DS-music-Flutter/compare/v1.1.2...v1.2.0) (2026-07-01)
 
 
