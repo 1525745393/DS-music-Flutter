@@ -23,6 +23,14 @@
 # ===== Android Auto / MediaBrowserService =====
 -keep class com.dsplayer.music.** { *; }
 
+# ===== Google Play Core（Flutter 引擎引用，但项目未依赖） =====
+# Flutter 引擎的 PlayStoreDeferredComponentManager 引用了 play-core 类，
+# 项目未使用动态特性分发，安全地忽略缺失类警告
+-dontwarn com.google.android.play.core.**
+-dontwarn com.google.android.play.core.splitcompat.**
+-dontwarn com.google.android.play.core.splitinstall.**
+-dontwarn com.google.android.play.core.tasks.**
+
 # ===== MediaPlayer / ExoPlayer（音频播放底层） =====
 -keep class android.media.MediaPlayer { *; }
 -keep class android.media.session.** { *; }
