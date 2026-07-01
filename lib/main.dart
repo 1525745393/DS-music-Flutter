@@ -100,6 +100,7 @@ Future<void> main() async {
                 normalizeVolume: s.normalizeVolume,
                 gaplessEnabled: s.gaplessEnabled,
                 forceTranscodeOnMobile: s.forceTranscodeOnMobile,
+                playSpeed: s.playSpeed,
               );
             } catch (_) {
               return const SettingsPort();
