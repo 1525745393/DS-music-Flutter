@@ -9,8 +9,8 @@
       "@semantic-release/exec",
       {
         "verifyConditionsCmd": "flutter pub get",
-        "prepareCmd": "sed -i \"s/^version: .*/version: ${nextRelease.version}+${GITHUB_RUN_NUMBER}/\" pubspec.yaml",
-        "publishCmd": "flutter build apk --release --build-number=${GITHUB_RUN_NUMBER}"
+        "prepareCmd": "sed -i \"s/^version: .*/version: ${nextRelease.version}/\" pubspec.yaml",
+        "publishCmd": "flutter build apk --release --build-number=$GITHUB_RUN_NUMBER"
       }
     ],
     [
