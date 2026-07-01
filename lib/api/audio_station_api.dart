@@ -243,12 +243,7 @@ class AudioStationApi {
 
   // ==================== Stream URL 构造 ====================
 
-  /// stream.cgi 完整 URL
-  /// [song] 目标歌曲
-  /// [forceTranscode] 强制转码（用于蜂窝网络）
-  /// [bitrate] 转码码率
-  /// [format] 转码格式
-  /// [preferLossless] 外网+WiFi 时仍保持原始码流
+  /// stream.cgi 完整 URL（带 _sid 鉴权）
   String buildStreamUrl(
     Song song, {
     bool forceTranscode = false,
@@ -267,52 +262,62 @@ class AudioStationApi {
       params['bitrate'] = bitrate ?? ApiConstants.transcodeBitrate;
       params['samplerate'] = ApiConstants.transcodeSampleRate;
     }
+    final sid = _client.sid;
+    if (sid != null) params['_sid'] = sid;
     final query = _buildQuery(params);
     return '${_client.baseUrl}/${ApiConstants.streamPath}?$query';
   }
 
-  /// 专辑封面 URL（多尺寸：small/mid/big）
+  /// 专辑封面 URL（带 _sid 鉴权）
   String buildCoverUrl(String albumId, {String size = 'mid'}) {
-    final params = {
+    final params = <String, dynamic>{
       'api': ApiConstants.audioStationCover,
       'version': 1,
       'method': 'getcover',
       'id': albumId,
       'size': size,
     };
+    final sid = _client.sid;
+    if (sid != null) params['_sid'] = sid;
     return '${_client.baseUrl}/${ApiConstants.coverPath}?${_buildQuery(params)}';
   }
 
-  /// 头像/歌手封面
+  /// 头像/歌手封面（带 _sid 鉴权）
   String buildThumbUrl(String id) {
-    final params = {
+    final params = <String, dynamic>{
       'api': 'SYNO.AudioStation.Thumb',
       'version': 1,
       'method': 'get',
       'id': id,
     };
+    final sid = _client.sid;
+    if (sid != null) params['_sid'] = sid;
     return '${_client.baseUrl}/${ApiConstants.thumbPath}?${_buildQuery(params)}';
   }
 
-  /// 歌词 URL（stream 模式返回 lrc 文本）
+  /// 歌词 URL（走 entry.cgi，带 _sid 鉴权）
   String buildLyricsUrl(String songId) {
-    final params = {
+    final params = <String, dynamic>{
       'api': ApiConstants.audioStationLyrics,
       'version': 1,
       'method': 'getlyrics',
       'id': songId,
     };
+    final sid = _client.sid;
+    if (sid != null) params['_sid'] = sid;
     return '${_client.baseUrl}/${ApiConstants.entryPath}?${_buildQuery(params)}';
   }
 
-  /// 下载 URL（支持 Range 断点续传）
+  /// 下载 URL（带 _sid 鉴权，支持 Range 断点续传）
   String buildDownloadUrl(Song song) {
-    final params = {
+    final params = <String, dynamic>{
       'api': ApiConstants.audioStationDownload,
       'version': 1,
       'method': 'download',
       'id': song.id,
     };
+    final sid = _client.sid;
+    if (sid != null) params['_sid'] = sid;
     return '${_client.baseUrl}/${ApiConstants.downloadPath}?${_buildQuery(params)}';
   }
 
@@ -323,15 +328,13 @@ class AudioStationApi {
 
   // ==================== Internal ====================
 
-  /// 通用调用入口：解析动态路径、版本
+  /// 通用调用入口：所有 SYNO. 接口统一走 entry.cgi
   Future<Map<String, dynamic>> _call(
     String api,
     String method, {
     int? version,
     Map<String, dynamic> extra = const {},
   }) async {
-    final path = await _apiInfo.getPath(api);
-    if (path.isEmpty) throw AppException('未找到接口: $api');
     final v = version ?? await _apiInfo.getMaxVersion(api);
     final query = <String, dynamic>{
       'api': api,
@@ -340,7 +343,7 @@ class AudioStationApi {
       ...extra,
     };
     try {
-      final resp = await _dio.get(path, queryParameters: query);
+      final resp = await _dio.get(ApiConstants.entryPath, queryParameters: query);
       final data = resp.data as Map<String, dynamic>;
       if (data['success'] != true) {
         final err = data['error'];

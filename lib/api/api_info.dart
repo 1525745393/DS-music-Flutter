@@ -12,13 +12,14 @@ class ApiInfo {
 
   Map<String, dynamic> _cache = {};
 
-  /// 查询接口路径（带缓存）
+  /// 查询接口信息（带缓存）
   /// [name] 接口名，例如 SYNO.API.Auth
   /// 返回 {path, maxVersion, minVersion, ...}
+  /// 注意：SYNO.API.Info 本身也走 entry.cgi 入口
   Future<Map<String, dynamic>> query(String name) async {
     if (_cache.containsKey(name)) return _cache[name]!;
     try {
-      final resp = await _dio.get(ApiConstants.infoPath, queryParameters: {
+      final resp = await _dio.get(ApiConstants.entryPath, queryParameters: {
         'api': 'SYNO.API.Info',
         'version': 1,
         'method': 'query',

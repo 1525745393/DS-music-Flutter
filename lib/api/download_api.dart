@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/storage_keys.dart';
 import '../model/song.dart';
@@ -225,7 +226,6 @@ class DownloadApi {
 
     final cancelToken = CancelToken();
     task.cancelToken = cancelToken;
-    final sid = await _resolveSid();
 
     try {
       final resp = await _dio().get<ResponseBody>(
@@ -236,7 +236,6 @@ class DownloadApi {
           // 关键：Range 头让服务端从 existing 处继续传
           headers: {
             if (existing > 0) HttpHeaders.rangeHeader: 'bytes=$existing-',
-            if (sid != null) '_sid': sid,
           },
           // 接收超时设长，下载大文件不中断
           receiveTimeout: const Duration(minutes: 30),
@@ -293,17 +292,24 @@ class DownloadApi {
     }
   }
 
-  /// 复用单例 Dio，避免每次新建（解决原实现的内存/连接泄漏问题）
-  Dio _dio() => Dio(BaseOptions(
-        connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(minutes: 30),
-        headers: const {'User-Agent': 'DSPlayer/1.0 (Downloader)'},
-      ));
+  Dio? _dioInstance;
 
-  /// SID 取自当前活跃服务器的 SharedPreferences；用于解决原实现 `_sid: ''` 占位 bug
-  Future<String?> _resolveSid() async {
-    if (_sp == null) return null;
-    return _sp.getString(StorageKeys.sid);
+  /// 复用单例 Dio，避免每次新建；配置自签名证书兼容
+  Dio _dio() {
+    if (_dioInstance != null) return _dioInstance!;
+    final d = Dio(BaseOptions(
+      connectTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(minutes: 30),
+      headers: const {'User-Agent': 'DSPlayer/1.0 (Downloader)'},
+    ));
+    // 自签名证书兼容：NAS 默认 HTTPS 自签
+    (d.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+      final client = HttpClient()
+        ..badCertificateCallback = (cert, host, port) => true;
+      return client;
+    };
+    _dioInstance = d;
+    return d;
   }
 
   // ============ 持久化 ============

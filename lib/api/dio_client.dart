@@ -49,11 +49,18 @@ class DioClient {
       return client;
     };
 
-    // 2. 请求拦截：注入 SID
+    // 2. 请求拦截：注入 _sid（带下划线，群晖规范参数名）
+    // 登录请求（SYNO.API.Auth method=login）不注入，避免干扰
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
-        if (_sid != null && !options.path.contains('auth.cgi')) {
-          options.queryParameters['_sid'] = _sid;
+        if (_sid != null) {
+          final api = options.queryParameters['api']?.toString();
+          final method = options.queryParameters['method']?.toString();
+          final isLogin =
+              api == 'SYNO.API.Auth' && method == 'login';
+          if (!isLogin) {
+            options.queryParameters['_sid'] = _sid;
+          }
         }
         AppLogger.d('→ ${options.method} ${options.uri}');
         handler.next(options);

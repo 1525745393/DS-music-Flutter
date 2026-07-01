@@ -225,7 +225,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     Widget chip(String text, ServerMode mode) {
       final selected = _mode == mode;
       return GestureDetector(
-        onTap: () => setState(() => _mode = mode),
+        onTap: () {
+          setState(() {
+            _mode = mode;
+            // 切换模式时自动调整端口和 HTTPS 开关
+            if (mode == ServerMode.ddns) {
+              _useHttps = true;
+              _portCtrl.text = ApiConstants.defaultHttpsPort.toString();
+            } else if (mode == ServerMode.lan) {
+              _useHttps = false;
+              _portCtrl.text = ApiConstants.defaultHttpPort.toString();
+            }
+          });
+        },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(

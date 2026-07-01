@@ -14,21 +14,18 @@ class ApiAuth {
   ApiAuth(this._dio, this._apiInfo, this._client);
 
   /// 登录获取 SID
-  /// [account] 群晖账号
-  /// [passwd] 明文密码（内部会按群晖规则做 encode）
-  /// [otpCode] 双重认证代码（可选）
+  /// 完整流程：先通过 SYNO.API.Info 获取接口版本，再调用 SYNO.API.Auth 执行登录
+  /// 所有 SYNO. 接口统一走 entry.cgi 入口
   Future<String> login({
     required String account,
     required String passwd,
     String? otpCode,
     String? deviceId,
   }) async {
-    final path = await _apiInfo.getPath(ApiConstants.apiAuth);
-    if (path.isEmpty) throw AppException('无法获取鉴权接口路径');
     final version = await _apiInfo.getMaxVersion(ApiConstants.apiAuth);
 
     try {
-      final resp = await _dio.get(path, queryParameters: {
+      final resp = await _dio.get(ApiConstants.entryPath, queryParameters: {
         'api': ApiConstants.apiAuth,
         'version': version,
         'method': 'login',
@@ -65,9 +62,8 @@ class ApiAuth {
     final sid = _client.sid;
     if (sid == null) return;
     try {
-      final path = await _apiInfo.getPath(ApiConstants.apiAuth);
       final version = await _apiInfo.getMaxVersion(ApiConstants.apiAuth);
-      await _dio.get(path, queryParameters: {
+      await _dio.get(ApiConstants.entryPath, queryParameters: {
         'api': ApiConstants.apiAuth,
         'version': version,
         'method': 'logout',

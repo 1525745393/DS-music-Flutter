@@ -28,12 +28,11 @@ class ApiConstants {
   static const String quickConnectAuth = 'SYNO.QuickConnect.Auth';
 
   // —— WebAPI 公开路径 ——
-  static const String infoPath = 'webapi/query.cgi';
-  static const String authPath = 'webapi/auth.cgi';
+  // 所有 SYNO. 开头的 API 统一走 entry.cgi 入口，通过 api 参数指定接口名
   static const String entryPath = 'webapi/entry.cgi';
+  // 媒体文件流接口（非 SYNO. 业务 API，保留独立路径）
   static const String streamPath = 'webapi/AudioStation/stream.cgi';
   static const String coverPath = 'webapi/AudioStation/cover.cgi';
-  static const String lyricsPath = 'webapi/AudioStation/lyrics.cgi';
   static const String downloadPath = 'webapi/AudioStation/download.cgi';
   static const String thumbPath = 'webapi/AudioStation/thumb.cgi';
 
