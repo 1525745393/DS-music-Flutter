@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/1525745393/DS-music-Flutter/compare/v1.4.0...v1.4.1) (2026-07-01)
+
+
+### Bug Fixes
+
+* 修复群晖登录与API调用全链路问题 ([9cb1372](https://github.com/1525745393/DS-music-Flutter/commit/9cb137229892cd2e380a01e081d4d4b22beed8ec))
+
 # [1.4.0](https://github.com/1525745393/DS-music-Flutter/compare/v1.3.0...v1.4.0) (2026-07-01)
 
 
