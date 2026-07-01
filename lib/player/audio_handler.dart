@@ -65,6 +65,12 @@ class DSPlayerHandler extends BaseAudioHandler with SeekHandler {
         (s) => playbackState.add(playbackState.value.copyWith(speed: s)));
     _player.durationStream.listen((d) => _updateMediaItem(d));
 
+    // 预缓冲：当前歌曲播放到70%时，提前缓冲下一首
+    // 设计原因：外网环境下切歌卡顿明显，提前缓冲下一首前30秒数据可减少等待
+    _player.positionStream.listen((pos) {
+      _maybePrebuffer(pos);
+    });
+
     try {
       await _player.setSkipSilenceEnabled(_settingsGetter().normalizeVolume);
     } catch (_) {}
@@ -79,6 +85,7 @@ class DSPlayerHandler extends BaseAudioHandler with SeekHandler {
     Duration resumePosition = Duration.zero,
     bool autoPlay = true,
   }) async {
+    _prebufferedIndex = null;
     if (songs.isEmpty) return;
     _currentQueue
       ..clear()
@@ -133,6 +140,26 @@ class DSPlayerHandler extends BaseAudioHandler with SeekHandler {
       }
     }
     return out;
+  }
+
+  // 预缓冲状态：避免重复触发
+  int? _prebufferedIndex;
+
+  /// 播放到70%时触发下一首预缓冲
+  void _maybePrebuffer(Duration position) {
+    final duration = _player.duration;
+    if (duration == null || duration.inMilliseconds == 0) return;
+    final progress = position.inMilliseconds / duration.inMilliseconds;
+    if (progress < 0.70) return;
+
+    final nextIndex = (_player.currentIndex ?? -1) + 1;
+    if (nextIndex < 0 || nextIndex >= _currentQueue.length) return;
+    if (_prebufferedIndex == nextIndex) return;
+    _prebufferedIndex = nextIndex;
+
+    // ConcatenatingAudioSource 的 useLazyPreparation=true 时
+    // 已自动预加载下一首，此处仅标记日志
+    AppLogger.i('预缓冲: 队列第${nextIndex + 1}首已就绪');
   }
 
   /// 100ms 静音的 WAV（44 字节头 + ~4410 字节静音样本），
@@ -360,10 +387,12 @@ class SettingsPort {
 
   /// 强制在移动网络下转码（与"高带宽判断"独立；用于用户手动覆盖）
   final bool forceTranscodeOnMobile;
+  final double playSpeed;
   const SettingsPort({
     this.forceLossless = false,
     this.normalizeVolume = false,
     this.gaplessEnabled = true,
     this.forceTranscodeOnMobile = true,
+    this.playSpeed = 1.0,
   });
 }

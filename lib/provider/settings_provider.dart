@@ -16,6 +16,7 @@ class SettingsState {
   final bool equalizerEnabled;
   final int equalizerPreset;
   final double volume;
+  final double playSpeed;
 
   /// 语言：'system' / 'zh' / 'en'
   final String localeCode;
@@ -33,6 +34,7 @@ class SettingsState {
     this.equalizerEnabled = false,
     this.equalizerPreset = 0,
     this.volume = 1.0,
+    this.playSpeed = 1.0,
     this.localeCode = 'system',
   });
 
@@ -49,6 +51,7 @@ class SettingsState {
     bool? equalizerEnabled,
     int? equalizerPreset,
     double? volume,
+    double? playSpeed,
     String? localeCode,
   }) {
     return SettingsState(
@@ -65,6 +68,7 @@ class SettingsState {
       equalizerEnabled: equalizerEnabled ?? this.equalizerEnabled,
       equalizerPreset: equalizerPreset ?? this.equalizerPreset,
       volume: volume ?? this.volume,
+      playSpeed: playSpeed ?? this.playSpeed,
       localeCode: localeCode ?? this.localeCode,
     );
   }
@@ -89,6 +93,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       equalizerEnabled: sp.getBool(StorageKeys.equalizerEnabled) ?? false,
       equalizerPreset: sp.getInt(StorageKeys.equalizerPreset) ?? 0,
       volume: sp.getDouble(StorageKeys.playVolume) ?? 1.0,
+      playSpeed: sp.getDouble(StorageKeys.playSpeed) ?? 1.0,
     );
   }
 
@@ -150,6 +155,11 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   Future<void> setVolume(double v) async {
     state = state.copyWith(volume: v);
     await _sp.setDouble(StorageKeys.playVolume, v);
+  }
+
+  Future<void> setPlaySpeed(double v) async {
+    state = state.copyWith(playSpeed: v);
+    await _sp.setDouble(StorageKeys.playSpeed, v);
   }
 
   Future<void> setLocaleCode(String code) async {

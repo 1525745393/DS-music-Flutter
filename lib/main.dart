@@ -21,6 +21,7 @@ import 'pages/login/login_page.dart';
 import 'pages/main_shell.dart';
 import 'pages/onboarding/onboarding_page.dart';
 import 'theme/app_colors.dart';
+import 'theme/app_scroll_behavior.dart';
 import 'theme/app_theme.dart';
 import 'utils/crash_reporter.dart';
 import 'utils/logger.dart';
@@ -220,6 +221,7 @@ class _DSPlayerAppState extends ConsumerState<DSPlayerApp> {
         title: 'DS Player',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.dark,
+        scrollBehavior: const AppScrollBehavior(),
         home: const ColoredBox(color: AppColors.darkBg),
       );
     }
@@ -227,6 +229,7 @@ class _DSPlayerAppState extends ConsumerState<DSPlayerApp> {
       title: 'DS Player',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark,
+      scrollBehavior: const AppScrollBehavior(),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
